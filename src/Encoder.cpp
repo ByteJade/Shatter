@@ -283,7 +283,7 @@ void Compiler::encode(X86_64& buf) {
         case SAL: emit_math(buf, ORR_R, false); break;
         case SHR: emit_math(buf, LSL_R, false); break;
         case SAR: emit_math(buf, ASR_R, false); break;
-        case EBR: case NOP: case LEAVE: break;
+        case EBR: case NOP: case LEAVE: case HLT: break;
         case JMP: emit_branch(buf, BR); break;
         case CALL: emit_branch(buf, BLR); break;
         case RET: emit_ret(); break;
