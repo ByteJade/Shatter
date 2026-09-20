@@ -1,0 +1,95 @@
+#include  "../include/Compiler.hpp"
+#include  "../include/Logger.hpp"
+#include  "../include/Cache.hpp"
+#include  "../include/Printer_X86_64.hpp"
+#include <cstdint>
+
+void Compiler::jump(uint8_t* dst) {
+    Block& prev = blocks.back();
+    prev.size = buffer.size() - prev.buffer;
+    uint32_t buf = buffer.size();
+    blocks.push_back({dst,buf, 0});
+    decoder.set_guest(dst);
+}
+bool Compiler::has_block(uint8_t* p) {
+    for (Block& b : blocks) {
+        uint8_t* start = b.start;
+        uint8_t* end = start + b.size;
+        if (p >= start && p < end) return true;
+    }
+    return false;
+}
+bool Compiler::forward() {
+    for (; reader < points.size(); reader++) {
+        uint8_t* p = points[reader].point;
+        if (!has_block(p)) {
+            jump(p);
+            return true;
+        }
+    }
+    return false;
+}
+void Compiler::decode(uint8_t* code) {
+    need_entry = false;
+    logger.deb() << "Start compile " << (size_t)code << std::endl;
+    blocks.push_back({code, 0, 0});
+    decoder.set_guest(code);
+    while (1) {
+        X86_64 buf;
+        uint8_t* prev_pos = decoder.get_guest();
+        decoder.decode(buf);
+        uint8_t* cur_pos  = decoder.get_guest();
+        sizes.push_back(cur_pos - prev_pos);
+        buffer.push_back(buf);
+        if (buf.type >= JO && buf.type <= JG) {
+            uint8_t* new_pos = cur_pos + buf.dst.imm;
+            points.push_back({new_pos, 0});
+        } else if (buf.type == JMP || buf.type == RET){
+            if (buf.type == RET) need_entry = true;
+            if (buf.dst.type == IMM) {
+                uint8_t* new_pos = cur_pos + buf.dst.imm;
+                points.push_back({new_pos, 0});
+            }
+            if(!forward()) break;
+        }
+    }
+    Block& prev = blocks.back();
+    prev.size = buffer.size() - prev.buffer;
+    logger.deb() << "End compile, blocks: " << blocks.size() << std::endl;
+}
+void Compiler::iterate(Block& block) {
+    guest = block.start;
+    uint32_t end = block.buffer + block.size;
+    for (reader = block.buffer; reader < end; reader++) {
+        for (Point& p : points) {
+            if (p.point == guest) {
+                p.host = cache.get_host();
+                logger.force() << "found point\n";
+                break;
+            }
+        }
+        guest += sizes[reader];
+        X86_64& buf = buffer[reader];
+        print(logger.log(), buf);
+        encode(buf);
+    }
+}
+
+void Compiler::compile(uint8_t* code) {
+    decode(code);
+    cache.start_block(code);
+    if (need_entry) emit_entry();
+    for (Block& block : blocks) {
+        logger.log() << "start" << std::endl;
+        iterate(block);
+    }
+    patch();
+    cache.end_block();
+}
+
+X86_64& Compiler::next(int i) {
+    return buffer[reader+i];
+}
+void Compiler::skip(int i) {
+    reader += i;
+}
