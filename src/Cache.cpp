@@ -51,7 +51,7 @@ uint8_t* Cache::get_patch(int id) {
 }
 void Cache::print() {
     logger.force() << std::hex;
-    for (uint32_t i = 0; i < host_p; i++) {
+    for (uint32_t i = prev_host_p; i < host_p; i++) {
         logger.force() << host[i] << std::endl;
     }
     logger.force() << std::dec;
