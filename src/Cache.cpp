@@ -1,5 +1,6 @@
 #include "../include/Cache.hpp"
 #include "../include/Logger.hpp"
+#include <bits/floatn.h>
 #include <sys/mman.h>
 #include <cstdint>
 #include <cstdlib>
@@ -22,12 +23,14 @@ void* Cache::mmap_guest(size_t size) {
 
 void Cache::start_block(uint8_t* guest) {
     mtx.lock();
+    prev_host_p = host_p;
     blocks.push_back({guest, host + host_p});
 }
 void Cache::emit(uint32_t data) {
     host[host_p++] = data;
 }
 void Cache::end_block() {
+    __builtin___clear_cache(host+prev_host_p, host+host_p);
     mtx.unlock();
 }
 int Cache::set_patch(uint8_t* guest) {

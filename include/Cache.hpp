@@ -15,6 +15,7 @@ class Cache {
     std::vector<int> reuse;
     std::mutex mtx;
     uint32_t* host;
+    size_t prev_host_p;
     size_t host_p;
 public:
     void* mmap_guest(size_t size);
