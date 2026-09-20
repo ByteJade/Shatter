@@ -1,31 +1,21 @@
 #include "wrapper.hpp"
 #include <unistd.h>
-#include <setjmp.h>
-
 extern "C" {
-    static int ret_code;
-    static jmp_buf g_exit_jmp;
     
-    int my___libc_start_main(
+    void my___libc_start_main(
         int (*main) (int, char**, char**),
         int argc, char** argv,
         void (*init) (void), void (*fini) (void),
         void (*rtld_fini) (void), void* stack_end)
     {
         if (init) init();
-        if (setjmp(g_exit_jmp) == 0) {
-            ret_code = main(argc, argv, environ);
-        }
+        int stat = main(argc, argv, environ);
         if (fini) fini();
         //if (rtld_fini) rtld_fini();
-        #ifdef __x86_64__
-        _exit(0);
-        #endif
-        return ret_code;
+        _exit(stat);
     }
     void my_exit(int stat) {
-        ret_code = stat;
-        longjmp(g_exit_jmp, 1);
+        _exit(stat);
     }
     // IO
     WRAP_FUNC(puts)

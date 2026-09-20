@@ -81,6 +81,7 @@ void Decoder::decode_00(X86_64& buf, uint8_t byte) {
             buf.type = POP;
             decode_rm(buf.dst, fetch8());
             break;
+        case 0xF4:
         case 0x90: 
             buf.type = NOP;
             break;
@@ -117,7 +118,6 @@ void Decoder::decode_00(X86_64& buf, uint8_t byte) {
                 buf.src.reg = RCX;
             }
         } break;
-        case 0xF4:
         case 0xC3:
             buf.type = RET;
             break;
