@@ -42,7 +42,7 @@ class Compiler {
     void emit_address(uint8_t dst, Operand& op, X86_64& buf);
     void emit_load(uint8_t dst, Operand& op, X86_64& buf, bool fast);
     void emit_store(uint8_t src, Operand& op, X86_64& buf, bool fast);
-    void emit_math(X86_64& buf, uint32_t opcode);
+    void emit_math(X86_64& buf, uint32_t opcode, bool unsafe);
     void emit_branch(X86_64& buf, uint32_t opcode);
     void emit_mov(X86_64& buf);
     void emit_push(X86_64& buf);

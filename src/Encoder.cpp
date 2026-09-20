@@ -157,7 +157,7 @@ void Compiler::emit_store(uint8_t src, Operand& op, X86_64& buf, bool fast) {
         cache.emit(sf|STR | (SC1R<<5) | src);
     }
 }
-void Compiler::emit_math(X86_64& buf, uint32_t opcode) {
+void Compiler::emit_math(X86_64& buf, uint32_t opcode, bool unsafe) {
     // ADD, SUB, OR, XOR, AND
     uint8_t src;
     uint8_t dst;
@@ -178,8 +178,12 @@ void Compiler::emit_math(X86_64& buf, uint32_t opcode) {
     } else dst = x86_regs[buf.dst.reg];
     
     uint32_t sf = (buf.size == 64) * ASF;
-    cache.emit(sf | opcode | dst | (dst<<5) | (src<<16));
-    if (buf.dst.type&MEM) emit_store(src, buf.dst, buf, true);
+    if (unsafe) {
+        cache.emit(sf | opcode | XZR | (dst<<5) | (src<<16));
+    } else {
+        cache.emit(sf | opcode | dst | (dst<<5) | (src<<16));
+        if (buf.dst.type&MEM) emit_store(src, buf.dst, buf, true);
+    }
 }
 void Compiler::emit_branch(X86_64& buf, uint32_t opcode) {
     if (buf.dst.type == IMM) {
@@ -267,16 +271,18 @@ void Compiler::encode(X86_64& buf) {
         case PUSH: emit_push(buf); break;
         case POP: emit_pop(buf); break;
         case LEA: emit_address(x86_regs[buf.dst.reg], buf.src, buf); break;
-        case ADD: emit_math(buf, ADDS_R); break;
-        case SUB: emit_math(buf, SUBS_R); break;
-        case OR:  emit_math(buf, ORR_R); break;
-        case XOR: emit_math(buf, EOR_R); break;
-        case AND: emit_math(buf, ANDS_R); break;
-        case ROR: emit_math(buf, ROR_R); break;
+        case ADD: emit_math(buf, ADDS_R, false); break;
+        case SUB: emit_math(buf, SUBS_R, false); break;
+        case CMP: emit_math(buf, SUBS_R, true); break;
+        case TEST: emit_math(buf, ANDS_R, true); break;
+        case OR:  emit_math(buf, ORR_R, false); break;
+        case XOR: emit_math(buf, EOR_R, false); break;
+        case AND: emit_math(buf, ANDS_R, false); break;
+        case ROR: emit_math(buf, ROR_R, false); break;
         case SHL:
-        case SAL: emit_math(buf, ORR_R); break;
-        case SHR: emit_math(buf, LSL_R); break;
-        case SAR: emit_math(buf, ASR_R); break;
+        case SAL: emit_math(buf, ORR_R, false); break;
+        case SHR: emit_math(buf, LSL_R, false); break;
+        case SAR: emit_math(buf, ASR_R, false); break;
         case EBR: case NOP: case LEAVE: break;
         case JMP: emit_branch(buf, BR); break;
         case CALL: emit_branch(buf, BLR); break;
