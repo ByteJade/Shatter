@@ -36,7 +36,7 @@ enum Types {
 
     LEAVE, NOP, CLTQ, CLTD,
 
-    SYSCALL, MOVX, EBR,
+    SYSCALL, MOVX, EBR, HLT,
     MOVAPX, CVTSI2X, CVTX2SI,
     UCOMIX, COMIX,
 

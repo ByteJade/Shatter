@@ -47,7 +47,7 @@ void Compiler::decode(uint8_t* code) {
         buffer.push_back(buf);
         if (buf.type >= JO && buf.type <= JG) {
             set_point(cur_pos + buf.dst.imm);
-        } else if (buf.type == JMP || buf.type == RET){
+        } else if (buf.type == JMP || buf.type == RET || buf.type == HLT){
             Block& prev = blocks.back();
             prev.size = buffer.size() - prev.buffer;
             prev.end = cur_pos;

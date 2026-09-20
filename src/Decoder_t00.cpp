@@ -81,7 +81,6 @@ void Decoder::decode_00(X86_64& buf, uint8_t byte) {
             buf.type = POP;
             decode_rm(buf.dst, fetch8());
             break;
-        case 0xF4:
         case 0x90: 
             buf.type = NOP;
             break;
@@ -152,6 +151,9 @@ void Decoder::decode_00(X86_64& buf, uint8_t byte) {
             buf.type = JMP;
             buf.dst.type = IMM;
             buf.dst.imm = fetch8_imm();
+            break;
+        case 0xF4:
+            buf.type = HLT;
             break;
         case 0xF7: {
             uint8_t modrm = fetch8();
