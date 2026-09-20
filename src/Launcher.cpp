@@ -4,15 +4,9 @@
 void execute_with_save(void* address) {
     #ifdef __aarch64__ 
     asm volatile (
-        "stp x24, x25, [sp, #-16]!\n"
-        "stp x26, x30, [sp, #-16]!\n"
-
         "blr %0\n"
-
-        "ldp x26, x30, [sp], #16\n"
-        "ldp x24, x25, [sp], #16\n"
         : : "r" (address)
-        : "memory"
+        : "memory", "x24", "x25", "x26", "x30"
     );
     #else
     asm volatile (
@@ -25,7 +19,19 @@ void execute_with_save(void* address) {
 void execute_with_stack(void* address, void* stack) {
     logger.deb() << "Entry to _start()" << std::endl;
     logger.force() << std::endl;
-    #ifdef __aarch64__ 
+    #ifdef __aarch64__
+    asm volatile (
+        "mov x27, sp\n"
+
+        "mov sp, %0\n"
+        "blr %1\n"
+        "mov sp, x27\n"
+
+        "ldp x26, x30, [sp], #16\n"
+        "ldp x24, x25, [sp], #16\n"
+        : : "r" (stack), "r" (address)
+        : "memory", "x24", "x25", "x26", "x27", "x30"
+    );
     #else
     asm volatile (
         "mov %%rsp, %%r9\n"
