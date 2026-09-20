@@ -252,7 +252,7 @@ void Compiler::emit_pop(X86_64& buf) {
     // LDR Xt, [SP], #16
 }
 void Compiler::emit_patch(X86_64& buf) {
-    patches.push_back({cache.get_host(), guest});
+    patches.push_back({cache.get_host(), guest + buf.dst.imm});
     cache.emit(buf.type);
 }
 void Compiler::emit_entry() {
