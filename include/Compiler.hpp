@@ -8,6 +8,7 @@ extern const uint8_t x86_regs[];
 
 struct Block {
     uint8_t* start;
+    uint8_t* end;
     uint32_t buffer;
     uint32_t size;
 };
@@ -34,6 +35,7 @@ class Compiler {
     void jump(uint8_t* dst);
     bool has_block(uint8_t* p);
     bool forward();
+    void set_point(uint8_t* guest);
     void decode(uint8_t* code);
     void iterate(Block& block);
     void patch();

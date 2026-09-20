@@ -21,13 +21,13 @@ uint64_t Decoder::fetch64() {
 }
 
 int64_t Decoder::fetch8_imm() {
-    return (int64_t)fetch8();
+    return (int64_t)(int8_t)fetch8();
 }
 int64_t Decoder::fetch16_imm() {
-    return (int64_t)fetch16();
+    return (int64_t)(int16_t)fetch16();
 }
 int64_t Decoder::fetch32_imm() {
-    return (int64_t)fetch32();
+    return (int64_t)(int32_t)fetch32();
 }
 
 void Decoder::fetch_imm(X86_64& buf) {

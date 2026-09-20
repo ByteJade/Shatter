@@ -5,17 +5,15 @@
 #include <cstdint>
 
 void Compiler::jump(uint8_t* dst) {
-    Block& prev = blocks.back();
-    prev.size = buffer.size() - prev.buffer;
     uint32_t buf = buffer.size();
-    blocks.push_back({dst,buf, 0});
+    blocks.push_back({dst, 0,buf, 0});
     decoder.set_guest(dst);
 }
 bool Compiler::has_block(uint8_t* p) {
     for (Block& b : blocks) {
-        uint8_t* start = b.start;
-        uint8_t* end = start + b.size;
-        if (p >= start && p < end) return true;
+        if (p >= b.start && p < b.end) {
+            return true;
+        }
     }
     return false;
 }
@@ -29,10 +27,16 @@ bool Compiler::forward() {
     }
     return false;
 }
+void Compiler::set_point(uint8_t* guest) {
+    for (Point& p : points) {
+        if (p.point == guest) return;
+    }
+    points.push_back({guest, 0});
+}
 void Compiler::decode(uint8_t* code) {
     need_entry = false;
     logger.deb() << "Start compile " << (size_t)code << std::endl;
-    blocks.push_back({code, 0, 0});
+    blocks.push_back({code, 0, 0, 0});
     decoder.set_guest(code);
     while (1) {
         X86_64 buf;
@@ -42,19 +46,18 @@ void Compiler::decode(uint8_t* code) {
         sizes.push_back(cur_pos - prev_pos);
         buffer.push_back(buf);
         if (buf.type >= JO && buf.type <= JG) {
-            uint8_t* new_pos = cur_pos + buf.dst.imm;
-            points.push_back({new_pos, 0});
+            set_point(cur_pos + buf.dst.imm);
         } else if (buf.type == JMP || buf.type == RET){
+            Block& prev = blocks.back();
+            prev.size = buffer.size() - prev.buffer;
+            prev.end = cur_pos;
             if (buf.type == RET) need_entry = true;
             if (buf.dst.type == IMM) {
-                uint8_t* new_pos = cur_pos + buf.dst.imm;
-                points.push_back({new_pos, 0});
+                set_point(cur_pos + buf.dst.imm);
             }
             if(!forward()) break;
         }
     }
-    Block& prev = blocks.back();
-    prev.size = buffer.size() - prev.buffer;
     logger.deb() << "End compile, blocks: " << blocks.size() << std::endl;
 }
 void Compiler::iterate(Block& block) {
@@ -64,7 +67,6 @@ void Compiler::iterate(Block& block) {
         for (Point& p : points) {
             if (p.point == guest) {
                 p.host = cache.get_host();
-                logger.force() << "found point\n";
                 break;
             }
         }
@@ -76,6 +78,7 @@ void Compiler::iterate(Block& block) {
 }
 
 void Compiler::compile(uint8_t* code) {
+    reader = 0;
     decode(code);
     cache.start_block(code);
     if (need_entry) emit_entry();
@@ -85,6 +88,11 @@ void Compiler::compile(uint8_t* code) {
     }
     patch();
     cache.end_block();
+    blocks.clear();
+    sizes.clear();
+    buffer.clear();
+    points.clear();
+    patches.clear();
 }
 
 X86_64& Compiler::next(int i) {

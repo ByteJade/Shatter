@@ -139,8 +139,12 @@ void Decoder::decode_00(X86_64& buf, uint8_t byte) {
             buf.type = LEAVE;
             break;
         case 0xE8:
+            buf.type = CALL;
+            buf.dst.type = IMM;
+            buf.dst.imm = fetch32_imm();
+            break;
         case 0xE9:
-            buf.type = CALL + (byte - 0xE8);
+            buf.type = JMP;
             buf.dst.type = IMM;
             buf.dst.imm = fetch32_imm();
             break;
