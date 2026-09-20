@@ -224,10 +224,10 @@ void Compiler::emit_mov(X86_64& buf) {
 }
 void Compiler::emit_push(X86_64& buf) {
     uint8_t dst;
-    if (buf.type == IMM) {
+    if (buf.dst.type == IMM) {
         emit_imm(buf.dst.imm, SC1R);
         dst = SC1R;
-    } else if (buf.type&MEM) {
+    } else if (buf.dst.type&MEM) {
         emit_load(SC1R, buf.dst, buf, false);
         dst = SC1R;
     } else {
