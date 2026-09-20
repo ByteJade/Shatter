@@ -24,7 +24,7 @@ void execute_with_save(void* address) {
 }
 void execute_with_stack(void* address, void* stack) {
     logger.deb() << "Entry to _start()" << std::endl;
-    logger.force();
+    logger.force() << std::endl;
     #ifdef __aarch64__ 
     #else
     asm volatile (
