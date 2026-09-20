@@ -3,6 +3,7 @@
 #include "../include/Debugger.hpp"
 #include "../include/Cache.hpp"
 #include "../include/Compiler.hpp"
+#include "../include/Printer_X86_64.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
