@@ -46,6 +46,7 @@ int main(int argc, char** argv, char** envp) {
     int user_argc = parse_argv(argc, argv);
     Stack stack;
     stack.setup(argc - user_argc, argv + user_argc, envp);
+    setup_handlers();
     Elf file;
     if (!file.open(argv[user_argc])) {
         logger.err() << "Cannot open file" << std::endl;

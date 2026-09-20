@@ -2,6 +2,7 @@
 #include "../include/Logger.hpp"
 
 void execute_with_save(void* address) {
+    logger.force() << std::endl;
     #ifdef __aarch64__ 
     asm volatile (
         "blr %0\n"
