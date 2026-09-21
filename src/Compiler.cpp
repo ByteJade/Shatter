@@ -32,6 +32,7 @@ bool Compiler::forward() {
     return false;
 }
 Point* Compiler::search_point(uint8_t* guest) {
+    if (points.empty()) return nullptr;
     if (guest > points.back().point) return nullptr;
     size_t left = 0;
     size_t right = points.size();
