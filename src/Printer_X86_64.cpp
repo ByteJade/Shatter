@@ -90,7 +90,7 @@ void print_op(std::ostream& stream, X86_64& buf, Operand& op) {
         }
         if (op.type&IDX) {
             if (buf.prefix == FS) stream << "fs ";
-            else stream << regs64[op.reg] << " ";
+            else stream << regs64[op.idx] << " ";
             stream << scale[op.scale];
         }
         if (op.type&IMM) {
