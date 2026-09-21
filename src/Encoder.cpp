@@ -259,11 +259,11 @@ void Compiler::emit_patch(X86_64& buf) {
     cache.emit(buf.type);
 }
 void Compiler::emit_entry() {
-    if (need_entry) cache.emit(ASF|STP_PRE | ((-16&0x3FF)<<12) | 30 | (31<<5) | (29<<10));
     cache.emit(ASF|ADD_I | 28 | (31<<5));
+    if (need_entry) cache.emit(ASF|STP_PRE | ((-16&0x3FF)<<12) | 30 | (28<<5) | (29<<10));
 }
 void Compiler::emit_ret() {
-    if (need_entry) cache.emit(ASF|LDP_POST | (16<<12) | 30 | (31<<5) | (29<<10));
+    if (need_entry) cache.emit(ASF|LDP_POST | (16<<12) | 30 | (28<<5) | (29<<10));
     cache.emit(ASF|ADD_I | 31 | (29<<5));
     cache.emit(0xD65F03C0);
 }
