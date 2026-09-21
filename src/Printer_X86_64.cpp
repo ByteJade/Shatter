@@ -99,7 +99,7 @@ void print_op(std::ostream& stream, X86_64& buf, Operand& op) {
                     stream << "fs ";
                 else stream << "rip ";
             }
-            stream << op.imm << " ";
+            if (op.imm) stream << "+ " << op.imm << " ";
         }
         stream << "] ";
     }
