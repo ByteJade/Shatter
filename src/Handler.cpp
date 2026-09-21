@@ -32,9 +32,11 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
         return;
     }
     if (info->si_code == SEGV_ACCERR || pc%4 != 0) {
-        logger.deb() << "found unhandled jump" << std::endl;
+        if (logger.get_level() <= DEBUG) {
+            logger.deb() << "found unhandled jump" << std::endl;
+            logger.force() << std::endl;
+        }
         handler.set_pc((size_t)check_code(pc));
-        logger.force();
         return;
     }
     const char* name;
@@ -55,12 +57,14 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     
     uint32_t* pc = (uint32_t*)handler.get_pc();
     uint16_t id = (*pc >> 5) & 0xFFFF;
-    logger.deb() << "found patch: " << id << std::endl;
+    if (logger.get_level() <= DEBUG) {
+        logger.deb() << "found patch: " << id << std::endl;
+        logger.force() << std::endl;
+    }
     uint32_t* target = check_code((size_t)cache.get_patch(id));
     int32_t offset = target - pc;
     *pc = 0x94000000 | (offset & 0x3FFFFFF);
     __builtin___clear_cache(pc, pc+1);
-    logger.force();
 }
 void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     (void)sig;
