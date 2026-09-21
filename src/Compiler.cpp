@@ -32,6 +32,7 @@ bool Compiler::forward() {
     return false;
 }
 Point* Compiler::search_point(uint8_t* guest) {
+    if (guest > points.back().point) return nullptr;
     size_t left = 0;
     size_t right = points.size();
     while (left < right) {
@@ -79,7 +80,7 @@ void Compiler::decode(uint8_t* code) {
             if(!forward()) break;
             continue;
         }
-        if (search_point(decoder.get_guest()) && !forward()) break;
+        if (search_point(cur_pos) && !forward()) break;
     }
     std::sort(blocks.begin(), blocks.end(),
     [](const auto& a, const auto& b) { return a.start < b.start; });
