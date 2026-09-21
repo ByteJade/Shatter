@@ -61,6 +61,7 @@ void Compiler::set_point(uint8_t* guest) {
 }
 void Compiler::decode(uint8_t* code) {
     need_entry = false;
+    has_jmp = false;
     logger.deb() << "Start compile " << (size_t)code << std::endl;
     blocks.push_back({code, 0, 0, 0});
     decoder.set_guest(code);
@@ -77,7 +78,7 @@ void Compiler::decode(uint8_t* code) {
             if (buf.type == RET) need_entry = true;
             if (buf.dst.type == IMM) {
                 set_point(cur_pos + buf.dst.imm);
-            }
+            } else if (buf.type == JMP) has_jmp = true;
             if(!forward()) break;
             continue;
         }
@@ -113,7 +114,7 @@ void Compiler::compile(uint8_t* code) {
     reader = 0;
     decode(code);
     cache.start_block(code);
-    emit_entry();
+    if (!has_jmp) emit_entry();
     for (Block& block : blocks) {
         logger.log() << "start" << std::endl;
         iterate(block);

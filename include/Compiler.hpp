@@ -31,6 +31,7 @@ class Compiler {
     uint32_t reader;
     uint8_t* guest;
     bool need_entry;
+    bool has_jmp;
 
     void jump(uint8_t* dst);
     bool has_block(uint8_t* p);
