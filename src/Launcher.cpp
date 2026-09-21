@@ -39,12 +39,10 @@ void execute_with_stack(void* address, void* stack) {
     );
     #else
     asm volatile (
-        "mov %%rsp, %%r9\n"
         "mov %0, %%rsp\n"
-        "call *%1\n"
-        "mov %%r9, %%rsp\n"
+        "jmp *%1\n"
         : : "r" (stack), "r" (address)
-        : "memory", "r9"
+        : "memory"
     );
     #endif
 }

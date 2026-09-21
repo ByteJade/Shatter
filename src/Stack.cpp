@@ -32,7 +32,7 @@ void Stack::setup(int argc, char** argv, char** envp) {
     push_arg(0);
     while (*envp) push_str(*envp++);
     push_arg(0);
-    for (int i = 0; i < argc; i++) push_str(argv[i]);
+    for (int i = argc-1; i >= 0; i--) push_str(argv[i]);
     push_arg(argc);
     logger.deb() << "Stack setup finish" << std::endl;
 }
