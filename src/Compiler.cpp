@@ -113,7 +113,7 @@ void Compiler::compile(uint8_t* code) {
     reader = 0;
     decode(code);
     cache.start_block(code);
-    if (need_entry) emit_entry();
+    emit_entry();
     for (Block& block : blocks) {
         logger.log() << "start" << std::endl;
         iterate(block);
