@@ -75,10 +75,10 @@ void Compiler::decode(uint8_t* code) {
         if (buf.type >= JO && buf.type <= JG) {
             set_point(cur_pos + buf.dst.imm);
         } else if (buf.type == JMP || buf.type == RET || buf.type == HLT){
-            if (buf.type == RET) need_entry = true;
-            if (buf.dst.type == IMM) {
+            if (buf.dst.type == IMM)
                 set_point(cur_pos + buf.dst.imm);
-            } else if (buf.type == JMP) has_jmp = true;
+            else if (buf.type == JMP) has_jmp = true;
+            else need_entry = true;
             if(!forward()) break;
             continue;
         }
