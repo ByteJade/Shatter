@@ -38,7 +38,7 @@ Point* Compiler::search_point(uint8_t* guest) {
         size_t mid = left + (right - left) / 2;
         Point* p = &points[mid];
         if (p->point == guest) return p;
-        if (p->point <= guest) left = mid + 1;
+        if (p->point < guest) left = mid + 1;
         else right = mid;
     }
     return nullptr;
@@ -99,7 +99,7 @@ void Compiler::iterate(Block& block) {
 }
 void Compiler::patch() {
     for (Patch& p : patches) {
-        Point* n = search_point(guest);
+        Point* n = search_point(p.guest);
         if (n) {
             emit_jump(*p.host, p.host, n->host);
             break;
