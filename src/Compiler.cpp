@@ -33,13 +33,13 @@ bool Compiler::forward() {
 }
 Point* Compiler::search_point(uint8_t* guest) {
     size_t left = 0;
-    size_t right = points.size() - 1;
-    while (left <= right) {
-        size_t mid = (left + right) / 2;
+    size_t right = points.size();
+    while (left < right) {
+        size_t mid = left + (left + right) / 2;
         Point* p = &points[mid];
         if (p->point == guest) return p;
         if (p->point <= guest) left = mid + 1;
-        else right = mid - 1;
+        else right = mid;
     }
     return nullptr;
 }
