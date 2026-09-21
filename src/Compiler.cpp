@@ -79,7 +79,7 @@ void Compiler::decode(uint8_t* code) {
             if(!forward()) break;
             continue;
         }
-        if (search_point(guest) && !forward()) break;
+        if (search_point(decoder.get_guest()) && !forward()) break;
     }
     std::sort(blocks.begin(), blocks.end(),
     [](const auto& a, const auto& b) { return a.start < b.start; });
