@@ -78,7 +78,7 @@ void Compiler::decode(uint8_t* code) {
             if (buf.dst.type == IMM)
                 set_point(cur_pos + buf.dst.imm);
             else if (buf.type == JMP) has_jmp = true;
-            else need_entry = true;
+            else if (buf.type == RET) need_entry = true;
             if(!forward()) break;
             continue;
         }
