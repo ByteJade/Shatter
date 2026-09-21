@@ -14,7 +14,7 @@ bool memory_check;
 uint32_t* check_code(size_t pc) {
     uint32_t* target = cache.search((uint8_t*)pc);
     if (target == nullptr) {
-        logger.warn() << "Not found " << pc << std::endl;
+        logger.warn() << "Not found " << pc << std::endl << RESET_COLOR;
         Compiler compiler;
         compiler.compile((uint8_t*)pc);
         target = cache.search((uint8_t*)pc);
