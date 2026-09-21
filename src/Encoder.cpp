@@ -147,7 +147,7 @@ void Compiler::emit_load(uint8_t dst, Operand& op, X86_64& buf, bool fast) {
     }
 }
 void Compiler::emit_store(uint8_t src, Operand& op, X86_64& buf, bool fast) {
-    uint32_t sf = ASF*(buf.size==64);
+    uint32_t sf = MSF*(buf.size==64);
     if (op.type == (MEM|REG|IMM) &&
         op.imm > -256 &&
         op.imm < 255) {
