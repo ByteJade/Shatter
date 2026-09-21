@@ -2,6 +2,7 @@
 #include  "../include/Logger.hpp"
 #include  "../include/Cache.hpp"
 #include  "../include/Printer_X86_64.hpp"
+#include <algorithm>
 #include <cstdint>
 
 void Compiler::jump(uint8_t* dst) {
@@ -57,7 +58,14 @@ void Compiler::decode(uint8_t* code) {
             }
             if(!forward()) break;
         }
+        for (Point& p : points) {
+            if (p.point == cur_pos) {
+                if(!forward()) break;
+            }
+        }
     }
+    std::sort(blocks.begin(), blocks.end(),
+    [](const auto& a, const auto& b) { return a.start < b.start; });
     logger.deb() << "End compile, blocks: " << blocks.size() << std::endl;
 }
 void Compiler::iterate(Block& block) {
