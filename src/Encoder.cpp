@@ -42,6 +42,8 @@
 #define ASR_R 0x1AC02800
 #define ROR_R 0x1AC02C00
 
+#define SXTW_R 0x93407C00
+
 #define MSF 0x40000000
 
 #define STR 0xB9000000
@@ -288,6 +290,11 @@ void Compiler::encode(X86_64& buf) {
         case CALL: emit_branch(buf, BLR); break;
         case RET: emit_ret(); break;
         case JO ... JG: emit_patch(buf); break;
+        case CLTQ: cache.emit(SXTW_R | (x86_regs[RAX] << 5) | x86_regs[RAX]); break;
+        case CLTD:
+            cache.emit(SXTW_R | (x86_regs[RAX] << 5) | x86_regs[RAX]);
+            cache.emit(0x937ffc00 | (x86_regs[RAX] << 5) | x86_regs[RDX]); // asr x2, x8, #63
+            break;
         default:
             logger.err() << "Unknown encode: " << (int)buf.type << std::endl;
             exit(0);
