@@ -35,6 +35,7 @@ class Compiler {
     void jump(uint8_t* dst);
     bool has_block(uint8_t* p);
     bool forward();
+    Point* search_point(uint8_t* guest);
     void set_point(uint8_t* guest);
     void decode(uint8_t* code);
     void iterate(Block& block);
