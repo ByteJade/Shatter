@@ -35,7 +35,7 @@ Point* Compiler::search_point(uint8_t* guest) {
     size_t left = 0;
     size_t right = points.size();
     while (left < right) {
-        size_t mid = left + (left + right) / 2;
+        size_t mid = left + (right - left) / 2;
         Point* p = &points[mid];
         if (p->point == guest) return p;
         if (p->point <= guest) left = mid + 1;
@@ -52,8 +52,8 @@ void Compiler::set_point(uint8_t* guest) {
     }
     size_t end = points.size();
     points.push_back({});
-    for (size_t y = i; y < end; y++) {
-        points[y+1].point = points[y].point;
+    for (size_t y = end; y > i; y--) {
+        points[y].point = points[y-1].point;
     }
     points[i].point = guest;
 }
