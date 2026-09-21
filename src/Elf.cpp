@@ -98,17 +98,18 @@ Elf::~Elf() {
 bool Elf::open(const char* filename) {
     FILE* fp = fopen(filename, "rb");
     if (fp == nullptr) return false;
-    fread(&head, sizeof(Elf64_Ehdr), 1, fp);
+    bool allright = true;
+    allright *= fread(&head, sizeof(Elf64_Ehdr), 1, fp) != 0;
     pheads = new Elf64_Phdr[head.e_phnum];
     fseek(fp, head.e_phoff, SEEK_SET);
-    fread(pheads, sizeof(Elf64_Phdr), head.e_phnum, fp);
+    allright *= fread(pheads, sizeof(Elf64_Phdr), head.e_phnum, fp) != 0;
     mmap_base();
     for (int i = 0; i < head.e_phnum; i++) {
         Elf64_Phdr* phdr = pheads + i;
         if (phdr->p_type == PT_LOAD) {
             char* dst = (char*)base + phdr->p_vaddr;
             fseek(fp, phdr->p_offset, SEEK_SET);
-            fread(dst, 1, phdr->p_filesz, fp);
+            allright *= fread(dst, 1, phdr->p_filesz, fp) != 0;
             if (phdr->p_filesz != phdr->p_memsz) {
                 memset(dst + phdr->p_filesz, 0,
                     phdr->p_memsz - phdr->p_filesz
@@ -117,7 +118,7 @@ bool Elf::open(const char* filename) {
         }
     }
     fclose(fp);
-    return true;
+    return allright;
 }
 void Elf::read_dynamic() {
     Elf64_Phdr* dyn_phdr = nullptr;
