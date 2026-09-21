@@ -60,10 +60,11 @@ void Compiler::decode(uint8_t* code) {
         }
         for (Point& p : points) {
             if (p.point == cur_pos) {
-                if(!forward()) break;
+                if(!forward()) goto exit;
             }
         }
     }
+    exit:
     std::sort(blocks.begin(), blocks.end(),
     [](const auto& a, const auto& b) { return a.start < b.start; });
     logger.deb() << "End compile, blocks: " << blocks.size() << std::endl;
