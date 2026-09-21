@@ -105,7 +105,6 @@ void Compiler::patch() {
         Point* n = search_point(p.guest);
         if (n) {
             emit_jump(*p.host, p.host, n->host);
-            break;
         } else logger.err() << "Compiler: Cannot patch jump" << std::endl;
     }
 }
