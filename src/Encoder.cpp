@@ -66,6 +66,7 @@
 
 #define SC1R 9
 #define SC2R 10
+#define SC3R 11
 #define XZR 31
 
 const uint8_t x86_regs[] = {
@@ -165,8 +166,8 @@ void Compiler::emit_math(X86_64& buf, uint32_t opcode, bool unsafe) {
     uint8_t dst;
     if (buf.src.type == IMM) {
         if (buf.src.imm) {
-            emit_imm(buf.src.imm, SC2R);
-            src = SC2R;
+            emit_imm(buf.src.imm, SC3R);
+            src = SC3R;
         } else src = XZR;
     } else if (buf.src.type == REG) {
         src = x86_regs[buf.src.reg];
@@ -217,8 +218,8 @@ void Compiler::emit_mov(X86_64& buf) {
         uint8_t src;
         if (buf.src.type == IMM) {
             if (buf.src.imm) {
-                emit_imm(buf.src.imm, SC2R);
-                src = SC2R;
+                emit_imm(buf.src.imm, SC3R);
+                src = SC3R;
             } else src = XZR;
         } else src = x86_regs[buf.src.reg];
         emit_store(src, buf.dst, buf, false);
@@ -227,8 +228,8 @@ void Compiler::emit_mov(X86_64& buf) {
 void Compiler::emit_push(X86_64& buf) {
     uint8_t dst;
     if (buf.dst.type == IMM) {
-        emit_imm(buf.dst.imm, SC1R);
-        dst = SC1R;
+        emit_imm(buf.dst.imm, SC3R);
+        dst = SC3R;
     } else if (buf.dst.type&MEM) {
         emit_load(SC1R, buf.dst, buf, false);
         dst = SC1R;
