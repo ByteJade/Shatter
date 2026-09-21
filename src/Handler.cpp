@@ -34,6 +34,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     if (info->si_code == SEGV_ACCERR || pc%4 != 0) {
         logger.deb() << "found unhandled jump" << std::endl;
         handler.set_pc((size_t)check_code(pc));
+        logger.force();
         return;
     }
     const char* name;
@@ -59,6 +60,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     int32_t offset = target - pc;
     *pc = 0x94000000 | (offset & 0x3FFFFFF);
     __builtin___clear_cache(pc, pc+1);
+    logger.force();
 }
 void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     (void)sig;
