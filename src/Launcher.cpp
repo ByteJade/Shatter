@@ -2,7 +2,9 @@
 #include "../include/Logger.hpp"
 
 void execute_with_save(void* address) {
-    logger.force() << std::endl;
+    if (logger.get_level() <= DEBUG) {
+        logger.force() << std::endl;
+    }
     #ifdef __aarch64__ 
     asm volatile (
         "blr %0\n"
@@ -18,8 +20,10 @@ void execute_with_save(void* address) {
     #endif
 }
 void execute_with_stack(void* address, void* stack) {
-    logger.deb() << "Entry to _start()" << std::endl;
-    logger.force() << std::endl;
+    if (logger.get_level() <= DEBUG) {
+        logger.deb() << "Entry to _start()" << std::endl;
+        logger.force() << std::endl;
+    }
     #ifdef __aarch64__
     asm volatile (
         "mov x27, sp\n"

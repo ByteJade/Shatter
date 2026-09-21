@@ -302,7 +302,7 @@ void Compiler::encode(X86_64& buf) {
 }
 void Compiler::emit_jump(uint8_t type, uint32_t* dst, uint32_t* target) {
     int64_t delta = target - dst;
-    logger.force() << "patch " << instr_types[type] << std::endl;
+    logger.log() << "patch " << instr_types[type] << std::endl;
     switch (type) {
     case JE:
         *dst = 0x54000000 | ((delta & 0x7FFFF) << 5);
