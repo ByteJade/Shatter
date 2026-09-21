@@ -99,6 +99,7 @@ void Compiler::iterate(Block& block) {
     }
 }
 void Compiler::patch() {
+    logger.deb() << "Patch " << patches.size() << " jumps" << std::endl;
     for (Patch& p : patches) {
         Point* n = search_point(p.guest);
         if (n) {
