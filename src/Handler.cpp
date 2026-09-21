@@ -14,10 +14,11 @@ bool memory_check;
 uint32_t* check_code(size_t pc) {
     uint32_t* target = cache.search((uint8_t*)pc);
     if (target == nullptr) {
-        logger.warn() << "Not found " << pc << std::endl << RESET_COLOR;
+        logger.warn() << "Not found " << pc << std::endl;
         Compiler compiler;
         compiler.compile((uint8_t*)pc);
         target = cache.search((uint8_t*)pc);
+        logger.deb() << "Set block at " << (size_t)target << std::endl << RESET_COLOR;
     }
     return target;
 }
@@ -118,8 +119,8 @@ void Handler::print_native_cpu() {
     print_flags();
 }
 void Handler::print_guest_cpu() {
+    logger.force() << "PC: " << get_pc() << std::endl;
     #ifdef __aarch64__
-    printf("PC:  %lX\n", get_pc());
     for (int i = 0; i < 16; i++) {
         printf("%s: %llX\n", regs64[i], sc->regs[x86_regs[i]]);
     }
