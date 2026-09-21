@@ -185,7 +185,7 @@ void Compiler::emit_math(X86_64& buf, uint32_t opcode, bool unsafe) {
         cache.emit(sf | opcode | XZR | (dst<<5) | (src<<16));
     } else {
         cache.emit(sf | opcode | dst | (dst<<5) | (src<<16));
-        if (buf.dst.type&MEM) emit_store(src, buf.dst, buf, true);
+        if (buf.dst.type&MEM) emit_store(dst, buf.dst, buf, true);
     }
 }
 void Compiler::emit_branch(X86_64& buf, uint32_t opcode) {
