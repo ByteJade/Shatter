@@ -53,6 +53,7 @@ class Compiler {
     void emit_patch(X86_64& buf);
     void emit_entry();
     void emit_ret();
+    void emit_jump(uint8_t type, uint32_t* dst, uint32_t* target);
     void encode(X86_64& buf);
     X86_64& next(int i);
     void skip(int i);

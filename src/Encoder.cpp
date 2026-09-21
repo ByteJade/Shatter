@@ -300,7 +300,7 @@ void Compiler::encode(X86_64& buf) {
             exit(0);
     }
 }
-void emit_jump(uint8_t type, uint32_t* dst, uint32_t* target) {
+void Compiler::emit_jump(uint8_t type, uint32_t* dst, uint32_t* target) {
     int64_t delta = target - dst;
     logger.force() << "patch " << instr_types[type] << std::endl;
     switch (type) {
@@ -331,15 +331,5 @@ void emit_jump(uint8_t type, uint32_t* dst, uint32_t* target) {
     case JMP:
         *dst = 0x14000000 | (delta & 0x3FFFFFF);
         break;
-    }
-}
-void Compiler::patch() {
-    for (Patch& p : patches) {
-        for (Point& n : points) {
-            if (p.guest == n.point) {
-                emit_jump(*p.host, p.host, n.host);
-                break;
-            }
-        }
     }
 }

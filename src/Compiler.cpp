@@ -32,15 +32,30 @@ bool Compiler::forward() {
     return false;
 }
 Point* Compiler::search_point(uint8_t* guest) {
-    for (size_t i = 0; i < points.size(); i++) {
-        if (points[i].point == guest)
-            return &points[i];
+    size_t left = 0;
+    size_t right = points.size() - 1;
+    while (left <= right) {
+        size_t mid = (left + right) / 2;
+        Point* p = &points[mid];
+        if (p->point == guest) return p;
+        if (p->point <= guest) left = mid + 1;
+        else right = mid - 1;
     }
     return nullptr;
 }
 void Compiler::set_point(uint8_t* guest) {
-    if (search_point(guest)) return;
-    points.push_back({guest, 0});
+    size_t i = 0;
+    for (; i < points.size(); i++) {
+        uint8_t* p = points[i].point;
+        if (p == guest) return;
+        if (p > guest) break;
+    }
+    size_t end = points.size();
+    points.push_back({});
+    for (size_t y = i; y < end; y++) {
+        points[y+1].point = points[y].point;
+    }
+    points[i].point = guest;
 }
 void Compiler::decode(uint8_t* code) {
     need_entry = false;
@@ -80,6 +95,15 @@ void Compiler::iterate(Block& block) {
         X86_64& buf = buffer[reader];
         print(logger.log(), buf);
         encode(buf);
+    }
+}
+void Compiler::patch() {
+    for (Patch& p : patches) {
+        Point* n = search_point(guest);
+        if (n) {
+            emit_jump(*p.host, p.host, n->host);
+            break;
+        } else logger.err() << "Compiler: Cannot patch jump" << std::endl;
     }
 }
 
