@@ -58,6 +58,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     uint32_t* target = check_code((size_t)cache.get_patch(id));
     int32_t offset = target - pc;
     *pc = 0x94000000 | (offset & 0x3FFFFFF);
+    __builtin___clear_cache(pc, pc+1);
 }
 void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     (void)sig;
