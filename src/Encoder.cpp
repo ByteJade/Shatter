@@ -331,5 +331,7 @@ void Compiler::emit_jump(uint8_t type, uint32_t* dst, uint32_t* target) {
     case JMP:
         *dst = 0x14000000 | (delta & 0x3FFFFFF);
         break;
+    default:
+        logger.err() << "Unknown jump type " << type << std::endl;
     }
 }
