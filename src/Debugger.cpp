@@ -26,47 +26,45 @@ void emulate(Handler& handler) {
     uint32_t instr = *(uint32_t*)pc;
     logger.log() << "Emulate: ";
     print(logger.log(), instr);
+    int imm = 1;
     switch (instr&BCC_M) {
     case BEQ:
         if (handler.get_flag('Z'))
-            pc += get_imm19(instr);
+            imm = get_imm19(instr);
         break;
     case BNE:
         if (!handler.get_flag('Z'))
-            pc += get_imm19(instr);
+            imm = get_imm19(instr);
         break;
     case BCS:
         if (handler.get_flag('C'))
-            pc += get_imm19(instr);
+            imm = get_imm19(instr);
         break;
     case BLS:
         if (!handler.get_flag('C') || handler.get_flag('Z'))
-            pc += get_imm19(instr);
+            imm = get_imm19(instr);
         break;
     case BGE:
         if (handler.get_flag('N') == handler.get_flag('V'))
-            pc += get_imm19(instr);
+            imm = get_imm19(instr);
         break;
     case BLT:
         if (handler.get_flag('N') != handler.get_flag('V'))
-            pc += get_imm19(instr);
+            imm = get_imm19(instr);
         break;
     case BGT:
         if (!handler.get_flag('Z') && handler.get_flag('N') == handler.get_flag('V'))
-            pc += get_imm19(instr);
+            imm = get_imm19(instr);
         break;
     case BLE:
         if (handler.get_flag('Z') || handler.get_flag('N') != handler.get_flag('V'))
-            pc += get_imm19(instr);
+            imm = get_imm19(instr);
         break;
     case B:
-        pc += get_imm26(instr);
-        break;
-    default:
-        pc += 1;
+        imm = get_imm26(instr);
         break;
     }
-    debugger.set_brk(pc);
+    debugger.set_brk(pc + imm);
 }
 
 void Debugger::set_brk(uint32_t* pc) {
