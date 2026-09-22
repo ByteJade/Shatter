@@ -80,8 +80,8 @@ void Debugger::set_brk(uint32_t* pc) {
 void Debugger::ret() {
     if (last_pc) {
         *last_pc = last_instr;
-        last_pc = nullptr;
         __builtin___clear_cache(last_pc, last_pc+1);
+        last_pc = nullptr;
     }
 }
 
