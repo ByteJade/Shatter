@@ -11,3 +11,9 @@ cd ByteShatter && make
 
 cd build
 ./shatter ../tests/glxgears
+
+## Dependencies
+
+Arch linux for example:
+
+sudo pacman -S readline sdl2 sdl2_image libx11 mesa

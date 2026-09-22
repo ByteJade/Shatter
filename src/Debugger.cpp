@@ -89,8 +89,9 @@ void Debugger::usage() {
     logger.force() << "Commands:" << std::endl
         << "exit - return to execution" << std::endl
         << "si - skip instruction" << std::endl
+        << "print - print current instruction" << std::endl
         << "brk <imm> - set break at pc+imm" << std::endl
-        << "print - print current instruction" << std::endl;
+        << "level \"level\" - set logger level" << std::endl;
 }
 void Debugger::enable() {
     enabled = true;
@@ -102,29 +103,35 @@ void Debugger::step(Handler& handler) {
     if (!enabled) return;
     mut.lock();
     ret();
-    while (true) {
-        char* line = readline("> ");
+    bool run = true;
+    char* line = nullptr;
+    while (run) {
+        line = readline("> ");
         if (!line) break;
         if (*line) add_history(line);
         switch (*line) {
         case 'e':
-            free(line);
-            return;
+            run = false;
+            break;
         case 's':
+            run = false;
             emulate(handler);
-            free(line);
-            return;
+            break;
+        case 'p': {
+            uint32_t instr = *(uint32_t*)handler.get_pc();
+            logger.force() << std::hex << instr << std::dec << ": ";
+            print(logger.force(), instr);
+        } break;
         case 'b': {
             char* arg = skip(line);
             int imm;
             sscanf(arg, "%i", &imm);
             brk((uint32_t*)(handler.get_pc()+imm));  
         } break;
-        case 'p':
-            uint32_t instr = *(uint32_t*)handler.get_pc();
-            logger.force() << std::hex << instr << std::dec << ": ";
-            print(logger.force(), instr);
+        case 'l':
+            logger.set_level(skip(line));  
             break;
+        default: usage();
         }
         free(line);
     }
