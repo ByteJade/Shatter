@@ -123,6 +123,7 @@ void Debugger::step(Handler& handler) {
         } break;
         case 'b': {
             char* arg = skip(line);
+            if (!*arg) break;
             int imm;
             sscanf(arg, "%i", &imm);
             set_brk((uint32_t*)(handler.get_pc()+imm));  
