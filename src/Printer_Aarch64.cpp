@@ -38,13 +38,17 @@ int get_reg(uint32_t buf, int reg) {
     return ret&0x1F;
 }
 void print_r_r_r(std::ostream& stream, uint32_t buf) {
-    stream << " X"<<get_reg(buf,0);
-    stream << " X"<<get_reg(buf,1);
-    stream << " X"<<get_reg(buf,2);
+    const char* reg = " W";
+    if (buf&ASF) reg = " X";
+    stream << reg << get_reg(buf,0);
+    stream << reg << get_reg(buf,1);
+    stream << reg << get_reg(buf,2);
 }
 void print_r_r_i(std::ostream& stream, uint32_t buf) {
-    stream << " X"<<get_reg(buf,0);
-    stream << " X"<<get_reg(buf,1);
+    const char* reg = " W";
+    if (buf&ASF) reg = " X";
+    stream << reg << get_reg(buf,0);
+    stream << reg << get_reg(buf,1);
     stream << get_imm12(buf);
 }
 
