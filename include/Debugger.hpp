@@ -8,7 +8,7 @@ class Debugger {
     uint32_t* last_pc = nullptr;
     uint32_t last_instr = 0;
 public:
-    void brk(uint32_t* pc);
+    void set_brk(uint32_t* pc);
     void ret();
     void usage();
     void enable();

@@ -63,14 +63,14 @@ void emulate(Handler& handler) {
         pc += get_imm26(instr);
         break;
     default:
-        brk((uint32_t*)(pc+4));
+        debugger.set_brk((uint32_t*)(pc+4));
         return;
     }
-    brk((uint32_t*)(pc));
+    debugger.set_brk((uint32_t*)(pc));
     handler.set_pc(pc);
 }
 
-void Debugger::brk(uint32_t* pc) {
+void Debugger::set_brk(uint32_t* pc) {
     logger.force() << "Set break at " << (size_t)pc << std::endl;
     last_pc = pc;
     last_instr = *pc;
@@ -126,7 +126,7 @@ void Debugger::step(Handler& handler) {
             char* arg = skip(line);
             int imm;
             sscanf(arg, "%i", &imm);
-            brk((uint32_t*)(handler.get_pc()+imm));  
+            set_brk((uint32_t*)(handler.get_pc()+imm));  
         } break;
         case 'l':
             logger.set_level(skip(line));  

@@ -126,7 +126,7 @@ uint32_t* Compiler::compile(uint8_t* code) {
     }
     patch();
     if (debugger.is_enabled())
-        debugger.brk(ret);
+        debugger.set_brk(ret);
     cache.end_block();
     blocks.clear();
     sizes.clear();
