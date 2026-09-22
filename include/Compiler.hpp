@@ -59,5 +59,5 @@ class Compiler {
     X86_64& next(int i);
     void skip(int i);
 public:
-    void compile(uint8_t* code);
+    uint32_t* compile(uint8_t* code);
 };

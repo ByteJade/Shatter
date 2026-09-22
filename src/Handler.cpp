@@ -16,8 +16,7 @@ uint32_t* check_code(size_t pc) {
     if (target == nullptr) {
         logger.warn() << "Not found " << pc << std::endl;
         Compiler compiler;
-        compiler.compile((uint8_t*)pc);
-        target = cache.search((uint8_t*)pc);
+        target = compiler.compile((uint8_t*)pc);
         logger.deb() << "Set block at " << (size_t)target << std::endl << RESET_COLOR;
     }
     return target;

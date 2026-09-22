@@ -69,17 +69,15 @@ void emulate(Handler& handler) {
     brk((uint32_t*)(pc));
     handler.set_pc(pc);
 }
-uint32_t* last_pc = nullptr;
-uint32_t last_instr = 0;
 
-void brk(uint32_t* pc) {
+void Debugger::brk(uint32_t* pc) {
     logger.force() << "Set break at " << (size_t)pc << std::endl;
     last_pc = pc;
     last_instr = *pc;
     *pc = BRK;
     __builtin___clear_cache(pc, pc+1);
 }
-void ret() {
+void Debugger::ret() {
     if (last_pc) {
         *last_pc = last_instr;
         __builtin___clear_cache(last_pc, last_pc+1);

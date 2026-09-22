@@ -2,6 +2,7 @@
 #include  "../include/Logger.hpp"
 #include  "../include/Cache.hpp"
 #include  "../include/Printer_X86_64.hpp"
+#include  "../include/Debugger.hpp"
 #include <algorithm>
 #include <cstdint>
 
@@ -113,22 +114,26 @@ void Compiler::patch() {
     }
 }
 
-void Compiler::compile(uint8_t* code) {
+uint32_t* Compiler::compile(uint8_t* code) {
     reader = 0;
     decode(code);
     cache.start_block(code);
+    uint32_t* ret = cache.get_host();
     if (!has_jmp) emit_entry();
     for (Block& block : blocks) {
         logger.log() << "start" << std::endl;
         iterate(block);
     }
     patch();
+    if (debugger.is_enabled())
+        debugger.brk(ret);
     cache.end_block();
     blocks.clear();
     sizes.clear();
     buffer.clear();
     points.clear();
     patches.clear();
+    return ret;
 }
 
 X86_64& Compiler::next(int i) {
