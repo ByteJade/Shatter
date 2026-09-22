@@ -10,6 +10,7 @@ class Handler {
     struct sigcontext* sc;
 public:
     Handler(struct sigcontext* n_sc);
+    bool memory_check = false;
     void start_memory_chech();
     bool end_memory_check();
 

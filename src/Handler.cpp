@@ -9,8 +9,6 @@
 #include <cstring>
 #include <stdint.h>
 
-bool memory_check;
-
 uint32_t* check_code(size_t pc) {
     uint32_t* target = cache.search((uint8_t*)pc);
     if (target == nullptr) {
@@ -26,9 +24,9 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     Handler handler((struct sigcontext*)&ctx->uc_mcontext);
     size_t pc = (size_t)info->si_addr;
-    if (memory_check) {
+    if (handler.memory_check) {
         handler.set_pc(pc + 4);
-        memory_check = 0;
+        handler.memory_check = 0;
         return;
     }
     if (info->si_code == SEGV_ACCERR || pc%4 != 0) {
