@@ -73,12 +73,12 @@ void Debugger::set_brk(uint32_t* pc) {
     last_pc = pc;
     last_instr = *pc;
     *pc = BRK;
-    __builtin___clear_cache(pc, pc+1);
+    __builtin___clear_cache(pc, pc+4);
 }
 void Debugger::ret() {
     if (last_pc) {
         *last_pc = last_instr;
-        __builtin___clear_cache(last_pc, last_pc+1);
+        __builtin___clear_cache(last_pc, last_pc+4);
         last_pc = nullptr;
     }
 }
