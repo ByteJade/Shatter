@@ -22,7 +22,7 @@ char* skip(char* src) {
 #define BCC_M 0xFF00001F
 
 void emulate(Handler& handler) {
-    size_t pc = handler.get_pc();
+    uint32_t* pc = (uint32_t*)handler.get_pc();
     uint32_t instr = *(uint32_t*)pc;
     logger.log() << "Emulate: ";
     print(logger.log(), instr);
@@ -63,10 +63,10 @@ void emulate(Handler& handler) {
         pc += get_imm26(instr);
         break;
     default:
-        pc += 4;
+        pc += 1;
         break;
     }
-    debugger.set_brk((uint32_t*)(pc));
+    debugger.set_brk(pc);
 }
 
 void Debugger::set_brk(uint32_t* pc) {
