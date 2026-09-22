@@ -179,7 +179,7 @@ void my_dlclose(void* handler) {
         if (lib != handler) continue;
         if (--lib->refs > 0) break;
         dlclose(lib->data);
-        free(lib);
+        delete lib;
         if (libraries.size() != 0) {
             libraries[i] = libraries.back();
             libraries.pop_back();

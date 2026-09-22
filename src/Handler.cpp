@@ -44,9 +44,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     if (sig == SIGBUS) name = "SIGBUS";
     else name = "segfault";
     logger.err() << name << std::endl;
-    if (debugger.is_enabled()) {
-        debugger.step();
-    }
+    debugger.step(handler);
     handler.print_guest_cpu();
     exit(EXIT_FAILURE);
 }
@@ -58,6 +56,10 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     
     uint32_t* pc = (uint32_t*)handler.get_pc();
     uint16_t id = (*pc >> 5) & 0xFFFF;
+    if (!id) {
+        debugger.step(handler);
+        return;
+    }
     uint32_t* target = check_code((size_t)cache.get_patch(id));
     int32_t offset = target - pc;
     *pc = 0x94000000 | (offset & 0x3FFFFFF);
@@ -72,9 +74,8 @@ void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     (void)info;
     ucontext_t* ctx = (ucontext_t*)ucontext;
     Handler handler((struct sigcontext*)&ctx->uc_mcontext);
-    if (debugger.is_enabled()) {
-        debugger.step();
-    } else _exit(0);
+    if (!debugger.is_enabled()) _exit(0);
+    debugger.step(handler);
 }
 
 Handler::Handler(struct sigcontext* n_sc) {
@@ -92,20 +93,9 @@ bool Handler::end_memory_check() {
 }
 
 void Handler::print_flags() {
-    #ifdef __aarch64__
-    int N = (sc->pstate >> 31) & 1;
-    int Z = (sc->pstate >> 30) & 1;  
-    int C = (sc->pstate >> 29) & 1;
-    int V = (sc->pstate >> 28) & 1;
-    #else
-    int N = (sc->eflags >> 7) & 1;
-    int Z = (sc->eflags >> 6) & 1;  
-    int C = (sc->eflags >> 0) & 1;
-    int V = (sc->eflags >> 11) & 1;
-    #endif
     logger.force() << "Flags: N"
-                 << N << " Z" << Z<< " C"
-                 << C << " V" << V << std::endl;
+        << get_flag('N') << " Z" << get_flag('Z')<< " C"
+        << get_flag('C') << " V" << get_flag('V') << std::endl;
 }
 void Handler::print_native_cpu() {
     #ifdef __aarch64__
@@ -128,6 +118,17 @@ void Handler::print_guest_cpu() {
     print_flags();
 }
 
+bool Handler::get_flag(char f) {
+    #ifdef __aarch64__
+    switch (f) {
+        case 'N': return (sc->pstate >> 31) & 1;
+        case 'Z': return (sc->pstate >> 30) & 1;
+        case 'C': return (sc->pstate >> 29) & 1;
+        case 'V': return (sc->pstate >> 28) & 1;
+    }
+    #endif
+    return 0;
+}
 int Handler::get_reg(const char* name) {
     #ifdef __aarch64__
     if (strcmp(name, "rsp") == 0) return sc->sp;

@@ -3,7 +3,6 @@
 #include "Decoder.hpp"
 #include <iostream>
 
-
 extern const char* instr_types[];
 extern const char* regs64[];
 extern const char* regs32[];

@@ -17,6 +17,7 @@ public:
     void print_native_cpu();
     void print_guest_cpu();
 
+    bool get_flag(char f);
     int get_reg(const char* name);
     void set_pc(size_t pc);
     size_t get_pc();

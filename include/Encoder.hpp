@@ -1,0 +1,65 @@
+#define GET_FS 0xD53BD040
+#define ADRP 0x90000000
+#define UBFM 0xD3400000
+
+#define ASF 0x80000000
+
+#define MOVN_I 0x12800000
+#define MOVZ_I 0x52800000
+#define MOVK_I 0x72800000
+
+#define ADD_R 0x0B000000
+#define ADDS_R 0x2B000000
+#define SUB_R 0x4B000000
+#define SUBS_R 0x6B000000
+
+#define ADD_I 0x11000000
+#define ADDS_I 0x31000000
+#define SUB_I 0x51000000
+#define SUBS_I 0x71000000
+
+#define AND_R 0x0A000000
+#define ADC_R 0x1A000000
+#define ORR_R 0x2A000000
+#define ADCS_R 0x3A000000
+#define EOR_R 0x4A000000
+#define SBC_R 0x5A000000
+#define ANDS_R 0x6A000000
+#define SBCS_R 0x7A000000
+
+#define LSL_R 0x1AC02000
+#define LSR_R 0x1AC02400
+#define ASR_R 0x1AC02800
+#define ROR_R 0x1AC02C00
+
+#define SXTW_R 0x93407C00
+
+#define MSF 0x40000000
+
+#define STR 0xB9000000
+#define STUR 0xB8000000
+#define STR_PRE 0xB8000C00
+#define STR_POST 0xB8000400
+#define STP_PRE 0x29800000
+#define STP_POST 0x28800000
+
+#define LDR 0xB9400000
+#define LDUR 0xB8400000
+#define LDR_PRE 0xB8400C00
+#define LDR_POST 0xB8400400
+#define LDP_PRE 0x29c00000
+#define LDP_POST 0x28c00000
+
+#define BR 0xD61F0000
+#define BLR 0xD63F0000
+#define BRK 0xD4200000
+
+#define BEQ 0x54000000
+#define BNE 0x54000001
+#define BCS 0x54000002
+#define BLS 0x54000009
+#define BGE 0x5400000A
+#define BLT 0x5400000B
+#define BGT 0x5400000C
+#define BLE 0x5400000D
+#define B 0x14000000

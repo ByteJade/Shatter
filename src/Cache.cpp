@@ -43,9 +43,10 @@ int Cache::set_patch(uint8_t* guest) {
         patches[reuse.back()] = guest;
         reuse.pop_back();
     }
-    return id;
+    return id+1;
 }
 uint8_t* Cache::get_patch(int id) {
+    id--;
     reuse.push_back(id);
     return patches[id];
 }

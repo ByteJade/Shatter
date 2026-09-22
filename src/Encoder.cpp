@@ -1,68 +1,10 @@
 #include "../include/Compiler.hpp"
 #include "../include/Cache.hpp"
 #include "../include/Logger.hpp"
+#include "../include/Encoder.hpp"
 #include "../include/Printer_X86_64.hpp"
 #include <cstdint>
 #include <stdint.h>
-
-/*
-1. 
-2. 
-3. MOVZX
-4. PUSH, POP
-5. JCC
-6. JMP, CALL
-7. XMM
-*/
-#define GET_FS 0xD53BD040
-#define ADRP 0x90000000
-#define UBFM 0xD3400000
-
-#define ASF 0x80000000
-
-#define MOVN_I 0x12800000
-#define MOVZ_I 0x52800000
-#define MOVK_I 0x72800000
-
-#define ADD_R 0x0B000000
-#define SUB_R 0x4B000000
-#define ORR_R 0x2A000000
-#define EOR_R 0x4A000000
-#define AND_R 0x0A000000
-
-#define ADDS_R 0x2B000000
-#define SUBS_R 0x6B000000
-#define ANDS_R 0x6A000000
-
-#define ADD_I 0x11000000
-#define SUB_I 0x51000000
-
-#define LSL_R 0x1AC02000
-#define LSR_R 0x1AC02400
-#define ASR_R 0x1AC02800
-#define ROR_R 0x1AC02C00
-
-#define SXTW_R 0x93407C00
-
-#define MSF 0x40000000
-
-#define STR 0xB9000000
-#define STUR 0xB8000000
-#define STR_PRE 0xB8000C00
-#define STR_POST 0xB8000400
-#define STP_PRE 0x29800000
-#define STP_POST 0x28800000
-
-#define LDR 0xB9400000
-#define LDUR 0xB8400000
-#define LDR_PRE 0xB8400C00
-#define LDR_POST 0xB8400400
-#define LDP_PRE 0x29c00000
-#define LDP_POST 0x28c00000
-
-#define BR 0xD61F0000
-#define BLR 0xD63F0000
-#define BRK 0xD4200000
 
 #define SC1R 9
 #define SC2R 10
@@ -306,31 +248,31 @@ void Compiler::emit_jump(uint8_t type, uint32_t* dst, uint32_t* target) {
     logger.log() << "patch " << instr_types[type] << std::endl;
     switch (type) {
     case JE:
-        *dst = 0x54000000 | ((delta & 0x7FFFF) << 5);
+        *dst = BEQ | ((delta & 0x7FFFF) << 5);
         break;
     case JNE:
-        *dst = 0x54000001 | ((delta & 0x7FFFF) << 5);
+        *dst = BNE | ((delta & 0x7FFFF) << 5);
         break;
     case JAE:
-        *dst = 0x54000002 | ((delta & 0x7FFFF) << 5);
+        *dst = BCS | ((delta & 0x7FFFF) << 5);
         break;
     case JBE:
-        *dst = 0x54000009 | ((delta & 0x7FFFF) << 5);
+        *dst = BLS | ((delta & 0x7FFFF) << 5);
         break;
     case JGE:
-        *dst = 0x5400000A | ((delta & 0x7FFFF) << 5);
+        *dst = BGE | ((delta & 0x7FFFF) << 5);
         break;
     case JL:
-        *dst = 0x5400000B | ((delta & 0x7FFFF) << 5);
+        *dst = BLT | ((delta & 0x7FFFF) << 5);
         break;
     case JG:
-        *dst = 0x5400000C | ((delta & 0x7FFFF) << 5);
+        *dst = BGT | ((delta & 0x7FFFF) << 5);
         break;
     case JLE:
-        *dst = 0x5400000D | ((delta & 0x7FFFF) << 5);
+        *dst = BLE | ((delta & 0x7FFFF) << 5);
         break;
     case JMP:
-        *dst = 0x14000000 | (delta & 0x3FFFFFF);
+        *dst = B | (delta & 0x3FFFFFF);
         break;
     default:
         logger.err() << "Unknown jump type " << type << std::endl;
