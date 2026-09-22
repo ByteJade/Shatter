@@ -72,6 +72,7 @@ void emulate(Handler& handler) {
 
 void Debugger::set_brk(uint32_t* pc) {
     logger.force() << "Set break at " << (size_t)pc << std::endl;
+    ret();
     last_pc = pc;
     last_instr = *pc;
     *pc = BRK;
