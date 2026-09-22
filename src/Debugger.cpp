@@ -80,8 +80,8 @@ void Debugger::set_brk(uint32_t* pc) {
 void Debugger::ret() {
     if (last_pc) {
         *last_pc = last_instr;
-        __builtin___clear_cache(last_pc, last_pc+1);
         last_pc = nullptr;
+        __builtin___clear_cache(last_pc, last_pc+1);
     }
 }
 
@@ -110,12 +110,11 @@ void Debugger::step(Handler& handler) {
         if (!line) break;
         if (*line) add_history(line);
         switch (*line) {
+        case 's':
+            emulate(handler);
+            [[fallthrough]];
         case 'e':
             run = false;
-            break;
-        case 's':
-            run = false;
-            emulate(handler);
             break;
         case 'p': {
             uint32_t instr = *(uint32_t*)handler.get_pc();

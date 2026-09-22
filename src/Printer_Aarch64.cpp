@@ -61,19 +61,19 @@ void print(std::ostream& stream, uint32_t buf) {
         stream << jumps[buf&0xF] << " " << get_imm19(buf) << std::endl;
         return;
     }
-    if ((buf&A_M) == AND_R) {
+    if ((buf&AR_M) == AND_R) {
         stream << arythm[buf>>28];
         print_r_r_r(stream, buf);
         stream << std::endl;
         return;
     }
-    if ((buf&A_M) == ADD_R) {
+    if ((buf&AR_M) == ADD_R) {
         stream << math[buf>>29];
         print_r_r_r(stream, buf);
         stream << std::endl;
         return;
     }
-    if ((buf&A_M) == ADD_I) {
+    if ((buf&AI_M) == ADD_I) {
         stream << math[buf>>29];
         print_r_r_i(stream, buf);
         stream << std::endl;
