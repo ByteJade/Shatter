@@ -13,7 +13,7 @@ Debugger debugger;
 
 char* skip(char* src) {
     while (*src != ' ') {
-        if (*src == '\0') return nullptr;
+        if (*src == '\0') return src;
         src++;
     }
     return ++src;
