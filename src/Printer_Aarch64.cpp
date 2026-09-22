@@ -49,7 +49,7 @@ void print_r_r_i(std::ostream& stream, uint32_t buf) {
     if (buf&ASF) reg = " X";
     stream << reg << get_reg(buf,0);
     stream << reg << get_reg(buf,1);
-    stream << get_imm12(buf);
+    stream << " " << get_imm12(buf);
 }
 
 void print(std::ostream& stream, uint32_t buf) {
@@ -62,19 +62,19 @@ void print(std::ostream& stream, uint32_t buf) {
         return;
     }
     if ((buf&AR_M) == AND_R) {
-        stream << arythm[buf>>28];
+        stream << arythm[(buf>>28)&7];
         print_r_r_r(stream, buf);
         stream << std::endl;
         return;
     }
     if ((buf&AR_M) == ADD_R) {
-        stream << math[buf>>29];
+        stream << math[(buf>>29)&3];
         print_r_r_r(stream, buf);
         stream << std::endl;
         return;
     }
     if ((buf&AI_M) == ADD_I) {
-        stream << math[buf>>29];
+        stream << math[(buf>>29)&3];
         print_r_r_i(stream, buf);
         stream << std::endl;
         return;
