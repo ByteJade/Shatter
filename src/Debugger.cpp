@@ -63,11 +63,10 @@ void emulate(Handler& handler) {
         pc += get_imm26(instr);
         break;
     default:
-        debugger.set_brk((uint32_t*)(pc+4));
-        return;
+        pc += 4;
+        break;
     }
     debugger.set_brk((uint32_t*)(pc));
-    handler.set_pc(pc);
 }
 
 void Debugger::set_brk(uint32_t* pc) {
