@@ -116,10 +116,18 @@ void Debugger::step(Handler& handler) {
         case 'e':
             run = false;
             break;
-        case 'p': {
-            uint32_t instr = *(uint32_t*)handler.get_pc();
-            logger.force() << std::hex << instr << std::dec << ": ";
-            print(logger.force(), instr);
+        case 'p': { // print
+            char* arg = skip(line);
+            if (!*arg) break;
+            if (*arg == 'i') { // instruction
+                uint32_t instr = *(uint32_t*)handler.get_pc();
+                logger.force() << std::hex << instr << std::dec << ": ";
+                print(logger.force(), instr);
+            } else if (*arg == 'r') { // regs
+                handler.print_native_cpu();
+            } else if (*arg == 'g') { // guest_regs
+                handler.print_guest_cpu();
+            }
         } break;
         case 'b': {
             char* arg = skip(line);
