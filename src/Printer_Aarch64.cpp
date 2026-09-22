@@ -57,7 +57,7 @@ void print(std::ostream& stream, uint32_t buf) {
         stream << "b " << get_imm26(buf) << std::endl;
         return;
     }
-    if ((buf&B_M) == BEQ) {
+    if ((buf&BC_M) == BEQ) {
         stream << jumps[buf&0xF] << " " << get_imm19(buf) << std::endl;
         return;
     }

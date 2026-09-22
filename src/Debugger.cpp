@@ -21,7 +21,7 @@ char* skip(char* src) {
 
 #define BCC_M 0xFF00001F
 
-void emulate(Handler& handler) {
+void emulate_jump(Handler& handler) {
     uint32_t* pc = (uint32_t*)handler.get_pc();
     uint32_t instr = *(uint32_t*)pc;
     logger.log() << "Emulate: ";
@@ -60,10 +60,9 @@ void emulate(Handler& handler) {
         if (handler.get_flag('Z') || handler.get_flag('N') != handler.get_flag('V'))
             imm = get_imm19(instr);
         break;
-    case B:
-        imm = get_imm26(instr);
-        break;
     }
+    if ((instr&B_M) == B)
+        imm = get_imm26(instr);
     debugger.set_brk(pc + imm);
 }
 
@@ -73,12 +72,12 @@ void Debugger::set_brk(uint32_t* pc) {
     last_pc = pc;
     last_instr = *pc;
     *pc = BRK;
-    __builtin___clear_cache(pc, pc+4);
+    __builtin___clear_cache(pc, pc+1);
 }
 void Debugger::ret() {
     if (last_pc) {
         *last_pc = last_instr;
-        __builtin___clear_cache(last_pc, last_pc+4);
+        __builtin___clear_cache(last_pc, last_pc+1);
         last_pc = nullptr;
     }
 }
@@ -109,7 +108,7 @@ void Debugger::step(Handler& handler) {
         if (*line) add_history(line);
         switch (*line) {
         case 's':
-            emulate(handler);
+            emulate_jump(handler);
             [[fallthrough]];
         case 'e':
             run = false;
