@@ -178,7 +178,7 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     decode_step(compiler);
     cache_start_block(guest);
     uint32_t* ret = cache_get_host();
-    emit_entry(compiler);
+    if (compiler->need_entry) emit_entry();
     for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {
         logger_log("start block %i", i);
         block_t* block = compiler->blocks + i;
@@ -188,4 +188,16 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     cache_end_block();
     if (debugger_enabled()) debugger_brk(ret);
     return ret;
+}
+
+X86_64* next(compiler_t* compiler) {
+    return compiler->buffer + compiler->reader + 1;
+}
+void skip(compiler_t* compiler) {
+    compiler->reader++;
+    compiler->guest += compiler->sizes[compiler->reader];
+    if (debugger_enabled()) {
+        X86_64* buf = compiler->buffer + compiler->reader;
+        print_x86_64(buf);
+    }
 }

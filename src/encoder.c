@@ -177,8 +177,11 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
         emit_load(compiler, SC1R, &buf->dst, buf, 0);
         dst = SC1R;
     } else {
-        if (buf->dst.reg == RBP) return;
-        if (buf->dst.reg == RSP) {
+        if (buf->dst.reg == RBP) {
+            if (next(compiler)->type == MOV)
+                skip(compiler);
+            return;
+        } if (buf->dst.reg == RSP) {
             cache_emit(ASF|ADD_I | SC1R | (31<<5));
             dst = SC1R;
         } else dst = x86_regs[buf->dst.reg];
@@ -202,10 +205,10 @@ void emit_patch(compiler_t* compiler, X86_64* buf) {
     patch->guest = compiler->guest + buf->dst.imm;
     cache_emit(buf->type);
 }
-void emit_entry(compiler_t* compiler) {
+void emit_entry() {
+    cache_emit(ASF|STP_PRE | ((-16&0x3FF)<<12) | 29 | (31<<5) | (30<<10));
     cache_emit(ASF|ADD_I | 28 | (31<<5));
-    if (compiler->need_entry)
-        cache_emit(ASF|STP_PRE | ((-16&0x3FF)<<12) | 29 | (28<<5) | (30<<10));
+    cache_emit(ASF|ADD_I | 29 | (31<<5));
 }
 void emit_ret() {
     cache_emit(ASF|ADD_I | 31 | (29<<5));
@@ -271,10 +274,9 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case CALL: emit_branch(compiler, buf, BLR); break;
         case RET: emit_ret(); break;
         case JO ... JG: emit_patch(compiler, buf); break;
-        case CLTQ: cache_emit(SXTW_R | (x86_regs[RAX] << 5) | x86_regs[RAX]); break;
-        case CLTD:
+        case CLTQ: case CLTD:
             cache_emit(SXTW_R | (x86_regs[RAX] << 5) | x86_regs[RAX]);
-            cache_emit(0x937ffc00 | (x86_regs[RAX] << 5) | x86_regs[RDX]); // asr x2, x8, #63
+            if (buf->type == CLTD) cache_emit(0x937ffc00 | (x86_regs[RAX] << 5) | x86_regs[RDX]); // asr x2, x8, #63
             break;
         default:
             logger_err("Unknown encode: %i", buf->type);

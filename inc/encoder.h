@@ -84,7 +84,7 @@ void emit_mov(struct compiler_t* compiler, X86_64* buf);
 void emit_push(struct compiler_t* compiler, X86_64* buf);
 void emit_pop(struct compiler_t* compiler, X86_64* buf);
 void emit_patch(struct compiler_t* compiler, X86_64* buf);
-void emit_entry(struct compiler_t* compiler);
+void emit_entry();
 void emit_ret();
 void emit_jump(uint32_t* dst, uint32_t* target);
 void encode(struct compiler_t* compiler, X86_64* buf);
