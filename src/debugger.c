@@ -5,6 +5,7 @@
 #include "../inc/encoder.h"
 #include "../inc/printer_Aarch64.h"
 #include <pthread.h>
+#include <string.h>
 #include <stdint.h>
 
 #define BCC_M 0xFF00001F
