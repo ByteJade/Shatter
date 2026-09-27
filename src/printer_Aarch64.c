@@ -41,7 +41,7 @@ int get_reg(uint32_t buf, int reg) {
 void print_r_r_r(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
-    printf(GREEN_COLOR" %c%i %c%i %c%i\n",
+    printf(GREEN_COLOR" %c%i %c%i %c%i",
         reg, get_reg(buf,0),
         reg, get_reg(buf,1),
         reg, get_reg(buf,2)
@@ -50,21 +50,19 @@ void print_r_r_r(uint32_t buf) {
 void print_r_r_i(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
-    printf(GREEN_COLOR" %c%i %c%i %x\n",
+    printf(GREEN_COLOR" %c%i %c%i %x",
         reg, get_reg(buf,0),
         reg, get_reg(buf,1),
         get_imm12(buf)
     );
 }
-
-void print_aarch64(uint32_t buf) {
-    printf(BLUE_COLOR);
+void decode_aarch64(uint32_t buf) {
     if ((buf&B_M) == B) {
-        printf("b "GREEN_COLOR"%i\n", get_imm26(buf));
+        printf("b "GREEN_COLOR"%i", get_imm26(buf));
         return;
     }
     if ((buf&BC_M) == BEQ) {
-        printf("%s "GREEN_COLOR"%i\n", jumps[buf&0xF], get_imm19(buf));
+        printf("%s "GREEN_COLOR"%i", jumps[buf&0xF], get_imm19(buf));
         return;
     }
     if ((buf&AR_M) == AND_R) {
@@ -83,8 +81,13 @@ void print_aarch64(uint32_t buf) {
         return;
     }
     if (buf == (RET_R|(30<<5))) {
-        printf("ret\n");
+        printf("ret");
         return;
     }
-    printf("unk\n");
+    printf("unk");
+}
+void print_aarch64(uint32_t buf) {
+    printf(BLUE_COLOR);
+    decode_aarch64(buf);
+    printf(RESET_COLOR"\n");
 }
