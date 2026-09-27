@@ -46,12 +46,14 @@ void debugger_brk(uint32_t* host) {
     
     iov.iov_base = &regs;
     iov.iov_len = sizeof(regs);
-    ptrace(PTRACE_GETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
+    if (ptrace(PTRACE_GETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov) < 0) {
+        logger_err("cannot get break");
+    }
     
     for (int i = 0; i < 16; i++) {
         if (regs.dbg_regs[i].ctrl == 0) {
             regs.dbg_regs[i].addr = (uint64_t)host;
-            regs.dbg_regs[i].ctrl = 0x1 | (0x1 << 1);
+            regs.dbg_regs[i].ctrl = 1 | (3 << 1) | (0xf << 5);
             logger_log("Set break at %p", host);
             break;
         }
@@ -59,7 +61,9 @@ void debugger_brk(uint32_t* host) {
     
     iov.iov_base = &regs;
     iov.iov_len = sizeof(regs);
-    ptrace(PTRACE_SETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
+    if (ptrace(PTRACE_SETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov) < 0) {
+        logger_err("cannot set break");
+    }
 }
 void debugger_ret(uint32_t* host) {
     struct user_hwdebug_state regs = {0};
