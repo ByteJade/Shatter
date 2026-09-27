@@ -4,6 +4,7 @@
 #include "../inc/elf_loader.h"
 #include "../inc/elf_manager.h"
 #include "../inc/launcher.h"
+#include "../inc/handler.h"
 #include <stdlib.h>
 
 [[noreturn]] void usage(void) {
@@ -45,6 +46,7 @@ int main(int argc, char** argv, char** envp) {
         logger_err("Cannot open file");
         return EXIT_FAILURE;
     }
+    handler_init();
     elf_read_dynamic(elf);
     elf_start(elf);
     launch((void*)(elf->base + elf->head.e_entry), stack);
