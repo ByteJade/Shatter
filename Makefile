@@ -11,7 +11,7 @@ directories:
 	mkdir -p $(LIB_DIR)
 
 $(BUILD_DIR)/shatter: src/*
-	$(CC) $(CFLAGS) src/* -o $@ -lreadline
+	$(CC) $(CFLAGS) src/* -o $@
 
 $(LIB_DIR)/my_libc.so.6: lib/my_libc.c
 	$(CC) $(LIBFLAGS) $< -o $@
