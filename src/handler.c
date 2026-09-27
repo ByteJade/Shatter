@@ -19,6 +19,7 @@ uint32_t* compile(size_t pc) {
     }
     return target;
 }
+#define PSTATE_SS_BIT (1 << 21)
 
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
@@ -28,8 +29,8 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     uint32_t instruction = *pc;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
     #ifdef __aarch64__
+    long long unsigned int *pstate = &ctx->uc_mcontext.pstate;
     if (ret == 0 || *pstate & PSTATE_SS_BIT) {
-        uint64_t *pstate = &ctx->uc_mcontext.pstate;
         if (!(*pstate & PSTATE_SS_BIT))
             *pstate |= PSTATE_SS_BIT;
         debugger_step(sc);
