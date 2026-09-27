@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <signal.h>
 #include <unistd.h>
+#include <string.h>
 
 uint32_t* compile(size_t pc) {
     uint32_t* target = cache_search((uint8_t*)pc);
@@ -106,6 +107,7 @@ size_t sc_get_reg_host(struct sigcontext* sc, const char* reg) {
     int num = 0;
     sscanf(reg+1, "%i", &num);
     #ifdef __aarch64__
+    if (strcmp(reg, sp) == 0) return sc->sp;
     return sc->regs[num];
     #else
     return 0;
