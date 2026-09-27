@@ -92,15 +92,3 @@ uint32_t* cache_search(uint8_t* guest) {
     }
     return NULL;
 }
-void cache_clear(void *address, uint64_t len) {
-    char *begin = (char *)address;
-    char *end = begin + len;
-    
-    __builtin___clear_cache(begin, end);
-
-    __asm__ __volatile__ (
-        "dsb ish\n"
-        "isb\n"
-        : : : "memory"
-    );
-}

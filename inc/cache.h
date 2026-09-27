@@ -21,6 +21,5 @@ uint8_t* cache_get_patch(int id);
 void cache_print();
 uint32_t* cache_get_host();
 uint32_t* cache_search(uint8_t* guest);
-void cache_clear(void *address, uint64_t len);
 
 #endif

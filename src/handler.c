@@ -5,9 +5,6 @@
 #include "../inc/compiler.h"
 #include <stdint.h>
 #include <signal.h>
-#include <sys/ucontext.h>
-#include <sys/ptrace.h>
-#include <asm/ptrace.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -19,7 +16,6 @@ uint32_t* compile(size_t pc) {
     }
     return target;
 }
-#define PSTATE_SS_BIT (1 << 21)
 
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
@@ -28,20 +24,15 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
     uint32_t instruction = *pc;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
-    #ifdef __aarch64__
-    long long unsigned int *pstate = &ctx->uc_mcontext.pstate;
-    if (ret == 0 || *pstate & PSTATE_SS_BIT) {
-        if (!(*pstate & PSTATE_SS_BIT))
-            *pstate |= PSTATE_SS_BIT;
+    if (ret == 0) {
         debugger_step(sc);
         return;
     }
-    #endif
     uint8_t* patch = cache_get_patch(ret);
     uint32_t* target = compile((size_t)patch);
     int32_t offset = target - pc;
     *pc = 0x94000000 | (offset & 0x3FFFFFF);
-    cache_clear(pc, 4);
+    __builtin___clear_cache(pc, pc+1);
     logger_deb("found patch: %i", ret);
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {

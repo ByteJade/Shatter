@@ -3,12 +3,10 @@
 #include "../inc/dynarray.h"
 #include "../inc/handler.h"
 #include "../inc/encoder.h"
-#include "../inc/cache.h"
 #include "../inc/printer_Aarch64.h"
 #include <pthread.h>
 #include <string.h>
 #include <stdint.h>
-#include <unistd.h>
 
 #define BCC_M 0xFF00001F
 
@@ -35,7 +33,7 @@ void debugger_brk(uint32_t* host) {
     b->pos = host;
     b->instr = *host;
     *host = BRK;
-    cache_clear(host, 4);
+    __builtin___clear_cache(host, host+1);
 }
 void debugger_ret(uint32_t* host) {
     for (size_t i = 0; i < dynarray_size(breaks); i++) {
@@ -43,12 +41,12 @@ void debugger_ret(uint32_t* host) {
         if (b->pos == host) {
             *host = b->instr;
             *b = breaks[dynarray_pop(breaks)];
-            cache_clear(host, 4);
+            __builtin___clear_cache(host, host + 1);
             return;
         }
     }
 }
-/*void emulate_jump(struct sigcontext* sc) {
+void emulate_jump(struct sigcontext* sc) {
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
     logger_log("Emulate:");
     uint32_t instr = *pc;
@@ -92,7 +90,7 @@ void debugger_ret(uint32_t* host) {
     if ((instr&B_M) == B)
         imm = get_imm26(instr);
     debugger_brk(pc + imm);
-} */
+}
 void print_memory(struct sigcontext* sc, char* buf) {
     char com[32];
     char base[32];
@@ -115,10 +113,10 @@ void debugger_step(struct sigcontext* sc) {
         fgets(buf, sizeof(buf), stdin);
         switch (buf[0]) {
             case 's':
-                run = 0;
-                break;
+                emulate_jump(sc);
+                [[fallthrough]];
             case 'e':
-                _exit(0);
+                run = 0;
                 break;
             case 'f':
                 sc_print_flags(sc);
