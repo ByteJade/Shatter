@@ -8,6 +8,11 @@
 #include <string.h>
 #include <stdint.h>
 
+#include <sys/ptrace.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <linux/ptrace.h>
+
 #define BCC_M 0xFF00001F
 
 typedef struct {
@@ -17,16 +22,43 @@ typedef struct {
 
 int enabled = 0;
 pthread_mutex_t mut;
-break_t* breaks = NULL;
+//break_t* breaks = NULL;
 
 void debugger_init(void) {
     enabled = 1;
-    breaks = dynarray_init(sizeof(break_t));
+    //breaks = dynarray_init(sizeof(break_t));
 }
 void debugger_fini(void) {
     enabled = 0;
-    dynarray_fini(breaks);
+    //dynarray_fini(breaks);
 }
+
+void debugger_brk(uint32_t* host) {
+    #ifdef __aarch64__
+    struct user_hw_breakpoint_control ctrl;
+    if (ptrace(PTRACE_SETHBPREGS, 0, (void *)1, &host) < 0) {
+        logger_err("Cannot setup break point");
+        return;
+    }
+
+    ctrl.trigger = ARM_BREAKPOINT_EXECUTE;
+    ctrl.len = 4;
+    ctrl.enabled = 1;
+
+    if (ptrace(PTRACE_SETHBPREGS, 0, (void *)2, &ctrl) < 0) {
+        logger_err("Cannot setup break point");
+    }
+    #endif
+}
+void debugger_ret(uint32_t* host) {
+    #ifdef __aarch64__
+    struct user_hw_breakpoint_control ctrl = {0};
+    if (ptrace(PTRACE_SETHBPREGS, child, (void *)1, &ctrl) < 0) {
+        logger_err("Cannot clear breakpoint control");
+    }
+    #endif
+}
+/*
 void debugger_brk(uint32_t* host) {
     size_t break_p = dynarray_push((void**)&breaks);
     break_t* b = breaks + break_p;
@@ -41,11 +73,11 @@ void debugger_ret(uint32_t* host) {
         if (b->pos == host) {
             *host = b->instr;
             *b = breaks[dynarray_pop(breaks)];
-            __builtin___clear_cache(host, host + 1);
+            __builtin___clear_cache(host, host+1);
             return;
         }
     }
-}
+}*/
 void emulate_jump(struct sigcontext* sc) {
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
     logger_log("Emulate:");

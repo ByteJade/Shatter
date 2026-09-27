@@ -66,10 +66,9 @@ int cache_set_patch(uint8_t* guest) {
         id = dynarray_push((void**)&patches);
     }
     patches[id] = guest;
-    return ++id;
+    return id;
 }
 uint8_t* cache_get_patch(int id) {
-    id--;
     size_t reuse_p = dynarray_push((void**)&reuse);
     reuse[reuse_p] = id;
     return patches[id];

@@ -20,14 +20,15 @@ uint32_t* compile(size_t pc) {
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
-    
-    uint32_t* pc = (uint32_t*)sc_get_pc(sc);
-    uint32_t instruction = *pc;
-    uint16_t ret = (instruction >> 5) & 0xFFFF;
-    if (ret == 0) {
+    #ifdef __aarch64__
+    if (info->si_code == TRAP_HWBKPT) {
         debugger_step(sc);
         return;
     }
+    #endif
+    uint32_t* pc = (uint32_t*)sc_get_pc(sc);
+    uint32_t instruction = *pc;
+    uint16_t ret = (instruction >> 5) & 0xFFFF;
     uint8_t* patch = cache_get_patch(ret);
     uint32_t* target = compile((size_t)patch);
     int32_t offset = target - pc;
