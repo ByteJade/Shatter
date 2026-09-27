@@ -7,6 +7,7 @@
 #include "../inc/printer_X86_64.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 
 compiler_t* compiler_init(void) {
     compiler_t* compiler = (compiler_t*)malloc(sizeof(compiler_t));
@@ -176,7 +177,11 @@ void patch_step(compiler_t* compiler) {
     }
 }
 uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
+    struct timespec start, end;
     logger_deb("Start compile: %p", guest);
+    if (debugger_enabled()) 
+        clock_gettime(CLOCK_MONOTONIC, &start);
+
     compiler->guest = guest;
     decode_step(compiler);
     cache_start_block(guest);
@@ -188,8 +193,15 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
         encode_step(compiler, block);
     }
     patch_step(compiler);
-    cache_end_block();
     if (debugger_enabled()) debugger_brk(ret);
+    cache_end_block();
+
+    if (debugger_enabled()) {
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        double time_taken = (end.tv_sec - start.tv_sec) + 
+                            (end.tv_nsec - start.tv_nsec) / 1e9;
+        logger_deb("Compile finish, time: %lf seconds", time_taken);
+    }
     return ret;
 }
 
