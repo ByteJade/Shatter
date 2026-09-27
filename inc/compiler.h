@@ -41,6 +41,7 @@ compiler_t* compiler_init(void);
 void compiler_fini(compiler_t* compiler);
 uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest);
 
+X86_64* prev(compiler_t* compiler);
 X86_64* next(compiler_t* compiler);
 void skip(compiler_t* compiler);
 

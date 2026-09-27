@@ -207,6 +207,9 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     return ret;
 }
 
+X86_64* prev(compiler_t* compiler) {
+    return compiler->buffer + compiler->reader - 1;
+}
 X86_64* next(compiler_t* compiler) {
     return compiler->buffer + compiler->reader + 1;
 }
