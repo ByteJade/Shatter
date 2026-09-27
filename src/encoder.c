@@ -145,6 +145,7 @@ void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
             dst = SC1R;
         } else dst = x86_regs[buf->dst.reg];
         cache_emit(opcode | (dst << 5));
+        cache_emit(ASF|ADD_I | 28 | (31<<5));
     }
 }
 void emit_mov(compiler_t* compiler, X86_64* buf) {
