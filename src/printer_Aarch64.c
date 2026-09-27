@@ -64,7 +64,7 @@ void print_r_i(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
     printf(GREEN_COLOR" %c%i %x",
-        reg, get_reg(buf,1),
+        reg, get_reg(buf,0),
         get_imm16(buf)
     );
 }
