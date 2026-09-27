@@ -6,11 +6,12 @@
 #include "../inc/printer_Aarch64.h"
 #include <pthread.h>
 #include <string.h>
-#include <stdint.h>
 
 #include <sys/ptrace.h>
-#include <sys/types.h>
-#include <linux/ptrace.h>
+#include <sys/uio.h>
+#include <linux/elf.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
 #define BCC_M 0xFF00001F
 
@@ -31,31 +32,52 @@ void debugger_fini(void) {
     enabled = 0;
     //dynarray_fini(breaks);
 }
-
+struct user_hwdebug_state {
+    struct {
+        uint64_t addr;
+        uint32_t ctrl;
+        uint32_t pad;
+    } dbg_regs[16];
+};
+struct user_hwdebug_state regs = {0};
 void debugger_brk(uint32_t* host) {
-    #ifdef __aarch64__
-    struct user_hw_breakpoint_control ctrl;
-    if (ptrace(PTRACE_SETHBPREGS, 0, (void *)1, &host) < 0) {
-        logger_err("Cannot setup break point");
-        return;
+    struct iovec iov;
+    
+    iov.iov_base = &regs;
+    iov.iov_len = sizeof(regs);
+    ptrace(PTRACE_GETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
+    
+    for (int i = 0; i < 16; i++) {
+        if (regs.dbg_regs[i].ctrl == 0) {
+            regs.dbg_regs[i].addr = (uint64_t)host;
+            regs.dbg_regs[i].ctrl = 0x1 | (0x1 << 1);
+            break;
+        }
     }
-
-    ctrl.trigger = ARM_BREAKPOINT_EXECUTE;
-    ctrl.len = 4;
-    ctrl.enabled = 1;
-
-    if (ptrace(PTRACE_SETHBPREGS, 0, (void *)2, &ctrl) < 0) {
-        logger_err("Cannot setup break point");
-    }
-    #endif
+    
+    iov.iov_base = &regs;
+    iov.iov_len = sizeof(regs);
+    ptrace(PTRACE_SETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
 }
 void debugger_ret(uint32_t* host) {
-    #ifdef __aarch64__
-    struct user_hw_breakpoint_control ctrl = {0};
-    if (ptrace(PTRACE_SETHBPREGS, child, (void *)1, &ctrl) < 0) {
-        logger_err("Cannot clear breakpoint control");
+    struct iovec iov;
+    
+    iov.iov_base = &regs;
+    iov.iov_len = sizeof(regs);
+    ptrace(PTRACE_GETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
+    
+    for (int i = 0; i < 16; i++) {
+        if (regs.dbg_regs[i].addr == (uint64_t)host && 
+            (regs.dbg_regs[i].ctrl & 0x1)) {
+            regs.dbg_regs[i].ctrl = 0;
+            break;
+        }
     }
-    #endif
+    
+    iov.iov_base = &regs;
+    iov.iov_len = sizeof(regs);
+    ptrace(PTRACE_SETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
+
 }
 /*
 void debugger_brk(uint32_t* host) {

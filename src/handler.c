@@ -21,12 +21,10 @@ uint32_t* compile(size_t pc) {
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
-    #ifdef __aarch64__
-    if (info->si_code == TRAP_HWBKPT) {
+    if (info->si_code == 4) {
         debugger_step(sc);
         return;
     }
-    #endif
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
     uint32_t instruction = *pc;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
