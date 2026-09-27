@@ -139,7 +139,6 @@ void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
             cache_emit(ASF|ADD_I | 28 | (31<<5));
         } else emit_patch(compiler, buf);
     } else {
-        cache_emit(ASF|ADD_I | 31 | (28<<5));
         uint8_t dst;
         if (buf->dst.type&MEM) {
             emit_load(compiler, SC1R, &buf->dst, buf, 0);
