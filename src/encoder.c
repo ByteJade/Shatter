@@ -22,7 +22,7 @@ void emit_imm(int64_t imm, uint8_t dst) {
     if (imm >= 0 && imm <= INT16_MAX) {
         cache_emit(ASF|MOVZ_I | (imm << 5) | dst);
     } else if (imm < 0 && ~imm <= INT16_MAX) {
-        cache_emit(ASF|MOVN_I | (~imm << 5) | dst);
+        cache_emit(ASF|MOVN_I | ((~imm << 5)&0xFFFF) | dst);
     } else {
         uint16_t a = imm & 0xFFFF;
         uint16_t b = (imm>>16) & 0xFFFF;

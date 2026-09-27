@@ -20,6 +20,10 @@ int32_t get_imm12(uint32_t buf) {
     int32_t n = (buf >> 10) & 0xFFF;
     return (n << 20) >> 20;
 }
+int32_t get_imm16(uint32_t buf) {
+    int32_t n = (buf >> 10) & 0xFFF;
+    return (int32_t)(int16_t)n;
+}
 int32_t get_imm19(uint32_t buf) {
     int32_t n = (buf >> 5) & 0x7FFFF;
     return (n << 13) >> 13;
@@ -56,6 +60,14 @@ void print_r_r_i(uint32_t buf) {
         get_imm12(buf)
     );
 }
+void print_r_i(uint32_t buf) {
+    char reg = 'W';
+    if (buf&ASF) reg = 'X';
+    printf(GREEN_COLOR" %c%i %x",
+        reg, get_reg(buf,1),
+        get_imm16(buf)
+    );
+}
 void decode_aarch64(uint32_t buf) {
     if ((buf&B_M) == B) {
         printf("b "GREEN_COLOR"%i", get_imm26(buf));
@@ -78,6 +90,21 @@ void decode_aarch64(uint32_t buf) {
     if ((buf&AI_M) == ADD_I) {
         printf("%s", math[(buf>>29)&3]);
         print_r_r_i(buf);
+        return;
+    }
+    if ((buf&MOV_M) == MOVZ_I) {
+        printf("movz");
+        print_r_i(buf);
+        return;
+    }
+    if ((buf&MOV_M) == MOVN_I) {
+        printf("movn");
+        print_r_i(buf);
+        return;
+    }
+    if ((buf&MOV_M) == MOVK_I) {
+        printf("movk");
+        print_r_i(buf);
         return;
     }
     if (buf == (RET_R|(30<<5))) {

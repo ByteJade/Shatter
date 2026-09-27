@@ -100,7 +100,7 @@ void print_op(X86_64* buf, operand_t* op) {
                 else printf("rip ");
             }
             if (op->imm > 0) printf("+ %lx ", op->imm);
-            else if (op->imm < 0) printf("- %lx ", ~op->imm);
+            else if (op->imm < 0) printf("- %lx ",(~op->imm) + 1);
         }
         printf("] ");
     }
