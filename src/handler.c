@@ -3,6 +3,7 @@
 #include "../inc/logger.h"
 #include "../inc/cache.h"
 #include "../inc/compiler.h"
+#include <sys/ptrace.h>
 #include <stdint.h>
 #include <signal.h>
 #include <unistd.h>

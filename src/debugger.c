@@ -10,8 +10,6 @@
 
 #include <sys/ptrace.h>
 #include <sys/types.h>
-#include <sys/wait.h>
-#include <linux/ptrace.h>
 
 #define BCC_M 0xFF00001F
 
