@@ -1,15 +1,15 @@
 #include "wrapper.h"
 #include <unistd.h>
-    
+
 void my___libc_start_main(
     int (*main) (int, char**, char**),
     int argc, char** argv,
     void (*init) (void), void (*fini) (void),
     void (*rtld_fini) (void), void* stack_end)
 {
-    if (init) init();
+    // if (init) init();
     int stat = main(argc, argv, __environ);
-    if (fini) fini();
+    // if (fini) fini();
     //if (rtld_fini) rtld_fini();
     _exit(stat);
 }
