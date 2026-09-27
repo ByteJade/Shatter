@@ -94,14 +94,13 @@ void print_memory(struct sigcontext* sc, char* buf) {
     char com[32];
     char base[32];
     sscanf(buf, "%s %s", com, base);
-    int pos = 1;
     int imm = 0;
-    size_t reg = sc_get_reg_host(sc, base);
+    size_t reg = sc_get_reg_host(sc, base+1);
     char* sep = strpbrk(base, "+-");
     if (sep) {
         imm = strtol(sep, NULL, 0);
     }
-    printf("%s: %lX", base, *(uint64_t*)(reg + imm));
+    printf("%s: %lX\n", base, *(uint64_t*)(reg + imm));
 }
 void debugger_step(struct sigcontext* sc) {
     pthread_mutex_lock(&mut);
