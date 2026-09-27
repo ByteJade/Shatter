@@ -21,7 +21,7 @@ int32_t get_imm12(uint32_t buf) {
     return (n << 20) >> 20;
 }
 int32_t get_imm16(uint32_t buf) {
-    int32_t n = (buf >> 10) & 0xFFF;
+    int32_t n = (buf >> 5) & 0xFFFF;
     return (int32_t)(int16_t)n;
 }
 int32_t get_imm19(uint32_t buf) {
