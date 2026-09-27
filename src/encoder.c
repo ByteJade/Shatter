@@ -261,19 +261,21 @@ void emit_jump(uint32_t* dst, uint32_t* target) {
         logger_err("Unknown jump type %i", type);
     }
 }
+int math_group[] = {
+    ADDS_R, ORR_R, ADCS_R, SBCS_R,
+    ANDS_R, SUBS_R, EOR_R, SUBS_R,
+};
 void encode(compiler_t* compiler, X86_64* buf) {
     switch (buf->type) {
         case MOV: emit_mov(compiler, buf); break;
         case PUSH: emit_push(compiler, buf); break;
         case POP: emit_pop(compiler, buf); break;
         case LEA: emit_address(compiler, x86_regs[buf->dst.reg], &buf->src, buf); break;
-        case ADD: emit_math(compiler, buf, ADDS_R, 0); break;
-        case SUB: emit_math(compiler, buf, SUBS_R, 0); break;
-        case CMP: emit_math(compiler, buf, SUBS_R, 1); break;
+        case ADD ... CMP: {
+            int opcode = math_group[buf->type - ADD];
+            emit_math(compiler, buf, opcode, buf->type == CMP);
+        } break;
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
-        case OR:  emit_math(compiler, buf, ORR_R, 0); break;
-        case XOR: emit_math(compiler, buf, EOR_R, 0); break;
-        case AND: emit_math(compiler, buf, ANDS_R, 0); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;
         case SHL:
         case SAL: emit_math(compiler, buf, LSL_R, 0); break;
