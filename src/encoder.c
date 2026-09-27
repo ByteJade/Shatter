@@ -136,6 +136,7 @@ void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
         if (buf->type == CALL) {
             cache_emit(ASF|ADD_I | 31 | (28<<5));
             cache_emit(BRK | (cache_set_patch(compiler->guest + buf->dst.imm)<<5));
+            cache_emit(ASF|ADD_I | 28 | (31<<5));
         } else emit_patch(compiler, buf);
     } else {
         cache_emit(ASF|ADD_I | 31 | (28<<5));
@@ -145,7 +146,6 @@ void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
             dst = SC1R;
         } else dst = x86_regs[buf->dst.reg];
         cache_emit(opcode | (dst << 5));
-        cache_emit(ASF|ADD_I | 28 | (31<<5));
     }
 }
 void emit_mov(compiler_t* compiler, X86_64* buf) {
