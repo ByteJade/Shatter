@@ -131,6 +131,23 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
         if (buf->dst.type&MEM) emit_store(compiler, dst, &buf->dst, buf, 1);
     }
 }
+void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
+    uint8_t r0 = buf->dst.reg;
+    uint8_t r1 = buf->src.reg;
+    uint32_t osf = (buf->prefix == REPN) * MSF;
+    uint32_t asf = (buf->prefix == REPN) * ASF;
+    if (buf->dst.type & MEM) {
+        emit_address(compiler, SC1R, &buf->dst, buf);
+        cache_emit(asf|LDR_N | (SC1R<<5) | 16);
+        r0 = 16;
+    } else if (buf->src.type & MEM) {
+        emit_address(compiler, SC1R, &buf->src,  buf);
+        cache_emit(asf|LDR_N | (SC1R<<5) | 16);
+        r1 = 16;
+    }
+    cache_emit(osf|opcode|(r0)|(r0<<5)|(r1<<16));
+    if (buf->dst.type & MEM) cache_emit(asf|STR_N | (SC1R<<5) | 16);
+}
 void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     if (buf->dst.type == IMM) {
         if (buf->type == CALL) {
@@ -265,6 +282,10 @@ int math_group[] = {
     ADDS_R, ORR_R, ADCS_R, SBCS_R,
     ANDS_R, SUBS_R, EOR_R, SUBS_R,
 };
+int neon_group[] = {
+    EOR_N, ADD_N, MUL_N,
+    SUB_N, DIV_N, CMP_N,
+};
 void encode(compiler_t* compiler, X86_64* buf) {
     switch (buf->type) {
         case MOV: emit_mov(compiler, buf); break;
@@ -274,6 +295,10 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case ADD ... CMP: {
             int opcode = math_group[buf->type - ADD];
             emit_math(compiler, buf, opcode, buf->type == CMP);
+        } break;
+        case PXOR ... COMIX: {
+            int opcode = neon_group[buf->type - PXOR];
+            emit_neon(compiler, buf, opcode);
         } break;
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;

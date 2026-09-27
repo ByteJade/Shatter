@@ -72,6 +72,15 @@ extern const uint8_t x86_regs[];
 #define BLE 0x5400000D
 #define B 0x14000000
 
+#define EOR_N 0x6E201C00
+#define ADD_N 0x1E202800
+#define MUL_N 0x1E200800
+#define SUB_N 0x1E203800
+#define DIV_N 0x1E201800
+#define CMP_N 0x1E202000
+#define LDR_N 0xBD400000
+#define STR_N 0xBD000000
+
 struct compiler_t;
 
 void emit_imm(int64_t imm, uint8_t dst);
@@ -79,6 +88,7 @@ void emit_address(struct compiler_t* compiler, uint8_t dst, operand_t* op, X86_6
 void emit_load(struct compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast);
 void emit_store(struct compiler_t* compiler, uint8_t src, operand_t* op, X86_64* buf, int fast);
 void emit_math(struct compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave);
+void emit_neon(struct compiler_t* compiler, X86_64* buf, uint32_t opcode);
 void emit_branch(struct compiler_t* compiler, X86_64* buf, uint32_t opcode);
 void emit_mov(struct compiler_t* compiler, X86_64* buf);
 void emit_push(struct compiler_t* compiler, X86_64* buf);

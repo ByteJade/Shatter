@@ -25,15 +25,15 @@ const char* instr_types[] = {
 
     "syscall", "movx", "ebr", "hlt",
     "movapx", "cvtsi2x", "cvtx2si",
-    "ucomix", "comix",
+    "ucomix", "cvtx", "movq",
 
     "cmovo", "cmovno", "cmovb", "cmovae",
     "cmove", "cmovne", "cmovbe", "cmova",
     "cmovs", "cmovns", "cmovp", "cmovpo",
     "cmovl", "cmovge", "cmovle", "cmovg",
 
-    "pxor", "addx", "mulx", "cvtx",
-    "subx", "divx", "movq",
+    "pxor", "addx", "mulx", 
+    "subx", "divx", "comix",
     "movzx8", "movzx16", "movsx8", "movsx16",
 
     "seto", "setno", "setb", "setae",
