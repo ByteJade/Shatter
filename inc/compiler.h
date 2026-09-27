@@ -18,6 +18,10 @@ typedef struct {
     uint8_t* guest;
 } patch_t;
 
+enum CompileFlags {
+    NEED_STACK = 1,
+    NEED_ENTRY = 2,
+};
 
 typedef struct compiler_t {
     uint8_t* guest;
@@ -29,7 +33,7 @@ typedef struct compiler_t {
     patch_t* patches;
 
     uint32_t reader;
-    int need_entry;
+    int flags;
 } compiler_t;
 
 compiler_t* compiler_init(void);
