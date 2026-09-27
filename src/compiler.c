@@ -193,15 +193,14 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
         encode_step(compiler, block);
     }
     patch_step(compiler);
-    if (debugger_enabled()) debugger_brk(ret);
-    cache_end_block();
-
     if (debugger_enabled()) {
+        debugger_brk(ret);
         clock_gettime(CLOCK_MONOTONIC, &end);
-        double time_taken = (end.tv_sec - start.tv_sec) + 
-                            (end.tv_nsec - start.tv_nsec) / 1e9;
-        logger_deb("Compile finish, time: %lf seconds", time_taken);
+        uint64_t nseconds = (uint64_t)(end.tv_sec - start.tv_sec) * 1000000000ULL + 
+                    (end.tv_nsec - start.tv_nsec);
+        logger_deb("Compile finish, time: %lf nseconds", nseconds);
     }
+    cache_end_block();
     return ret;
 }
 
