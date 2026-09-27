@@ -202,9 +202,10 @@ void emit_patch(compiler_t* compiler, X86_64* buf) {
     patch->guest = compiler->guest + buf->dst.imm;
     cache_emit(buf->type);
 }
-void emit_entry() {
+void emit_entry(compiler_t* compiler) {
     cache_emit(ASF|ADD_I | 28 | (31<<5));
-    cache_emit(ASF|STP_PRE | ((-16&0x3FF)<<12) | 30 | (28<<5) | (29<<10));
+    if (compiler->need_entry)
+        cache_emit(ASF|STP_PRE | ((-16&0x3FF)<<12) | 30 | (28<<5) | (29<<10));
 }
 void emit_ret() {
     cache_emit(ASF|LDP_POST | (16<<12) | 30 | (28<<5) | (29<<10));
