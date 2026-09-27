@@ -39,8 +39,9 @@ struct user_hwdebug_state {
         uint32_t pad;
     } dbg_regs[16];
 };
-struct user_hwdebug_state regs = {0};
+
 void debugger_brk(uint32_t* host) {
+    struct user_hwdebug_state regs = {0};
     struct iovec iov;
     
     iov.iov_base = &regs;
@@ -51,6 +52,7 @@ void debugger_brk(uint32_t* host) {
         if (regs.dbg_regs[i].ctrl == 0) {
             regs.dbg_regs[i].addr = (uint64_t)host;
             regs.dbg_regs[i].ctrl = 0x1 | (0x1 << 1);
+            logger_log("Set break at %p", host);
             break;
         }
     }
@@ -60,6 +62,7 @@ void debugger_brk(uint32_t* host) {
     ptrace(PTRACE_SETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
 }
 void debugger_ret(uint32_t* host) {
+    struct user_hwdebug_state regs = {0};
     struct iovec iov;
     
     iov.iov_base = &regs;
@@ -69,6 +72,7 @@ void debugger_ret(uint32_t* host) {
     for (int i = 0; i < 16; i++) {
         if (regs.dbg_regs[i].addr == (uint64_t)host && 
             (regs.dbg_regs[i].ctrl & 0x1)) {
+            logger_log("Ret at %p", host);
             regs.dbg_regs[i].ctrl = 0;
             break;
         }
@@ -77,7 +81,6 @@ void debugger_ret(uint32_t* host) {
     iov.iov_base = &regs;
     iov.iov_len = sizeof(regs);
     ptrace(PTRACE_SETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
-
 }
 /*
 void debugger_brk(uint32_t* host) {
