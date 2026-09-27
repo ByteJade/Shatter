@@ -90,7 +90,7 @@ void print_op(X86_64* buf, operand_t* op) {
         }
         if (op->type&IDX) {
             if (buf->prefix == FS) printf("rip ");
-            else printf("%s ", regs64[op->reg]);
+            else printf("%s ", regs64[op->idx]);
             printf("%s", scale[op->scale]);
         }
         if (op->type&IMM) {
