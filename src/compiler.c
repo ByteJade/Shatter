@@ -198,7 +198,7 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
         clock_gettime(CLOCK_MONOTONIC, &end);
         uint64_t nseconds = (uint64_t)(end.tv_sec - start.tv_sec) * 1000000000ULL + 
                     (end.tv_nsec - start.tv_nsec);
-        logger_deb("Compile finish, time: %lf nseconds", nseconds);
+        logger_deb("Compile finish, time: %li nseconds", nseconds);
     }
     cache_end_block();
     return ret;
