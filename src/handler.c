@@ -115,7 +115,7 @@ size_t sc_get_reg_guest(struct sigcontext* sc, const char* reg) {
     return 0;
 }
 void sc_print_flags(struct sigcontext* sc) {
-    logger_log("Flags: N%i Z%i C%i V%i",
+    printf("Flags: N%i Z%i C%i V%i\n",
         sc_get_flag(sc, "N"),
         sc_get_flag(sc, "Z"),
         sc_get_flag(sc, "C"),
@@ -125,9 +125,9 @@ void sc_print_flags(struct sigcontext* sc) {
 void sc_print_regs_host(struct sigcontext* sc) {
     #ifdef __aarch64__
     for (int i = 0; i < 31; i++) {
-        printf("X%i: %llX", i, sc->regs[i]);
+        printf("X%i: %llX\n", i, sc->regs[i]);
     }
-    printf("sp: %llX", sc->sp);
+    printf("sp: %llX\n", sc->sp);
     #endif
 }
 void sc_print_regs_guest(struct sigcontext* sc) {
