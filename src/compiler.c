@@ -91,7 +91,7 @@ int jump(compiler_t* compiler) {
         uint8_t* p = points[compiler->reader].point;
         if (!has_block(compiler, p)) {
             compiler->guest = p;
-            block_start();
+            block_start(compiler);
             return 1;
         }
     }
@@ -124,7 +124,7 @@ int emulate(compiler_t* compiler, X86_64* buf) {
 void decode_step(compiler_t* compiler) {
     X86_64* buf;
     // TODO: flags
-    block_start();
+    block_start(compiler);
     do {
         size_t buf_p = dynarray_push((void**)&compiler->buffer);
         buf = compiler->buffer + buf_p;
