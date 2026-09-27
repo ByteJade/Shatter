@@ -5,7 +5,7 @@ void execute(void* start) {
     asm volatile (
         "blr %0\n"
         : : "r" (start)
-        : "memory", "x24", "x25", "x26", "x27", "x28"
+        : "memory", "x24", "x25", "x26", "x27", "x28", "x29", "x30"
     );
     #else
     asm volatile (
@@ -22,7 +22,7 @@ void launch(void* start, stack_t* stack) {
         "br %1\n"
 
         : : "r" (stack->top), "r" (start)
-        : "memory", "x24", "x25", "x26", "x27", "x28"
+        : "memory"
     );
     #else
     asm volatile (
