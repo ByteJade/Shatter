@@ -1,7 +1,7 @@
 #ifndef HANDLER_H
 #define HANDLER_H
 
-#include <signal.h>
+#include <stdlib.h>
 
 void handler_init(void);
 
