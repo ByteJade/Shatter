@@ -93,7 +93,7 @@ void sc_set_pc(struct sigcontext* sc, size_t pc) {
 }
 int sc_get_flag(struct sigcontext* sc, const char* flag) {
     #ifdef __aarch64__
-    switch (f) {
+    switch (*flag) {
         case 'N': return (sc->pstate >> 31) & 1;
         case 'Z': return (sc->pstate >> 30) & 1;
         case 'C': return (sc->pstate >> 29) & 1;
@@ -125,9 +125,9 @@ void sc_print_flags(struct sigcontext* sc) {
 void sc_print_regs_host(struct sigcontext* sc) {
     #ifdef __aarch64__
     for (int i = 0; i < 31; i++) {
-        printf("X%i: %lX", i, sc->regs[i]);
+        printf("X%i: %llX", i, sc->regs[i]);
     }
-    printf("sp: %lX", sc->sp);
+    printf("sp: %llX", sc->sp);
     #endif
 }
 void sc_print_regs_guest(struct sigcontext* sc) {
