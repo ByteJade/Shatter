@@ -1,12 +1,13 @@
 #include "../inc/debugger.h"
-#include "../inc/logger.h"
 #include "../inc/dynarray.h"
 #include "../inc/handler.h"
 #include "../inc/encoder.h"
 #include "../inc/printer_Aarch64.h"
 #include <pthread.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #define BCC_M 0xFF00001F
 
@@ -48,7 +49,6 @@ void debugger_ret(uint32_t* host) {
 }
 void emulate_jump(struct sigcontext* sc) {
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
-    logger_log("Emulate:");
     uint32_t instr = *pc;
     print_aarch64(instr);
     if (instr == (RET_R | (30<<5))) return;
@@ -103,6 +103,16 @@ void print_memory(struct sigcontext* sc, char* buf) {
     }
     printf("%s: %lX\n", base, *(uint64_t*)(reg + imm));
 }
+void debugger_usage() {
+    printf("debugger commands:\n");
+    printf("step - single step\n");
+    printf("exit - continue execution\n");
+    printf("abort - exit from programm\n");
+    printf("flags - print cpu flags\n");
+    printf("regs - print cpu regs\n");
+    printf("memory [<reg>+<imm>] - print data in this location\n");
+    printf("help - print this message\n");
+}
 void debugger_step(struct sigcontext* sc) {
     pthread_mutex_lock(&mut);
     debugger_ret((uint32_t*)sc_get_pc(sc));
@@ -118,14 +128,20 @@ void debugger_step(struct sigcontext* sc) {
             case 'e':
                 run = 0;
                 break;
+            case 'a':
+                exit(EXIT_SUCCESS);
+                break;
             case 'f':
                 sc_print_flags(sc);
                 break;
-            case 'p':
+            case 'r':
                 sc_print_regs_host(sc);
                 break;
             case 'm':
                 print_memory(sc, buf);
+                break;
+            case 'h':
+                debugger_usage();
                 break;
         }
     }
