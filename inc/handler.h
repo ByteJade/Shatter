@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 
+struct sigcontext;
+
 void handler_init(void);
 
 size_t sc_get_pc(struct sigcontext* sc);
