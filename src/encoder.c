@@ -276,8 +276,8 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case AND: emit_math(compiler, buf, ANDS_R, 0); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;
         case SHL:
-        case SAL: emit_math(compiler, buf, ORR_R, 0); break;
-        case SHR: emit_math(compiler, buf, LSL_R, 0); break;
+        case SAL: emit_math(compiler, buf, LSL_R, 0); break;
+        case SHR: emit_math(compiler, buf, LSR_R, 0); break;
         case SAR: emit_math(compiler, buf, ASR_R, 0); break;
         case EBR: case NOP: case LEAVE: case HLT: break;
         case JMP: emit_branch(compiler, buf, BR); break;
