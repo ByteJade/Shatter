@@ -89,6 +89,19 @@ void emulate_jump(struct sigcontext* sc) {
         imm = get_imm26(instr);
     debugger_brk(pc + imm);
 }
+void print_memory(struct sigcontext* sc, char* buf) {
+    char com[32];
+    char base[32];
+    sscanf(buf, "%s %s", com, base);
+    int pos = 1;
+    int imm = 0;
+    size_t reg = sc_get_reg_host(sc, base);
+    char* sep = strpbrk(base, "+-");
+    if (sep) {
+        imm = strtol(sep, NULL, 0);
+    }
+    printf("%s: %lX", base, *(uint64_t*)(reg + imm));
+}
 void debugger_step(struct sigcontext* sc) {
     pthread_mutex_lock(&mut);
     debugger_ret((uint32_t*)sc_get_pc(sc));
@@ -109,6 +122,9 @@ void debugger_step(struct sigcontext* sc) {
                 break;
             case 'p':
                 sc_print_regs_host(sc);
+                break;
+            case 'm':
+                print_memory(sc, buf);
                 break;
         }
     }
