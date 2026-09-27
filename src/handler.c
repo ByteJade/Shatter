@@ -4,7 +4,7 @@
 #include "../inc/cache.h"
 #include "../inc/compiler.h"
 #include <stdint.h>
-#include <sys/unistd.h>
+#include <signal.h>
 #include <unistd.h>
 
 uint32_t* compile(size_t pc) {
