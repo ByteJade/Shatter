@@ -5,6 +5,9 @@
 #include "../inc/compiler.h"
 #include <stdint.h>
 #include <signal.h>
+#include <sys/ucontext.h>
+#include <sys/ptrace.h>
+#include <asm/ptrace.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -24,10 +27,15 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
     uint32_t instruction = *pc;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
-    if (ret == 0) {
+    #ifdef __aarch64__
+    if (ret == 0 || *pstate & PSTATE_SS_BIT) {
+        uint64_t *pstate = &ctx->uc_mcontext.pstate;
+        if (!(*pstate & PSTATE_SS_BIT))
+            *pstate |= PSTATE_SS_BIT;
         debugger_step(sc);
         return;
     }
+    #endif
     uint8_t* patch = cache_get_patch(ret);
     uint32_t* target = compile((size_t)patch);
     int32_t offset = target - pc;

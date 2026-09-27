@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <stdint.h>
+#include <unistd.h>
 
 #define BCC_M 0xFF00001F
 
@@ -47,7 +48,7 @@ void debugger_ret(uint32_t* host) {
         }
     }
 }
-void emulate_jump(struct sigcontext* sc) {
+/*void emulate_jump(struct sigcontext* sc) {
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
     logger_log("Emulate:");
     uint32_t instr = *pc;
@@ -91,7 +92,7 @@ void emulate_jump(struct sigcontext* sc) {
     if ((instr&B_M) == B)
         imm = get_imm26(instr);
     debugger_brk(pc + imm);
-}
+} */
 void print_memory(struct sigcontext* sc, char* buf) {
     char com[32];
     char base[32];
@@ -114,10 +115,10 @@ void debugger_step(struct sigcontext* sc) {
         fgets(buf, sizeof(buf), stdin);
         switch (buf[0]) {
             case 's':
-                emulate_jump(sc);
-                [[fallthrough]];
-            case 'e':
                 run = 0;
+                break;
+            case 'e':
+                _exit(0);
                 break;
             case 'f':
                 sc_print_flags(sc);
