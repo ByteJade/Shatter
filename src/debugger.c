@@ -33,7 +33,7 @@ void debugger_brk(uint32_t* host) {
     b->pos = host;
     b->instr = *host;
     *host = BRK;
-    __builtin___clear_cache(host, host+4);
+    __builtin___clear_cache(host, host+1);
 }
 void debugger_ret(uint32_t* host) {
     for (size_t i = 0; i < dynarray_size(breaks); i++) {
@@ -41,6 +41,7 @@ void debugger_ret(uint32_t* host) {
         if (b->pos == host) {
             *host = b->instr;
             *b = breaks[dynarray_pop(breaks)];
+            __builtin___clear_cache(host, host + 1);
             return;
         }
     }
