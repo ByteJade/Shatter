@@ -2,6 +2,7 @@
 #include "../inc/dynarray.h"
 #include "../inc/handler.h"
 #include "../inc/encoder.h"
+#include "../inc/logger.h"
 #include "../inc/cache.h"
 #include "../inc/printer_Aarch64.h"
 #include <pthread.h>
@@ -144,6 +145,9 @@ void debugger_step(struct sigcontext* sc) {
                 break;
             case 'h':
                 debugger_usage();
+                break;
+            case 'l':
+                logger_set_level(strpbrk(buf, " ")+1);
                 break;
             case 'c':
                 cache_print();
