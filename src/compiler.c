@@ -17,7 +17,7 @@ compiler_t* compiler_init(void) {
     compiler->points = dynarray_init(sizeof(point_t));
     compiler->patches = dynarray_init(sizeof(patch_t));
     compiler->reader = 0;
-    compiler->need_entry = 0;
+    compiler->flags = 0;
 
     return compiler;
 }
@@ -101,6 +101,9 @@ int jump(compiler_t* compiler) {
 int emulate(compiler_t* compiler, X86_64* buf) {
     int do_jump = 0;
     switch (buf->type) {
+        case CALL:
+            compiler->flags |= NEED_STACK;
+            break;
         case JO ... JG:
             push_jump(compiler, buf->dst.imm);
             break;
@@ -113,7 +116,7 @@ int emulate(compiler_t* compiler, X86_64* buf) {
             do_jump = 1;
             break;
         case RET:
-            compiler->need_entry = 1;
+            compiler->flags |= NEED_ENTRY;
             do_jump = 1;
             break;
     }
@@ -178,7 +181,7 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     decode_step(compiler);
     cache_start_block(guest);
     uint32_t* ret = cache_get_host();
-    if (compiler->need_entry) emit_entry();
+    emit_entry(compiler);
     for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {
         logger_log("start block %i", i);
         block_t* block = compiler->blocks + i;
