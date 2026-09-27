@@ -66,9 +66,10 @@ int cache_set_patch(uint8_t* guest) {
         id = dynarray_push((void**)&patches);
     }
     patches[id] = guest;
-    return id;
+    return ++id;
 }
 uint8_t* cache_get_patch(int id) {
+    id--;
     size_t reuse_p = dynarray_push((void**)&reuse);
     reuse[reuse_p] = id;
     return patches[id];
@@ -90,4 +91,16 @@ uint32_t* cache_search(uint8_t* guest) {
         }
     }
     return NULL;
+}
+void cache_clear(void *address, uint64_t len) {
+    char *begin = (char *)address;
+    char *end = begin + len;
+    
+    __builtin___clear_cache(begin, end);
+
+    __asm__ __volatile__ (
+        "dsb ish\n"
+        "isb\n"
+        : : : "memory"
+    );
 }

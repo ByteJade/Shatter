@@ -3,7 +3,6 @@
 #include "../inc/logger.h"
 #include "../inc/cache.h"
 #include "../inc/compiler.h"
-#include <sys/ptrace.h>
 #include <stdint.h>
 #include <signal.h>
 #include <unistd.h>
@@ -21,18 +20,19 @@ uint32_t* compile(size_t pc) {
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
-    if (info->si_code == 4) {
-        debugger_step(sc);
-        return;
-    }
+    
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
     uint32_t instruction = *pc;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
+    if (ret == 0) {
+        debugger_step(sc);
+        return;
+    }
     uint8_t* patch = cache_get_patch(ret);
     uint32_t* target = compile((size_t)patch);
     int32_t offset = target - pc;
     *pc = 0x94000000 | (offset & 0x3FFFFFF);
-    __builtin___clear_cache(pc, pc+1);
+    cache_clear(pc, 4);
     logger_deb("found patch: %i", ret);
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {

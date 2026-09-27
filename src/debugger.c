@@ -3,15 +3,11 @@
 #include "../inc/dynarray.h"
 #include "../inc/handler.h"
 #include "../inc/encoder.h"
+#include "../inc/cache.h"
 #include "../inc/printer_Aarch64.h"
 #include <pthread.h>
 #include <string.h>
-
-#include <sys/ptrace.h>
-#include <sys/uio.h>
-#include <linux/elf.h>
-#include <sys/syscall.h>
-#include <unistd.h>
+#include <stdint.h>
 
 #define BCC_M 0xFF00001F
 
@@ -22,81 +18,23 @@ typedef struct {
 
 int enabled = 0;
 pthread_mutex_t mut;
-//break_t* breaks = NULL;
+break_t* breaks = NULL;
 
 void debugger_init(void) {
     enabled = 1;
-    //breaks = dynarray_init(sizeof(break_t));
-    if (ptrace(PTRACE_TRACEME, 0, NULL, NULL) < 0) {
-        logger_err("PTRACE_TRACEME failed");
-    }
+    breaks = dynarray_init(sizeof(break_t));
 }
 void debugger_fini(void) {
     enabled = 0;
-    //dynarray_fini(breaks);
+    dynarray_fini(breaks);
 }
-struct user_hwdebug_state {
-    struct {
-        uint64_t addr;
-        uint32_t ctrl;
-        uint32_t pad;
-    } dbg_regs[16];
-};
-
-void debugger_brk(uint32_t* host) {
-    struct user_hwdebug_state regs = {0};
-    struct iovec iov;
-    
-    iov.iov_base = &regs;
-    iov.iov_len = sizeof(regs);
-    if (ptrace(PTRACE_GETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov) < 0) {
-        logger_err("cannot get break");
-    }
-    
-    for (int i = 0; i < 16; i++) {
-        if (regs.dbg_regs[i].ctrl == 0) {
-            regs.dbg_regs[i].addr = (uint64_t)host;
-            regs.dbg_regs[i].ctrl = 1 | (3 << 1) | (0xf << 5);
-            logger_log("Set break at %p", host);
-            break;
-        }
-    }
-    
-    iov.iov_base = &regs;
-    iov.iov_len = sizeof(regs);
-    if (ptrace(PTRACE_SETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov) < 0) {
-        logger_err("cannot set break");
-    }
-}
-void debugger_ret(uint32_t* host) {
-    struct user_hwdebug_state regs = {0};
-    struct iovec iov;
-    
-    iov.iov_base = &regs;
-    iov.iov_len = sizeof(regs);
-    ptrace(PTRACE_GETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
-    
-    for (int i = 0; i < 16; i++) {
-        if (regs.dbg_regs[i].addr == (uint64_t)host && 
-            (regs.dbg_regs[i].ctrl & 0x1)) {
-            logger_log("Ret at %p", host);
-            regs.dbg_regs[i].ctrl = 0;
-            break;
-        }
-    }
-    
-    iov.iov_base = &regs;
-    iov.iov_len = sizeof(regs);
-    ptrace(PTRACE_SETREGSET, syscall(SYS_gettid), NT_ARM_HW_BREAK, &iov);
-}
-/*
 void debugger_brk(uint32_t* host) {
     size_t break_p = dynarray_push((void**)&breaks);
     break_t* b = breaks + break_p;
     b->pos = host;
     b->instr = *host;
     *host = BRK;
-    __builtin___clear_cache(host, host+1);
+    cache_clear(host, 4);
 }
 void debugger_ret(uint32_t* host) {
     for (size_t i = 0; i < dynarray_size(breaks); i++) {
@@ -104,11 +42,11 @@ void debugger_ret(uint32_t* host) {
         if (b->pos == host) {
             *host = b->instr;
             *b = breaks[dynarray_pop(breaks)];
-            __builtin___clear_cache(host, host+1);
+            cache_clear(host, 4);
             return;
         }
     }
-}*/
+}
 void emulate_jump(struct sigcontext* sc) {
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
     logger_log("Emulate:");
