@@ -5,6 +5,7 @@
 #include "../inc/elf_manager.h"
 #include "../inc/launcher.h"
 #include "../inc/handler.h"
+#include "../inc/cache.h"
 #include <stdlib.h>
 
 [[noreturn]] void usage(void) {
