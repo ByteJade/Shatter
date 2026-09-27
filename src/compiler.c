@@ -102,6 +102,9 @@ int jump(compiler_t* compiler) {
 int emulate(compiler_t* compiler, X86_64* buf) {
     int do_jump = 0;
     switch (buf->type) {
+        case LEAVE:
+            compiler->flags |= NEED_LEAVE;
+            break;
         case CALL:
             compiler->flags |= NEED_STACK;
             break;
