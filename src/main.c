@@ -38,6 +38,8 @@ int main(int argc, char** argv, char** envp) {
         logger_err("Wait: filename");
         usage();
     }
+    cache_init();
+    handler_init();
     elf_manager_init();
     stack_t* stack = stack_init();
     stack_setup(stack, argc - user_argc, argv + user_argc, envp);
@@ -46,7 +48,6 @@ int main(int argc, char** argv, char** envp) {
         logger_err("Cannot open file");
         return EXIT_FAILURE;
     }
-    handler_init();
     elf_read_dynamic(elf);
     elf_start(elf);
     launch((void*)(elf->base + elf->head.e_entry), stack);
@@ -55,5 +56,6 @@ int main(int argc, char** argv, char** envp) {
     stack_fini(stack);
     elf_manager_fini();
     debugger_fini();
+    cache_fini();
     return EXIT_SUCCESS;
 }
