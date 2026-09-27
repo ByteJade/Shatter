@@ -166,7 +166,7 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     decode_step(compiler);
     cache_start_block(guest);
     uint32_t* ret = cache_get_host();
-    if (compiler->need_entry) emit_entry();
+    emit_entry(compiler);
     for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {
         logger_log("start block %i", i);
         block_t* block = compiler->blocks + i;
