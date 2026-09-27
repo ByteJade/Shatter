@@ -132,6 +132,7 @@ void decode_r_rm_XMM(compiler_t* compiler, X86_64* buf, int xmm) {
 
 void decode(compiler_t* compiler, X86_64* buf) {
     buf->prefix = 0;
+    buf->reverse = 0;
     buf->dst.type = NONE;
     buf->src.type = NONE;
     uint8_t rex = 0;
