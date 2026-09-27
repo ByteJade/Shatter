@@ -203,9 +203,9 @@ void emit_patch(compiler_t* compiler, X86_64* buf) {
     cache_emit(buf->type);
 }
 void emit_entry(compiler_t* compiler) {
-    if (compiler->need_entry)
-        cache_emit(ASF|STP_PRE | ((-16&0x3FF)<<12) | 29 | (31<<5) | (30<<10));
     cache_emit(ASF|ADD_I | 28 | (31<<5));
+    if (compiler->need_entry)
+        cache_emit(ASF|STP_PRE | ((-16&0x3FF)<<12) | 29 | (28<<5) | (30<<10));
 }
 void emit_ret() {
     cache_emit(ASF|ADD_I | 31 | (29<<5));
