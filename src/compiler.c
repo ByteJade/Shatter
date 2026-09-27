@@ -6,6 +6,7 @@
 #include "../inc/encoder.h"
 #include "../inc/printer_X86_64.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 compiler_t* compiler_init(void) {
     compiler_t* compiler = (compiler_t*)malloc(sizeof(compiler_t));
@@ -121,6 +122,11 @@ int emulate(compiler_t* compiler, X86_64* buf) {
     }
     return 1;
 }
+int block_compare(const void *a, const void *b) {
+    const block_t* ba = (const block_t*)a;
+    const block_t* bb = (const block_t*)b;
+    return (ba->start > bb->start) - (ba->start < bb->start);
+}
 void decode_step(compiler_t* compiler) {
     X86_64* buf;
     // TODO: flags
@@ -134,6 +140,12 @@ void decode_step(compiler_t* compiler) {
         size_t size_p = dynarray_push((void**)&compiler->sizes);
         compiler->sizes[size_p] = cur_guest - prev_guest;
     } while (emulate(compiler, buf));
+    qsort(
+        compiler->blocks,
+        dynarray_size(compiler->blocks),
+        sizeof(block_t),
+        block_compare
+    );
     logger_deb("End decode, blocks: %i", dynarray_size(compiler->blocks));
 }
 void encode_step(compiler_t* compiler, block_t* block) {
