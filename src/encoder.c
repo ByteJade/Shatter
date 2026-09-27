@@ -208,7 +208,7 @@ void emit_entry() {
 }
 void emit_ret() {
     cache_emit(ASF|LDP_POST | (16<<12) | 30 | (28<<5) | (29<<10));
-    cache_emit(ASF|ADD_I | 31 | (29<<5));
+    cache_emit(ASF|ADD_I | 31 | (28<<5));
     cache_emit(RET_R | (30 << 5));
 }
 void emit_jump(uint32_t* dst, uint32_t* target) {
