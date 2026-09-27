@@ -72,6 +72,14 @@ int has_block(compiler_t* compiler, uint8_t* p) {
     }
     return 0;
 }
+void block_start(compiler_t* compiler) {
+    size_t block_p = dynarray_push((void**)&compiler->blocks);
+    block_t* block = compiler->blocks + block_p;
+    block->start = compiler->guest;
+    block->end = 0;
+    block->buffer = dynarray_size(compiler->blocks);
+    block->size = 0;
+}
 int jump(compiler_t* compiler) {
     size_t prev_p = dynarray_size(compiler->blocks)-1;
     block_t* prev = compiler->blocks + prev_p;
@@ -82,14 +90,8 @@ int jump(compiler_t* compiler) {
     for (; compiler->reader < dynarray_size(points); compiler->reader++) {
         uint8_t* p = points[compiler->reader].point;
         if (!has_block(compiler, p)) {
-            uint32_t buf = buffer_size;
-            size_t block_p = dynarray_push((void**)&compiler->blocks);
-            block_t* block = compiler->blocks + block_p;
-            block->start = p;
-            block->end = 0;
-            block->buffer = buf;
-            block->size = 0;
             compiler->guest = p;
+            block_start();
             return 1;
         }
     }
@@ -122,6 +124,7 @@ int emulate(compiler_t* compiler, X86_64* buf) {
 void decode_step(compiler_t* compiler) {
     X86_64* buf;
     // TODO: flags
+    block_start();
     do {
         size_t buf_p = dynarray_push((void**)&compiler->buffer);
         buf = compiler->buffer + buf_p;
@@ -157,7 +160,7 @@ void patch_step(compiler_t* compiler) {
     }
 }
 uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
-    logger_deb("Start compile: %lX");
+    logger_deb("Start compile: %p", guest);
     compiler->guest = guest;
     decode_step(compiler);
     compiler->guest = guest;
