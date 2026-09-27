@@ -27,6 +27,9 @@ pthread_mutex_t mut;
 void debugger_init(void) {
     enabled = 1;
     //breaks = dynarray_init(sizeof(break_t));
+    if (ptrace(PTRACE_TRACEME, 0, NULL, NULL) < 0) {
+        logger_err("PTRACE_TRACEME failed");
+    }
 }
 void debugger_fini(void) {
     enabled = 0;
