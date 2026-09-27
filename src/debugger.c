@@ -2,6 +2,7 @@
 #include "../inc/dynarray.h"
 #include "../inc/handler.h"
 #include "../inc/encoder.h"
+#include "../inc/cache.h"
 #include "../inc/printer_Aarch64.h"
 #include <pthread.h>
 #include <stdlib.h>
@@ -112,6 +113,7 @@ void debugger_usage() {
     printf("regs - print cpu regs\n");
     printf("memory [<reg>+<imm>] - print data in this location\n");
     printf("help - print this message\n");
+    printf("cache - print last compiled block\n");
 }
 void debugger_step(struct sigcontext* sc) {
     pthread_mutex_lock(&mut);
@@ -142,6 +144,9 @@ void debugger_step(struct sigcontext* sc) {
                 break;
             case 'h':
                 debugger_usage();
+                break;
+            case 'c':
+                cache_print();
                 break;
         }
     }
