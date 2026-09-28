@@ -32,19 +32,15 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             decode_rm_r_XMM(compiler, buf,1);
             break;
         case 0x2A:
-            buf->type = CVTSI2X;
+            buf->type = CVTSI2SS;
             decode_r_rm_XMM(compiler, buf,0);
             break;
         case 0x2C:
-            buf->type = CVTX2SI;
+            buf->type = CVTSS2SI;
             decode_rm_r_XMM(compiler, buf,0);
             break;
-        case 0x2E:
-            buf->type = UCOMIX;
-            decode_r_rm_XMM(compiler, buf,1);
-            break;
         case 0x2F:
-            buf->type = COMIX;
+            buf->type = COMISD;
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x40 ... 0x4F:
@@ -57,23 +53,23 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x58:
-            buf->type = ADDX;
+            buf->type = ADDSS;
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x59:
-            buf->type = MULX;
+            buf->type = MULSS;
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x5A:
-            buf->type = CVTX;
+            buf->type = CVTSS2SD;
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x5C:
-            buf->type = SUBX;
+            buf->type = SUBSS;
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x5E:
-            buf->type = DIVX;
+            buf->type = DIVSS;
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x6E:

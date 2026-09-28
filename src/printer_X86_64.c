@@ -24,8 +24,16 @@ const char* instr_types[] = {
     "leave", "nop", "cltq", "cltd",
 
     "syscall", "movx", "ebr", "hlt",
-    "movapx", "cvtsi2x", "cvtx2si",
-    "ucomix", "movq",
+    "movapx", "movq",
+    "cvtsi2ss", "cvtsi2sd",
+    "cvtss2si", "cvtsd2si",
+
+    "pxor", "comisd",
+    "addss", "addsd", "mulss", "mulsd", 
+    "subss", "subsd", "divss", "divsd",
+    "cvtss2sd", "cvtsd2ss",
+    
+    "movzx8", "movzx16", "movsx8", "movsx16",
 
     "cmovo", "cmovno", "cmovb", "cmovae",
     "cmove", "cmovne", "cmovbe", "cmova",
@@ -36,10 +44,6 @@ const char* instr_types[] = {
     "sete", "setne", "setbe", "seta",
     "sets", "setns", "setp", "setpo",
     "setl", "setge", "setle", "setg",
-
-    "pxor", "addx", "mulx", 
-    "subx", "divx", "comix", "cvtx",
-    "movzx8", "movzx16", "movsx8", "movsx16",
 };
 const char* regs64[] = {
     "rax", "rcx", "rdx", "rbx",

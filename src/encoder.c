@@ -135,7 +135,6 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
 void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t r0 = buf->dst.reg;
     uint8_t r1 = buf->src.reg;
-    uint32_t nsf = (buf->prefix == REPN) * NSF;
     uint32_t msf = (buf->prefix == REPN) * MSF;
     if (buf->dst.type & MEM) {
         emit_address(compiler, SC1R, &buf->dst, buf);
@@ -146,7 +145,7 @@ void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
         cache_emit(msf|LDR_N | (SC1R<<5) | 16);
         r1 = 16;
     }
-    cache_emit(nsf|opcode|(r0)|(r0<<5)|(r1<<16));
+    cache_emit(opcode|(r0)|(r0<<5)|(r1<<16));
     if (buf->dst.type & MEM) cache_emit(msf|STR_N | (SC1R<<5) | 16);
 }
 void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
@@ -289,9 +288,13 @@ uint32_t math_group[] = {
     ANDS_R, SUBS_R, EOR_R, SUBS_R,
 };
 uint32_t neon_group[] = {
-    EOR_N, ADD_N, MUL_N,
-    SUB_N, DIV_N, CMP_N,
-    FCVTU_N
+    EOR_N, CMP_N,
+    ADD_N, NSF|ADD_N,
+    MUL_N, NSF|MUL_N,
+    SUB_N, NSF|SUB_N,
+    DIV_N, NSF|DIV_N,
+    CMP_N,
+    FCVT_N, FCVTU_N
 };
 
 uint32_t cset_group[] = {
@@ -309,17 +312,21 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint32_t opcode = math_group[buf->type - ADD];
             emit_math(compiler, buf, opcode, buf->type == CMP);
         } break;
-        case PXOR ... CVTX: {
+        case PXOR ... CVTSD2SS: {
             uint32_t opcode = neon_group[buf->type - PXOR];
-            if (buf->type == CVTX && buf->prefix == REPN)
-                opcode = FCVT_N;
             emit_neon(compiler, buf, opcode);
         } break;
         case SETB ... SETNE: {
             uint32_t opcode = cset_group[buf->type - SETB];
             cache_emit(opcode | x86_regs[buf->dst.reg]);
         } break;
-        case CVTX2SI: {
+        case CVTSS2SI: 
+        case CVTSD2SI: {
+            uint32_t prefix = ASF * (buf->prefix == REPN);
+            cache_emit(prefix | FCVTNS | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
+        } break;
+        case CVTSI2SS: 
+        case CVTSI2SD: {
             uint32_t prefix = ASF * (buf->prefix == REPN);
             cache_emit(prefix | FCVTNS | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
         } break;
