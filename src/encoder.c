@@ -58,7 +58,7 @@ void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf)
             logger_err("Too large rip distance");
         }
         cache_emit(ADRP | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | dst);
-        cache_emit((ASF|ADD_I | ((full & 0xFFF) << 10) | (dst << 5) | dst));
+        if (full & 0xFFF) cache_emit((ASF|ADD_I | ((full & 0xFFF) << 10) | (dst << 5) | dst));
     } else if (op->type&IDX) {
         if (op->scale != 0) {
             cache_emit(UBFM | ((-(op->scale) & 0x3F) << 16) |
