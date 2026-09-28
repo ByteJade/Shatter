@@ -68,6 +68,10 @@ const char* regs8[] = {
 const char* scale[] = {
     "", "* 2 ", "* 4 ", "* 8 ",
 };
+void print_imm(int64_t imm) {
+    if (imm >= 0) printf("+ %lx ", imm);
+    else printf("- %lx ",(~imm) + 1);
+}
 
 void print_op(X86_64* buf, operand_t* op) {
     if (op->type == REG) {
@@ -81,7 +85,7 @@ void print_op(X86_64* buf, operand_t* op) {
     } else if (op->type == IMM) {
         printf("%lx ", op->imm);
     } else if (op->type == (REG|XMM)) {
-        printf("xmm%i ", op->reg);
+        print_imm(op->imm);
     } else {
         printf("[ ");
         if (op->type&REG) {
@@ -99,8 +103,7 @@ void print_op(X86_64* buf, operand_t* op) {
                     printf("fs ");
                 else printf("rip ");
             }
-            if (op->imm > 0) printf("+ %lx ", op->imm);
-            else if (op->imm < 0) printf("- %lx ",(~op->imm) + 1);
+            print_imm(op->imm);
         }
         printf("] ");
     }
