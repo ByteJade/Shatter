@@ -98,19 +98,6 @@ void print_r_r_m(uint32_t buf) {
 }
 
 void decode_aarch64(uint32_t buf) {
-    if ((buf&B_M) == B) {
-        printf("b "GREEN_COLOR"%i", get_imm26(buf));
-        return;
-    }
-    if ((buf&BC_M) == BEQ) {
-        printf("%s "GREEN_COLOR"%i", jumps[buf&0xF], get_imm19(buf));
-        return;
-    }
-    if ((buf&AR_M) == AND_R) {
-        printf("%s", arythm[(buf>>28)&7]);
-        print_r_r_r(buf);
-        return;
-    }
     if ((buf&AR_M) == ADD_R) {
         printf("%s", math[(buf>>29)&3]);
         print_r_r_r(buf);
@@ -134,6 +121,23 @@ void decode_aarch64(uint32_t buf) {
     if ((buf&MOV_M) == MOVK_I) {
         printf("movk (%i),", (buf >> 21)&3);
         print_r_i(buf);
+        return;
+    }
+    if ((buf&B_M) == B) {
+        printf("b "GREEN_COLOR"%i", get_imm26(buf));
+        return;
+    }
+    if ((buf&B_M) == BL) {
+        printf("bl "GREEN_COLOR"%i", get_imm26(buf));
+        return;
+    }
+    if ((buf&BC_M) == BEQ) {
+        printf("%s "GREEN_COLOR"%i", jumps[buf&0xF], get_imm19(buf));
+        return;
+    }
+    if ((buf&AR_M) == AND_R) {
+        printf("%s", arythm[(buf>>28)&7]);
+        print_r_r_r(buf);
         return;
     }
     if ((buf&MEM_M) == STUR) {
