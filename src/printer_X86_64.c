@@ -29,7 +29,8 @@ const char* instr_types[] = {
     "cvtsi2ss", "cvtsi2sd",
     "cvtss2si", "cvtsd2si",
 
-    "pxor", "comisd",
+    "pxor",
+    "comiss", "comisd",
     "addss", "addsd", "mulss", "mulsd", 
     "subss", "subsd", "divss", "divsd",
     "cvtss2sd", "cvtsd2ss",
