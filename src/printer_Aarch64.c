@@ -16,6 +16,10 @@ const char* math[] = {
     "add", "adds", "sub", "subs",
 };
 
+int32_t get_imm10(uint32_t buf) {
+    int32_t n = (buf >> 12) & 0x3FF;
+    return (n << 23) >> 23;
+}
 int32_t get_imm12(uint32_t buf) {
     int32_t n = (buf >> 10) & 0xFFF;
     return (n << 20) >> 20;
@@ -39,6 +43,7 @@ int get_reg(uint32_t buf, int reg) {
         case 0: ret = buf; break;
         case 1: ret = buf>>5; break;
         case 2: ret = buf>>16; break;
+        case 3: ret = buf>>10; break;
     }
     return ret&0x1F;
 }
@@ -76,7 +81,7 @@ void print_r_m(uint32_t buf) {
         get_reg(buf, 1)
     );
     if (!((buf >> 24)&1)) {
-        int imm = (buf>>12)&0x1FF;
+        int imm = get_imm10(buf);
         int addent = (buf>>10)&0x3;
         if (addent == 1)
             printf("], %i", imm);
@@ -88,11 +93,11 @@ void print_r_r_m(uint32_t buf) {
     char reg = 'W';
     if (buf&MSF) reg = 'X';
     printf(GREEN_COLOR" %c%i, %c%i, [X%i",
+        reg, get_reg(buf, 3),
         reg, get_reg(buf, 0),
-        reg, get_reg(buf, 2),
         get_reg(buf, 1)
     );
-    int imm = (buf>>12)&0x1FF;
+    int imm = get_imm10(buf);
     if ((buf >> 24)&1) {
         printf(", %i]!", imm);
     } else printf("], %i", imm);
