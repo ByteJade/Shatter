@@ -15,7 +15,9 @@ const char* arythm[] = {
 const char* math[] = {
     "add", "adds", "sub", "subs",
 };
-
+const char* shift[] = {
+    "lsl", "lsr", "asr", "ror",
+};
 int32_t get_imm10(uint32_t buf) {
     int32_t n = (buf >> 12) & 0x3F8;
     return (n << 22) >> 22;
@@ -102,7 +104,6 @@ void print_r_r_m(uint32_t buf) {
         printf(", %i]!", imm);
     } else printf("], %i", imm);
 }
-
 void decode_aarch64(uint32_t buf) {
     if ((buf&AR_M) == ADD_R) {
         printf("%s", math[(buf>>29)&3]);
@@ -165,6 +166,10 @@ void decode_aarch64(uint32_t buf) {
         printf("ldp");
         print_r_r_m(buf);
         return;
+    }
+    if ((buf&AS_M) == LSL_R) {
+        printf("%s", shift[(buf>>10)&3]);
+        print_r_r_r(buf);
     }
     if ((buf&ADRP_M) == ADRP) {
         printf("adrp "GREEN_COLOR"X%i", get_reg(buf, 0));
