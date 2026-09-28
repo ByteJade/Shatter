@@ -334,7 +334,8 @@ void encode(compiler_t* compiler, X86_64* buf) {
             if (buf->src.type&XMM) cache_emit(FMOV_N | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
             else cache_emit(FMOVR_N | (buf->dst.reg) | (x86_regs[buf->src.reg] << 5));
             break;
-        case MOVX: {
+        case MOVSS: 
+        case MOVSD:{
             uint32_t sf = (buf->prefix == REPN) * MSF;
             if (buf->dst.type & MEM) {
                 emit_address(compiler, SC1R, &buf->dst, buf);
