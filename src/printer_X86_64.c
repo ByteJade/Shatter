@@ -85,7 +85,8 @@ void print_op(X86_64* buf, operand_t* op) {
     } else if (op->type == IMM) {
         printf("%lx ", op->imm);
     } else if (op->type == (REG|XMM)) {
-        print_imm(op->imm);
+        if (op->imm >= 0) printf("%lx ", op->imm);
+        else printf("-%lx ",(~op->imm) + 1);
     } else {
         printf("[ ");
         if (op->type&REG) {
@@ -103,7 +104,8 @@ void print_op(X86_64* buf, operand_t* op) {
                     printf("fs ");
                 else printf("rip ");
             }
-            print_imm(op->imm);
+            if (op->imm > 0) printf("+ %lx ", op->imm);
+            else if (op->imm < 0) printf("- %lx ",(~op->imm) + 1);
         }
         printf("] ");
     }

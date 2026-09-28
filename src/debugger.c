@@ -114,6 +114,7 @@ void debugger_usage() {
     printf("regs - print cpu regs\n");
     printf("memory [<reg>+<imm>] - print data in this location\n");
     printf("help - print this message\n");
+    printf("level <log_level> - set log level (log, deb, warn, err)\n");
     printf("cache - print last compiled block\n");
     printf("usage - print cache memory usage\n");
 }
