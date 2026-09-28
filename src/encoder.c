@@ -315,7 +315,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
         } break;
         case PXOR ... CVTSD2SS: {
             uint32_t opcode = neon_group[buf->type - PXOR];
-            emit_neon(compiler, buf, opcode, buf->type < CVTSS2SD);
+            emit_neon(compiler, buf, opcode, buf->type >= CVTSS2SD);
         } break;
         case SETB ... SETNE: {
             uint32_t opcode = cset_group[buf->type - SETB];
