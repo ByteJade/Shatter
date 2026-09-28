@@ -10,6 +10,7 @@
 #define MOV_M 0x7FF00000
 #define MEM_M 0xBEF00000
 #define ADRP_M 0x9F000000
+#define BR_M 0xFFFF0000
 
 int32_t get_imm12(uint32_t buf);
 int32_t get_imm16(uint32_t buf);

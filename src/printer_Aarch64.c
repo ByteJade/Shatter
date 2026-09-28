@@ -160,6 +160,14 @@ void decode_aarch64(uint32_t buf) {
         printf("adrp "GREEN_COLOR"X%i", get_reg(buf, 0));
         return;
     }
+    if ((buf&BR_M) == BLR) {
+        printf("blr "GREEN_COLOR"X%i", get_reg(buf, 0));
+        return;
+    }
+    if ((buf&BR_M) == BR) {
+        printf("br "GREEN_COLOR"X%i", get_reg(buf, 0));
+        return;
+    }
     if (buf == (RET_R|(30<<5))) {
         printf("ret");
         return;
