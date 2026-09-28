@@ -44,14 +44,22 @@ extern const uint8_t x86_regs[];
 #define MSF 0x40000000
 
 #define STR 0xB9000000
+#define STRH 0x79000000
+#define STRB 0x39000000
 #define STUR 0xB8000000
+#define STURH 0x78000000
+#define STURB 0x38000000
 #define STR_PRE 0xB8000C00
 #define STR_POST 0xB8000400
 #define STP_PRE 0x29800000
 #define STP_POST 0x28800000
 
 #define LDR 0xB9400000
+#define LDRH 0x79400000
+#define LDRB 0x39400000
 #define LDUR 0xB8400000
+#define LDURH 0x78400000
+#define LDURB 0x38400000
 #define LDR_PRE 0xB8400C00
 #define LDR_POST 0xB8400400
 #define LDP_PRE 0x29c00000

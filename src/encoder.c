@@ -79,29 +79,47 @@ void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf)
     }
 }
 void emit_load(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast) {
-    uint32_t sf = MSF*(buf->size==64);
+    uint32_t instruction;
+    switch (buf->size) {
+        case 64: instruction = LDUR | MSF;
+        case 32: instruction = LDUR;
+        case 16: instruction = LDURH;
+        case 8: instruction = LDURB;
+    }
     if (op->type == (MEM|REG|IMM) &&
         op->imm > -256 &&
         op->imm < 255) {
-        cache_emit(sf|LDUR|((op->imm&0x1FF)<<12)|(x86_regs[op->reg]<<5)|dst);
-    } else if (op->type == (MEM|REG)) {
-        cache_emit(sf|LDR | (x86_regs[op->reg]<<5) | dst);
+        cache_emit(instruction | ((op->imm&0x1FF)<<12)|(x86_regs[op->reg]<<5)|dst);
+        return;
+    }
+    instruction |= 1 << 24; // LDUR -> LDR
+    if (op->type == (MEM|REG)) {
+        cache_emit(instruction | (x86_regs[op->reg]<<5) | dst);
     } else {
         if (!fast) emit_address(compiler, SC1R, op, buf);
-        cache_emit(sf|LDR | (SC1R<<5) | dst);
+        cache_emit(instruction | (SC1R<<5) | dst);
     }
 }
 void emit_store(compiler_t* compiler, uint8_t src, operand_t* op, X86_64* buf, int fast) {
-    uint32_t sf = MSF*(buf->size==64);
+    uint32_t instruction;
+    switch (buf->size) {
+        case 64: instruction = STUR | MSF;
+        case 32: instruction = STUR;
+        case 16: instruction = STURH;
+        case 8: instruction = STURB;
+    }
     if (op->type == (MEM|REG|IMM) &&
         op->imm > -256 &&
         op->imm < 255) {
-        cache_emit(sf|STUR|((op->imm&0x1FF)<<12)|(x86_regs[op->reg]<<5)|(src));
-    } else if (op->type == (MEM|REG)) {
-        cache_emit(sf|STR | (x86_regs[op->reg]<<5) | src);
+        cache_emit(instruction | ((op->imm&0x1FF)<<12)|(x86_regs[op->reg]<<5)|(src));
+        return;
+    }
+    instruction |= 1 << 24; // STUR -> STR
+    if (op->type == (MEM|REG)) {
+        cache_emit(instruction | (x86_regs[op->reg]<<5) | src);
     } else {
         if (!fast) emit_address(compiler, SC1R, op, buf);
-        cache_emit(sf|STR | (SC1R<<5) | src);
+        cache_emit(instruction | (SC1R<<5) | src);
     }
 }
 void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
