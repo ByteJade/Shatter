@@ -333,7 +333,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
                 emit_address(compiler, SC1R, &buf->src, buf);
                 cache_emit(sf|LDR_N | (SC1R<<5) | buf->dst.reg);
             }
-        }
+        } break;
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;
         case SHL:
