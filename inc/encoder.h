@@ -95,6 +95,8 @@ extern const uint8_t x86_regs[];
 #define FMOV_N 0x9E660000
 #define FMOVR_N 0x9E670000
 #define FCVTNS 0x1E200000
+#define FCVTZS 0x1E780000
+#define SCVTF_N 0x1E220000
 
 struct compiler_t;
 
