@@ -18,6 +18,10 @@ const char* math[] = {
 const char* shift[] = {
     "lsl", "lsr", "asr", "ror",
 };
+int32_t get_imm9(uint32_t buf) {
+    int32_t n = (buf >> 12) & 0x1FF;
+    return (n << 23) >> 23;
+}
 int32_t get_imm10(uint32_t buf) {
     int32_t n = (buf >> 12) & 0x3F8;
     return (n << 22) >> 22;
@@ -83,7 +87,7 @@ void print_r_m(uint32_t buf) {
         get_reg(buf, 1)
     );
     if (!((buf >> 24)&1)) {
-        int imm = get_imm10(buf);
+        int imm = get_imm9(buf);
         int addent = (buf>>10)&0x3;
         if (addent == 1)
             printf("], %i", imm);
