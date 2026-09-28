@@ -320,10 +320,20 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint32_t prefix = ASF * (buf->prefix == REPN);
             cache_emit(prefix | FCVTNS | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
         } break;
-        case MOVQ: {
+        case MOVQ:
             if (buf->src.type&XMM) cache_emit(FMOV_N | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
             else cache_emit(FMOVR_N | (buf->dst.reg) | (x86_regs[buf->src.reg] << 5));
-        } break;
+            break;
+        case MOVX: {
+            uint32_t sf = (buf->prefix == REPN) * MSF;
+            if (buf->dst.type & MEM) {
+                emit_address(compiler, SC1R, &buf->dst, buf);
+                cache_emit(sf|STR_N | (SC1R<<5) | buf->src.reg);
+            }else {
+                emit_address(compiler, SC1R, &buf->src, buf);
+                cache_emit(sf|LDR_N | (SC1R<<5) | buf->dst.reg);
+            }
+        }
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;
         case SHL:
