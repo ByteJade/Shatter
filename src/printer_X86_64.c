@@ -32,14 +32,14 @@ const char* instr_types[] = {
     "cmovs", "cmovns", "cmovp", "cmovpo",
     "cmovl", "cmovge", "cmovle", "cmovg",
 
-    "pxor", "addx", "mulx", 
-    "subx", "divx", "comix",
-    "movzx8", "movzx16", "movsx8", "movsx16",
-
     "seto", "setno", "setb", "setae",
     "sete", "setne", "setbe", "seta",
     "sets", "setns", "setp", "setpo",
     "setl", "setge", "setle", "setg",
+
+    "pxor", "addx", "mulx", 
+    "subx", "divx", "comix",
+    "movzx8", "movzx16", "movsx8", "movsx16",
 };
 const char* regs64[] = {
     "rax", "rcx", "rdx", "rbx",
