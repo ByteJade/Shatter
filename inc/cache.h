@@ -19,6 +19,7 @@ int cache_set_patch(uint8_t* guest);
 uint8_t* cache_get_patch(int id);
 
 void cache_print();
+void cache_usage();
 uint32_t* cache_get_host();
 uint32_t* cache_search(uint8_t* guest);
 

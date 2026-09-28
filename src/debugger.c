@@ -115,6 +115,7 @@ void debugger_usage() {
     printf("memory [<reg>+<imm>] - print data in this location\n");
     printf("help - print this message\n");
     printf("cache - print last compiled block\n");
+    printf("usage - print cache memory usage\n");
 }
 void debugger_step(struct sigcontext* sc) {
     pthread_mutex_lock(&mut);
@@ -151,6 +152,9 @@ void debugger_step(struct sigcontext* sc) {
                 break;
             case 'c':
                 cache_print();
+                break;
+            case 'u':
+                cache_usage();
                 break;
         }
     }

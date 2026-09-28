@@ -84,6 +84,14 @@ void cache_print() {
         print_aarch64(buf);
     }
 }
+void cache_usage() {
+    printf("program: %li bytes\n", host_p*4);
+    printf("cache: %li bytes\n",
+        dynarray_size(blocks) * sizeof(code_t) +
+        dynarray_size(patches) * sizeof(uint8_t*) +
+        dynarray_size(reuse) * sizeof(int)
+    );
+}
 uint32_t* cache_get_host() {
     return host + host_p;
 }
