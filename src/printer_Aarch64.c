@@ -17,8 +17,8 @@ const char* math[] = {
 };
 
 int32_t get_imm10(uint32_t buf) {
-    int32_t n = (buf >> 12) & 0x3FF;
-    return (n << 23) >> 23;
+    int32_t n = (buf >> 12) & 0x3F8;
+    return (n << 22) >> 22;
 }
 int32_t get_imm12(uint32_t buf) {
     int32_t n = (buf >> 10) & 0xFFF;
