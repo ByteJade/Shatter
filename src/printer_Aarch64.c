@@ -136,12 +136,12 @@ void decode_aarch64(uint32_t buf) {
         print_r_i(buf);
         return;
     }
-    if ((buf&MEM_M) == STR) {
+    if ((buf&MEM_M) == STUR) {
         printf("str");
         print_r_m(buf);
         return;
     }
-    if ((buf&MEM_M) == LDR) {
+    if ((buf&MEM_M) == LDUR) {
         printf("ldr");
         print_r_m(buf);
         return;
@@ -157,7 +157,7 @@ void decode_aarch64(uint32_t buf) {
         return;
     }
     if ((buf&ADRP_M) == ADRP) {
-        printf("adrp X%i", get_reg(buf, 0));
+        printf("adrp "GREEN_COLOR"X%i", get_reg(buf, 0));
         return;
     }
     if (buf == (RET_R|(30<<5))) {
