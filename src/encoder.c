@@ -147,7 +147,7 @@ void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode, int small) {
     }
     if (small)
         cache_emit(opcode|(r0)|(r1<<5));
-    else cache_emit(opcode|(r0)|(r0<<5)|(small<<16));
+    else cache_emit(opcode|(r0)|(r0<<5)|(r1<<16));
     if (buf->dst.type & MEM) cache_emit(msf|STR_N | (SC1R<<5) | 16);
 }
 void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
