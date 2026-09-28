@@ -170,6 +170,7 @@ void decode_aarch64(uint32_t buf) {
     if ((buf&AS_M) == LSL_R) {
         printf("%s", shift[(buf>>10)&3]);
         print_r_r_r(buf);
+        return;
     }
     if ((buf&ADRP_M) == ADRP) {
         printf("adrp "GREEN_COLOR"X%i", get_reg(buf, 0));
