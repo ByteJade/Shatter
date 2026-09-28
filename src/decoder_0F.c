@@ -24,11 +24,11 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             fetch8(compiler);
             break;
         case 0x28:
-            buf->type = MOVAPX;
+            buf->type = MOVAPD;
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x29:
-            buf->type = MOVAPX;
+            buf->type = MOVAPD;
             decode_rm_r_XMM(compiler, buf,1);
             break;
         case 0x2A:

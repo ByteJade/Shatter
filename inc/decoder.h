@@ -34,7 +34,7 @@ enum Types {
 
     SYSCALL, EBR, HLT,
     MOVSS, MOVSD,
-    MOVAPX, MOVQ,
+    MOVAPD, MOVQ,
     CVTSI2SS, CVTSI2SD,
     CVTSS2SI, CVTSD2SI,
 

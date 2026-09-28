@@ -91,6 +91,7 @@ extern const uint8_t x86_regs[];
 #define LDR_N 0xBD400000
 #define STR_N 0xBD000000
 
+#define MOV_N 0x4EA01C00
 #define FMOV_N 0x9E660000
 #define FMOVR_N 0x9E670000
 #define FCVTNS 0x1E200000
