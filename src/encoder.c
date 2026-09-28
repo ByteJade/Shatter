@@ -132,7 +132,7 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
         if (buf->dst.type&MEM) emit_store(compiler, dst, &buf->dst, buf, 1);
     }
 }
-void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
+void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode, int small) {
     uint8_t r0 = buf->dst.reg;
     uint8_t r1 = buf->src.reg;
     uint32_t msf = (buf->prefix == REPN) * MSF;
@@ -145,7 +145,9 @@ void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
         cache_emit(msf|LDR_N | (SC1R<<5) | 16);
         r1 = 16;
     }
-    cache_emit(opcode|(r0)|(r0<<5)|(r1<<16));
+    if (small)
+        cache_emit(opcode|(r0)|(r1<<5));
+    else cache_emit(opcode|(r0)|(r0<<5)|(small<<16));
     if (buf->dst.type & MEM) cache_emit(msf|STR_N | (SC1R<<5) | 16);
 }
 void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
@@ -314,7 +316,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
         } break;
         case PXOR ... CVTSD2SS: {
             uint32_t opcode = neon_group[buf->type - PXOR];
-            emit_neon(compiler, buf, opcode);
+            emit_neon(compiler, buf, opcode, buf->type < CVTSS2SD);
         } break;
         case SETB ... SETNE: {
             uint32_t opcode = cset_group[buf->type - SETB];

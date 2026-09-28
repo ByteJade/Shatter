@@ -105,7 +105,7 @@ void emit_address(struct compiler_t* compiler, uint8_t dst, operand_t* op, X86_6
 void emit_load(struct compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast);
 void emit_store(struct compiler_t* compiler, uint8_t src, operand_t* op, X86_64* buf, int fast);
 void emit_math(struct compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave);
-void emit_neon(struct compiler_t* compiler, X86_64* buf, uint32_t opcode);
+void emit_neon(struct compiler_t* compiler, X86_64* buf, uint32_t opcode, int small);
 void emit_branch(struct compiler_t* compiler, X86_64* buf, uint32_t opcode);
 void emit_mov(struct compiler_t* compiler, X86_64* buf);
 void emit_push(struct compiler_t* compiler, X86_64* buf);
