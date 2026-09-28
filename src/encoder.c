@@ -6,17 +6,18 @@
 #include "../inc/printer_X86_64.h"
 #include <stdint.h>
 
+#define SC1R 10
+#define SC2R 11
+#define SC3R 12
+#define XZR 31
+#define TSP 28
+
 const uint8_t x86_regs[] = {
     8, 3, 2, 19,
-    28, 29, 1, 0,
+    TSP, 29, 1, 0,
     4, 5, 6, 7,
     20, 21, 22, 23,
 };
-
-#define SC1R 9
-#define SC2R 10
-#define SC3R 11
-#define XZR 31
 
 void emit_imm(int64_t imm, uint8_t dst) {
     if (imm >= 0 && imm <= INT16_MAX) {
@@ -151,9 +152,9 @@ void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
 void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     if (buf->dst.type == IMM) {
         if (buf->type == CALL) {
-            if (prev(compiler)->type != CALL) cache_emit(ASF|ADD_I | 31 | (28<<5));
+            if (prev(compiler)->type != CALL) cache_emit(ASF|ADD_I | 31 | (TSP<<5));
             cache_emit(BRK | (cache_set_patch(compiler->guest + buf->dst.imm)<<5));
-            if (next(compiler)->type != CALL) cache_emit(ASF|ADD_I | 28 | (31<<5));
+            if (next(compiler)->type != CALL) cache_emit(ASF|ADD_I | TSP | (31<<5));
         } else emit_patch(compiler, buf);
     } else {
         uint8_t dst;
@@ -203,7 +204,7 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
             dst = SC1R;
         } else dst = x86_regs[buf->dst.reg];
     }
-    cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | dst | (28<<5));
+    cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | dst | (TSP<<5));
 }
 void emit_pop(compiler_t* compiler, X86_64* buf) {
     (void)compiler; // for future use
@@ -212,7 +213,7 @@ void emit_pop(compiler_t* compiler, X86_64* buf) {
     } else {
         if (buf->dst.reg == RBP) return;
         uint8_t dst = x86_regs[buf->dst.reg];
-        cache_emit(MSF|LDR_POST | (8<<12) | dst | (28<<5));
+        cache_emit(MSF|LDR_POST | (8<<12) | dst | (TSP<<5));
     }
 }
 void emit_patch(compiler_t* compiler, X86_64* buf) {
@@ -230,14 +231,14 @@ void emit_entry(struct compiler_t* compiler) {
         if (compiler->flags&NEED_LEAVE) {
             cache_emit(ASF|ADD_I | 29 | (31<<5));
         }
-        cache_emit(ASF|ADD_I | 28 | (31<<5));
+        cache_emit(ASF|ADD_I | TSP | (31<<5));
     }
 }
 void emit_ret(struct compiler_t* compiler) {
     if (compiler->flags&NEED_STACK) {
         if (compiler->flags&NEED_LEAVE) {
             cache_emit(ASF|ADD_I | 31 | (29<<5));
-        } else cache_emit(ASF|ADD_I | 31 | (28<<5));
+        } else cache_emit(ASF|ADD_I | 31 | (TSP<<5));
         cache_emit(ASF|LDP_POST | (16<<12) | 29 | (31<<5) | (30<<10));
     }
     cache_emit(RET_R | (30 << 5));
