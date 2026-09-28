@@ -295,7 +295,7 @@ uint32_t neon_group[] = {
     MUL_N, NSF|MUL_N,
     SUB_N, NSF|SUB_N,
     DIV_N, NSF|DIV_N,
-    FCVT_N, FCVTU_N
+    FCVTU_N, FCVT_N
 };
 
 uint32_t cset_group[] = {
