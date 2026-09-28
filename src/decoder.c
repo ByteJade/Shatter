@@ -120,7 +120,7 @@ void decode_rm_r_XMM(compiler_t* compiler, X86_64* buf, int xmm) {
     if (xmm) buf->src.type |= XMM;
     buf->src.reg = (modrm >> 3) & 7;
     decode_rm(compiler, &buf->dst, modrm);
-    buf->dst.type |= XMM;
+    if (buf->dst.type == REG) buf->dst.type |= XMM;
     if (buf->prefix == REPN) buf->type++;
 }
 void decode_r_rm_XMM(compiler_t* compiler, X86_64* buf, int xmm) {
@@ -128,7 +128,7 @@ void decode_r_rm_XMM(compiler_t* compiler, X86_64* buf, int xmm) {
     buf->dst.type = REG|XMM;
     buf->dst.reg = (modrm >> 3) & 7;
     decode_rm(compiler, &buf->src, modrm);
-    if (xmm && buf->src.type&REG) buf->src.type |= XMM;
+    if (xmm && (buf->src.type == REG)) buf->src.type |= XMM;
     if (buf->prefix == REPN) buf->type++;
 }
 
