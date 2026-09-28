@@ -83,10 +83,10 @@ void print_op(X86_64* buf, operand_t* op) {
             printf("%s ", regs16[op->reg]);
         else printf("%s ", regs8[op->reg]);
     } else if (op->type == IMM) {
-        printf("%lx ", op->imm);
-    } else if (op->type == (REG|XMM)) {
         if (op->imm >= 0) printf("%lx ", op->imm);
         else printf("-%lx ",(~op->imm) + 1);
+    } else if (op->type == (REG|XMM)) {
+        printf("xmm%i ", op->reg);
     } else {
         printf("[ ");
         if (op->type&REG) {
