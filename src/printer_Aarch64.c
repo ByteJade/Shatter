@@ -45,7 +45,7 @@ int get_reg(uint32_t buf, int reg) {
 void print_r_r_r(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
-    printf(GREEN_COLOR" %c%i %c%i %c%i",
+    printf(GREEN_COLOR" %c%i, %c%i, %c%i",
         reg, get_reg(buf,0),
         reg, get_reg(buf,1),
         reg, get_reg(buf,2)
@@ -54,7 +54,7 @@ void print_r_r_r(uint32_t buf) {
 void print_r_r_i(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
-    printf(GREEN_COLOR" %c%i %c%i %x",
+    printf(GREEN_COLOR" %c%i, %c%i, %x",
         reg, get_reg(buf,0),
         reg, get_reg(buf,1),
         get_imm12(buf)
@@ -63,13 +63,13 @@ void print_r_r_i(uint32_t buf) {
 void print_r_i(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
-    printf(GREEN_COLOR" %c%i %x",
+    printf(GREEN_COLOR" %c%i, %x",
         reg, get_reg(buf,0),
         get_imm16(buf)
     );
 }
 void print_m(uint32_t buf) {
-    printf("[X%i", get_reg(buf, 1));
+    printf(" [X%i", get_reg(buf, 1));
     if (!((buf >> 24)&1)) {
         int imm = (buf>>12)&0x1FF;
         int addent = (buf>>10)&0x3;
@@ -82,7 +82,7 @@ void print_m(uint32_t buf) {
 void print_r_m(uint32_t buf) {
     char reg = 'W';
     if (buf&MSF) reg = 'X';
-    printf(GREEN_COLOR" %c%i",
+    printf(GREEN_COLOR" %c%i,",
         reg, get_reg(buf, 0)
     );
     print_m(buf);
@@ -90,7 +90,7 @@ void print_r_m(uint32_t buf) {
 void print_r_r_m(uint32_t buf) {
     char reg = 'W';
     if (buf&MSF) reg = 'X';
-    printf(GREEN_COLOR" %c%i %c%i",
+    printf(GREEN_COLOR" %c%i, %c%i,",
         reg, get_reg(buf, 0),
         reg, get_reg(buf, 2)
     );
@@ -132,7 +132,7 @@ void decode_aarch64(uint32_t buf) {
         return;
     }
     if ((buf&MOV_M) == MOVK_I) {
-        printf("movk (%i)", (buf >> 21)&3);
+        printf("movk (%i),", (buf >> 21)&3);
         print_r_i(buf);
         return;
     }
@@ -161,11 +161,11 @@ void decode_aarch64(uint32_t buf) {
         return;
     }
     if ((buf&BR_M) == BLR) {
-        printf("blr "GREEN_COLOR"X%i", get_reg(buf, 0));
+        printf("blr "GREEN_COLOR"X%i", get_reg(buf, 1));
         return;
     }
     if ((buf&BR_M) == BR) {
-        printf("br "GREEN_COLOR"X%i", get_reg(buf, 0));
+        printf("br "GREEN_COLOR"X%i", get_reg(buf, 1));
         return;
     }
     if (buf == (RET_R|(30<<5))) {
