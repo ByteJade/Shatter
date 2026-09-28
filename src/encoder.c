@@ -312,7 +312,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
             cache_emit(opcode | x86_regs[buf->dst.reg]);
         } break;
         case CVTX2SI: {
-            uint32_t prefix = ASF * (prefix == REPN);
+            uint32_t prefix = ASF * (buf->prefix == REPN);
             cache_emit(prefix | FCVTNS | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
         } break;
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
