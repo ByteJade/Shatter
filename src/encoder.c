@@ -79,10 +79,9 @@ void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf)
     }
 }
 void emit_load(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast) {
-    uint32_t instruction;
+    uint32_t instruction = LDUR;
     switch (buf->size) {
-        case 64: instruction = LDUR | MSF; break;
-        case 32: instruction = LDUR; break;
+        case 64: instruction |= MSF; break;
         case 16: instruction = LDURH; break;
         case 8: instruction = LDURB; break;
     }
@@ -101,10 +100,9 @@ void emit_load(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, in
     }
 }
 void emit_store(compiler_t* compiler, uint8_t src, operand_t* op, X86_64* buf, int fast) {
-    uint32_t instruction;
+    uint32_t instruction = STUR;
     switch (buf->size) {
-        case 64: instruction = STUR | MSF; break;
-        case 32: instruction = STUR; break;
+        case 64: instruction |= MSF; break;
         case 16: instruction = STURH; break;
         case 8: instruction = STURB; break;
     }
