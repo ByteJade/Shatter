@@ -72,6 +72,11 @@ extern const uint8_t x86_regs[];
 #define BLE 0x5400000D
 #define B 0x14000000
 
+#define CSETNE 0x1a9f07e0
+#define CSETEQ 0x1a9f17e0
+#define CSETLO 0x1a9f27e0
+#define CSETHS 0x1a9f37e0
+
 #define NSF 0x00400000
 
 #define EOR_N 0x6E201C00

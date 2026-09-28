@@ -286,7 +286,13 @@ uint32_t neon_group[] = {
     EOR_N, ADD_N, MUL_N,
     SUB_N, DIV_N, CMP_N,
 };
+
+uint32_t cset_group[] = {
+    CSETLO, CSETHS,
+    CSETEQ, CSETNE
+};
 void encode(compiler_t* compiler, X86_64* buf) {
+    if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
     switch (buf->type) {
         case MOV: emit_mov(compiler, buf); break;
         case PUSH: emit_push(compiler, buf); break;
@@ -299,6 +305,10 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case PXOR ... COMIX: {
             uint32_t opcode = neon_group[buf->type - PXOR];
             emit_neon(compiler, buf, opcode);
+        } break;
+        case SETB ... SETNE: {
+            uint32_t opcode = cset_group[buf->type - SETB];
+            cache_emit(opcode | x86_regs[buf->dst.reg]);
         } break;
         case CVTX2SI: {
             uint32_t prefix = ASF * (prefix == REPN);
