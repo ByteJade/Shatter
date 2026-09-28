@@ -172,6 +172,10 @@ void decode_aarch64(uint32_t buf) {
         printf("br "GREEN_COLOR"X%i", get_reg(buf, 1));
         return;
     }
+    if ((buf&BR_M) == BRK) {
+        printf("brk "GREEN_COLOR"%i", get_imm16(buf));
+        return;
+    }
     if (buf == (RET_R|(30<<5))) {
         printf("ret");
         return;
