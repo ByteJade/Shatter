@@ -3,6 +3,7 @@
 #include "../inc/logger.h"
 #include "../inc/cache.h"
 #include "../inc/compiler.h"
+#include "../inc/encoder.h"
 #include <stdint.h>
 #include <signal.h>
 #include <unistd.h>
@@ -30,9 +31,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     }
     uint8_t* patch = cache_get_patch(ret);
     uint32_t* target = compile((size_t)patch);
-    int32_t offset = target - pc;
-    *pc = 0x94000000 | (offset & 0x3FFFFFF);
-    __builtin___clear_cache(pc, pc+1);
+    emit_call(pc, target);
     logger_deb("found patch: %i", ret);
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {

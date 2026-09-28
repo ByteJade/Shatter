@@ -71,6 +71,7 @@ extern const uint8_t x86_regs[];
 #define BGT 0x5400000C
 #define BLE 0x5400000D
 #define B 0x14000000
+#define BL 0x94000000
 
 #define CSETNE 0x1a9f07e0
 #define CSETEQ 0x1a9f17e0
@@ -106,6 +107,7 @@ void emit_patch(struct compiler_t* compiler, X86_64* buf);
 void emit_entry(struct compiler_t* compiler);
 void emit_ret(struct compiler_t* compiler);
 void emit_jump(uint32_t* dst, uint32_t* target);
+void emit_call(uint32_t* dst, uint32_t* target);
 void encode(struct compiler_t* compiler, X86_64* buf);
 
 #endif

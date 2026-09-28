@@ -279,6 +279,11 @@ void emit_jump(uint32_t* dst, uint32_t* target) {
         logger_err("Unknown jump type %i", type);
     }
 }
+void emit_call(uint32_t* dst, uint32_t* target) {
+    int32_t offset = target - dst;
+    *dst = BL | (offset & 0x3FFFFFF);
+    __builtin___clear_cache(dst, dst+1);
+}
 uint32_t math_group[] = {
     ADDS_R, ORR_R, ADCS_R, SBCS_R,
     ANDS_R, SUBS_R, EOR_R, SUBS_R,
