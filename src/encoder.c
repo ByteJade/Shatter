@@ -322,6 +322,9 @@ uint32_t cset_group[] = {
 void encode(compiler_t* compiler, X86_64* buf) {
     if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
     switch (buf->type) {
+
+        case MOVZX8: buf->size = 8; emit_mov(compiler, buf); break;
+        case MOVZX16: buf->size = 16; emit_mov(compiler, buf); break;
         case MOV: emit_mov(compiler, buf); break;
         case PUSH: emit_push(compiler, buf); break;
         case POP: emit_pop(compiler, buf); break;
