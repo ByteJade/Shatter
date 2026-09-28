@@ -134,19 +134,19 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
 void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t r0 = buf->dst.reg;
     uint8_t r1 = buf->src.reg;
-    uint32_t osf = (buf->prefix == REPN) * MSF;
-    uint32_t asf = (buf->prefix == REPN) * ASF;
+    uint32_t nsf = (buf->prefix == REPN) * NSF;
+    uint32_t msf = (buf->prefix == REPN) * MSF;
     if (buf->dst.type & MEM) {
         emit_address(compiler, SC1R, &buf->dst, buf);
-        cache_emit(asf|LDR_N | (SC1R<<5) | 16);
+        cache_emit(msf|LDR_N | (SC1R<<5) | 16);
         r0 = 16;
     } else if (buf->src.type & MEM) {
         emit_address(compiler, SC1R, &buf->src,  buf);
-        cache_emit(asf|LDR_N | (SC1R<<5) | 16);
+        cache_emit(msf|LDR_N | (SC1R<<5) | 16);
         r1 = 16;
     }
-    cache_emit(osf|opcode|(r0)|(r0<<5)|(r1<<16));
-    if (buf->dst.type & MEM) cache_emit(asf|STR_N | (SC1R<<5) | 16);
+    cache_emit(nsf|opcode|(r0)|(r0<<5)|(r1<<16));
+    if (buf->dst.type & MEM) cache_emit(msf|STR_N | (SC1R<<5) | 16);
 }
 void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     if (buf->dst.type == IMM) {
@@ -278,11 +278,11 @@ void emit_jump(uint32_t* dst, uint32_t* target) {
         logger_err("Unknown jump type %i", type);
     }
 }
-int math_group[] = {
+uint32_t math_group[] = {
     ADDS_R, ORR_R, ADCS_R, SBCS_R,
     ANDS_R, SUBS_R, EOR_R, SUBS_R,
 };
-int neon_group[] = {
+uint32_t neon_group[] = {
     EOR_N, ADD_N, MUL_N,
     SUB_N, DIV_N, CMP_N,
 };
@@ -293,12 +293,16 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case POP: emit_pop(compiler, buf); break;
         case LEA: emit_address(compiler, x86_regs[buf->dst.reg], &buf->src, buf); break;
         case ADD ... CMP: {
-            int opcode = math_group[buf->type - ADD];
+            uint32_t opcode = math_group[buf->type - ADD];
             emit_math(compiler, buf, opcode, buf->type == CMP);
         } break;
         case PXOR ... COMIX: {
-            int opcode = neon_group[buf->type - PXOR];
+            uint32_t opcode = neon_group[buf->type - PXOR];
             emit_neon(compiler, buf, opcode);
+        } break;
+        case CVTX2SI: {
+            uint32_t prefix = ASF * (prefix == REPN);
+            cache_emit(prefix | FCVTNS | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
         } break;
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;

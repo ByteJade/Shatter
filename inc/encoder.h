@@ -72,6 +72,8 @@ extern const uint8_t x86_regs[];
 #define BLE 0x5400000D
 #define B 0x14000000
 
+#define NSF 0x00400000
+
 #define EOR_N 0x6E201C00
 #define ADD_N 0x1E202800
 #define MUL_N 0x1E200800
@@ -80,6 +82,8 @@ extern const uint8_t x86_regs[];
 #define CMP_N 0x1E202000
 #define LDR_N 0xBD400000
 #define STR_N 0xBD000000
+
+#define FCVTNS 0x1E200000
 
 struct compiler_t;
 
