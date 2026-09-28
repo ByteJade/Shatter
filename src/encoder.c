@@ -291,6 +291,7 @@ uint32_t math_group[] = {
 uint32_t neon_group[] = {
     EOR_N, ADD_N, MUL_N,
     SUB_N, DIV_N, CMP_N,
+    FCVTU_N
 };
 
 uint32_t cset_group[] = {
@@ -308,8 +309,10 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint32_t opcode = math_group[buf->type - ADD];
             emit_math(compiler, buf, opcode, buf->type == CMP);
         } break;
-        case PXOR ... COMIX: {
+        case PXOR ... CVTX: {
             uint32_t opcode = neon_group[buf->type - PXOR];
+            if (buf->type == CVTX && buf->prefix == REPN)
+                opcode = FCVT_N;
             emit_neon(compiler, buf, opcode);
         } break;
         case SETB ... SETNE: {

@@ -25,7 +25,7 @@ const char* instr_types[] = {
 
     "syscall", "movx", "ebr", "hlt",
     "movapx", "cvtsi2x", "cvtx2si",
-    "ucomix", "cvtx", "movq",
+    "ucomix", "movq",
 
     "cmovo", "cmovno", "cmovb", "cmovae",
     "cmove", "cmovne", "cmovbe", "cmova",
@@ -38,7 +38,7 @@ const char* instr_types[] = {
     "setl", "setge", "setle", "setg",
 
     "pxor", "addx", "mulx", 
-    "subx", "divx", "comix",
+    "subx", "divx", "comix", "cvtx",
     "movzx8", "movzx16", "movsx8", "movsx16",
 };
 const char* regs64[] = {
