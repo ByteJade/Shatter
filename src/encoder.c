@@ -81,10 +81,10 @@ void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf)
 void emit_load(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast) {
     uint32_t instruction;
     switch (buf->size) {
-        case 64: instruction = LDUR | MSF;
-        case 32: instruction = LDUR;
-        case 16: instruction = LDURH;
-        case 8: instruction = LDURB;
+        case 64: instruction = LDUR | MSF; break;
+        case 32: instruction = LDUR; break;
+        case 16: instruction = LDURH; break;
+        case 8: instruction = LDURB; break;
     }
     if (op->type == (MEM|REG|IMM) &&
         op->imm > -256 &&
@@ -103,10 +103,10 @@ void emit_load(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, in
 void emit_store(compiler_t* compiler, uint8_t src, operand_t* op, X86_64* buf, int fast) {
     uint32_t instruction;
     switch (buf->size) {
-        case 64: instruction = STUR | MSF;
-        case 32: instruction = STUR;
-        case 16: instruction = STURH;
-        case 8: instruction = STURB;
+        case 64: instruction = STUR | MSF; break;
+        case 32: instruction = STUR; break;
+        case 16: instruction = STURH; break;
+        case 8: instruction = STURB; break;
     }
     if (op->type == (MEM|REG|IMM) &&
         op->imm > -256 &&
