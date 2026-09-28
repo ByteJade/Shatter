@@ -322,7 +322,6 @@ uint32_t cset_group[] = {
 void encode(compiler_t* compiler, X86_64* buf) {
     if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
     switch (buf->type) {
-
         case MOVZX8: buf->size = 8; emit_mov(compiler, buf); break;
         case MOVZX16: buf->size = 16; emit_mov(compiler, buf); break;
         case MOV: emit_mov(compiler, buf); break;
@@ -356,6 +355,9 @@ void encode(compiler_t* compiler, X86_64* buf) {
                 cache_emit(prefix|SCVTF_N | (buf->dst.reg) | (x86_regs[buf->src.reg]<<5));
             }
         } break;
+        case MOVSX:
+            cache_emit(0x93407c00 | (x86_regs[buf->src.reg]<<5) | (x86_regs[buf->dst.reg]));
+            break;
         case MOVQ:
             if (buf->src.type&XMM) cache_emit(FMOV_N | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
             else cache_emit(FMOVR_N | (buf->dst.reg) | (x86_regs[buf->src.reg] << 5));
