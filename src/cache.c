@@ -1,8 +1,10 @@
 #include "../inc/cache.h"
 #include "../inc/logger.h"
 #include "../inc/dynarray.h"
+#include "../inc/printer_Aarch64.h"
 #include <pthread.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 
@@ -77,7 +79,9 @@ uint8_t* cache_get_patch(int id) {
 
 void cache_print() {
     for (uint32_t i = prev_host_p; i < host_p; i++) {
-        printf("%X\n", host[i]);
+        uint32_t buf = host[i];
+        printf("%X: ", buf);
+        print_aarch64(buf);
     }
 }
 uint32_t* cache_get_host() {

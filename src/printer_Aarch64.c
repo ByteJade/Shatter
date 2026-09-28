@@ -68,6 +68,35 @@ void print_r_i(uint32_t buf) {
         get_imm16(buf)
     );
 }
+void print_m(uint32_t buf) {
+    printf("[X%i", get_reg(buf, 1));
+    if (!((buf >> 24)&1)) {
+        int imm = (buf>>12)&0x1FF;
+        int addent = (buf>>10)&0x3;
+        if (addent == 1)
+            printf("], %i", imm);
+        else printf(", %i]", imm);
+        if (addent == 3) printf("!");
+    } else printf("]");
+}
+void print_r_m(uint32_t buf) {
+    char reg = 'W';
+    if (buf&MSF) reg = 'X';
+    printf(GREEN_COLOR" %c%i",
+        reg, get_reg(buf, 0)
+    );
+    print_m(buf);
+}
+void print_r_r_m(uint32_t buf) {
+    char reg = 'W';
+    if (buf&MSF) reg = 'X';
+    printf(GREEN_COLOR" %c%i %c%i",
+        reg, get_reg(buf, 0),
+        reg, get_reg(buf, 2)
+    );
+    print_m(buf);
+}
+
 void decode_aarch64(uint32_t buf) {
     if ((buf&B_M) == B) {
         printf("b "GREEN_COLOR"%i", get_imm26(buf));
@@ -103,8 +132,32 @@ void decode_aarch64(uint32_t buf) {
         return;
     }
     if ((buf&MOV_M) == MOVK_I) {
-        printf("movk");
+        printf("movk (%i)", (buf >> 21)&3);
         print_r_i(buf);
+        return;
+    }
+    if ((buf&MEM_M) == STR) {
+        printf("str");
+        print_r_m(buf);
+        return;
+    }
+    if ((buf&MEM_M) == LDR) {
+        printf("ldr");
+        print_r_m(buf);
+        return;
+    }
+    if ((buf&MEM_M) == STP_POST) {
+        printf("stp");
+        print_r_r_m(buf);
+        return;
+    }
+    if ((buf&MEM_M) == LDP_POST) {
+        printf("ldp");
+        print_r_r_m(buf);
+        return;
+    }
+    if ((buf&ADRP_M) == ADRP) {
+        printf("adrp X%i", get_reg(buf, 0));
         return;
     }
     if (buf == (RET_R|(30<<5))) {
