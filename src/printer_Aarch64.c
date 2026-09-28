@@ -71,10 +71,10 @@ void print_r_i(uint32_t buf) {
 void print_r_m(uint32_t buf) {
     char reg = 'W';
     if (buf&MSF) reg = 'X';
-    printf(GREEN_COLOR" %c%i,",
-        reg, get_reg(buf, 0)
+    printf(GREEN_COLOR" %c%i, [X%i",
+        reg, get_reg(buf, 0),
+        get_reg(buf, 1)
     );
-    printf(" [X%i", get_reg(buf, 1));
     if (!((buf >> 24)&1)) {
         int imm = (buf>>12)&0x1FF;
         int addent = (buf>>10)&0x3;
@@ -87,9 +87,10 @@ void print_r_m(uint32_t buf) {
 void print_r_r_m(uint32_t buf) {
     char reg = 'W';
     if (buf&MSF) reg = 'X';
-    printf(GREEN_COLOR" %c%i, %c%i,",
+    printf(GREEN_COLOR" %c%i, %c%i, [X%i",
         reg, get_reg(buf, 0),
-        reg, get_reg(buf, 2)
+        reg, get_reg(buf, 2),
+        get_reg(buf, 1)
     );
     int imm = (buf>>12)&0x1FF;
     if ((buf >> 24)&1) {

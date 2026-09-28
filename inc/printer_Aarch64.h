@@ -8,8 +8,8 @@
 #define AR_M 0x0FE0FC00
 #define AI_M 0x1FC00000
 #define MOV_M 0x7FF00000
-#define MEM_M 0xBEF00000
-#define MEMP_M 0x7EF00000
+#define MEM_M 0xBEC00000
+#define MEMP_M 0x7EC00000
 #define ADRP_M 0x9F000000
 #define BR_M 0xFFFF0000
 
