@@ -78,13 +78,14 @@ void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf)
         }
     }
 }
-void emit_load(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast) {
+void emit_load(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast, int sx) {
     uint32_t instruction = LDUR;
     switch (buf->size) {
         case 64: instruction |= MSF; break;
         case 16: instruction = LDURH; break;
         case 8: instruction = LDURB; break;
     }
+    if (sx) instruction |= 9 << 20;
     if (op->type == (MEM|REG|IMM) &&
         op->imm > -256 &&
         op->imm < 255) {
@@ -132,11 +133,11 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
     } else if (buf->src.type == REG) {
         src = x86_regs[buf->src.reg];
     } else {
-        emit_load(compiler, SC2R, &buf->src, buf, 0);
+        emit_load(compiler, SC2R, &buf->src, buf, 0, 0);
         src = SC2R;
     }
     if (buf->dst.type&MEM) {
-        emit_load(compiler, SC2R, &buf->dst, buf, 0);
+        emit_load(compiler, SC2R, &buf->dst, buf, 0, 0);
         dst = SC2R;
     } else dst = x86_regs[buf->dst.reg];
     
@@ -177,19 +178,19 @@ void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     } else {
         uint8_t dst;
         if (buf->dst.type&MEM) {
-            emit_load(compiler, SC1R, &buf->dst, buf, 0);
+            emit_load(compiler, SC1R, &buf->dst, buf, 0, 0);
             dst = SC1R;
         } else dst = x86_regs[buf->dst.reg];
         cache_emit(opcode | (dst << 5));
     }
 }
-void emit_mov(compiler_t* compiler, X86_64* buf) {
+void emit_mov(compiler_t* compiler, X86_64* buf, int sx) {
     if (buf->dst.type == REG) {
         uint8_t dst = x86_regs[buf->dst.reg];
         if (buf->src.type == IMM) {
             emit_imm(buf->src.imm, dst);
         } else if (buf->src.type&MEM) {
-            emit_load(compiler, dst, &buf->src, buf, 0);
+            emit_load(compiler, dst, &buf->src, buf, 0, sx);
         } else {
             cache_emit(ASF|ADD_I | dst | (x86_regs[buf->src.reg]<<5));
         }
@@ -210,7 +211,7 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
         emit_imm(buf->dst.imm, SC3R);
         dst = SC3R;
     } else if (buf->dst.type&MEM) {
-        emit_load(compiler, SC1R, &buf->dst, buf, 0);
+        emit_load(compiler, SC1R, &buf->dst, buf, 0, 0);
         dst = SC1R;
     } else {
         if (buf->dst.reg == RBP) {
@@ -340,9 +341,11 @@ uint32_t csel_group[] = {
 };
 void encode(compiler_t* compiler, X86_64* buf) {
     switch (buf->type) {
-        case MOVZX8: buf->size = 8; emit_mov(compiler, buf); break;
-        case MOVZX16: buf->size = 16; emit_mov(compiler, buf); break;
-        case MOV: emit_mov(compiler, buf); break;
+        case MOVZX8: buf->size = 8; emit_mov(compiler, buf, 0); break;
+        case MOVZX16: buf->size = 16; emit_mov(compiler, buf, 0); break;
+        case MOVSX8: buf->size = 8; emit_mov(compiler, buf, 1); break;
+        case MOVSX16: buf->size = 16; emit_mov(compiler, buf, 1); break;
+        case MOV: emit_mov(compiler, buf, 0); break;
         case PUSH: emit_push(compiler, buf); break;
         case POP: emit_pop(compiler, buf); break;
         case LEA: emit_address(compiler, x86_regs[buf->dst.reg], &buf->src, buf); break;
@@ -372,7 +375,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case CVTSI2SD: {
             uint32_t prefix = (ASF|NSF) * (buf->prefix == REPN);
             if (buf->src.type&MEM) {
-                emit_load(compiler, SC1R, &buf->src, buf, 0);
+                emit_load(compiler, SC1R, &buf->src, buf, 0, 0);
                 cache_emit(prefix|SCVTF_N | (buf->dst.reg) | (SC1R << 5));
             } else {
                 cache_emit(prefix|SCVTF_N | (buf->dst.reg) | (x86_regs[buf->src.reg]<<5));

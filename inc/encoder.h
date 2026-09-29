@@ -64,8 +64,10 @@ extern const uint8_t x86_regs[];
 #define LDURB 0x38400000
 #define LDR_PRE 0xB8400C00
 #define LDR_POST 0xB8400400
-#define LDP_PRE 0x29c00000
-#define LDP_POST 0x28c00000
+#define LDP_PRE 0x29C00000
+#define LDP_POST 0x28C00000
+#define LDRSH 0x79C00000
+#define LDRSB 0x39C00000
 
 #define BR 0xD61F0000
 #define BLR 0xD63F0000
@@ -131,12 +133,12 @@ struct compiler_t;
 
 void emit_imm(int64_t imm, uint8_t dst);
 void emit_address(struct compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf);
-void emit_load(struct compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast);
+void emit_load(struct compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast, int sx);
 void emit_store(struct compiler_t* compiler, uint8_t src, operand_t* op, X86_64* buf, int fast);
 void emit_math(struct compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave);
 void emit_neon(struct compiler_t* compiler, X86_64* buf, uint32_t opcode, int small);
 void emit_branch(struct compiler_t* compiler, X86_64* buf, uint32_t opcode);
-void emit_mov(struct compiler_t* compiler, X86_64* buf);
+void emit_mov(struct compiler_t* compiler, X86_64* buf, int sx);
 void emit_push(struct compiler_t* compiler, X86_64* buf);
 void emit_pop(struct compiler_t* compiler, X86_64* buf);
 void emit_patch(struct compiler_t* compiler, X86_64* buf);
