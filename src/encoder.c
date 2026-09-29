@@ -141,6 +141,7 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
     } else dst = x86_regs[buf->dst.reg];
     
     uint32_t sf = (buf->size == 64) * ASF;
+    if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
     if (unsave) {
         cache_emit(sf | opcode | XZR | (dst<<5) | (src<<16));
     } else {
@@ -334,7 +335,6 @@ uint32_t csel_group[] = {
     CSELS, CSELNS,
 };
 void encode(compiler_t* compiler, X86_64* buf) {
-    if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
     switch (buf->type) {
         case MOVZX8: buf->size = 8; emit_mov(compiler, buf); break;
         case MOVZX16: buf->size = 16; emit_mov(compiler, buf); break;
