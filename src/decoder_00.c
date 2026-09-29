@@ -55,10 +55,10 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->reverse = 1;
             buf->type = ADD + ((modrm >> 3) & 7);
             decode_rm(compiler, &buf->dst, modrm);
-            if (byte == 0x83) {
                 buf->src.type = IMM;
+            if (byte == 0x83) {
                 buf->src.imm = fetch8_imm(compiler);
-            } else fetch_imm(compiler, buf);
+            } else buf->src.imm = fetch32_imm(compiler);
         } break;
         case 0x84:
             buf->size = 8;
