@@ -5,6 +5,8 @@
 
 extern const uint8_t x86_regs[];
 
+#define UNK 0xFFFFFFFF
+
 #define GET_FS 0xD53BD040
 #define ADRP 0x90000000
 #define UBFM 0xD3400000
@@ -91,6 +93,8 @@ extern const uint8_t x86_regs[];
 #define CSETA 0x1a9f87e0
 #define CSETS 0x1a9f47e0
 #define CSETNS 0x1a9f57e0
+#define CSETL 0x1a9fb7e0
+#define CSETGE 0x1a9fa7e0
 
 #define CSELB 0x1A803000
 #define CSELAE 0x1A802000
@@ -100,6 +104,8 @@ extern const uint8_t x86_regs[];
 #define CSELA 0x1A808000
 #define CSELS 0x1A804000
 #define CSELNS 0x1A805000
+#define CSELL 0x1A80B000
+#define CSELGE 0x1A80A000
 
 #define NSF 0x00400000
 

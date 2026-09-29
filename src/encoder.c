@@ -327,12 +327,16 @@ uint32_t cset_group[] = {
     CSETE, CSETNE,
     CSETBE, CSETA,
     CSETS, CSETNS,
+    UNK, UNK,
+    CSETL, CSETGE,
 };
 uint32_t csel_group[] = {
     CSELB, CSELAE,
     CSELE, CSELNE,
     CSELBE, CSELA,
     CSELS, CSELNS,
+    UNK, UNK,
+    CSELL, CSELGE,
 };
 void encode(compiler_t* compiler, X86_64* buf) {
     switch (buf->type) {
@@ -350,11 +354,11 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint32_t opcode = neon_group[buf->type - PXOR];
             emit_neon(compiler, buf, opcode, buf->type >= CVTSS2SD);
         } break;
-        case SETB ... SETNS: {
+        case SETB ... SETGE: {
             uint32_t opcode = cset_group[buf->type - SETB];
             cache_emit(opcode | x86_regs[buf->dst.reg]);
         } break;
-        case CMOVB ... CMOVNS: {
+        case CMOVB ... CMOVGE: {
             uint32_t opcode = csel_group[buf->type - CMOVB];
             uint8_t dst = x86_regs[buf->dst.reg];
             cache_emit(opcode | dst | (x86_regs[buf->src.reg] << 5) | (dst << 16));
