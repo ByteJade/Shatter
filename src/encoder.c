@@ -393,6 +393,13 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint8_t src = buf->src.reg;
             cache_emit(MOV_N | (buf->dst.reg) | (src << 5) | (src << 16));
         } break;
+        case IDIV: {
+            uint8_t dst = x86_regs[buf->dst.reg];
+            uint8_t src = x86_regs[buf->src.reg];
+            cache_emit(ADD_I | SC1R | (dst<<5));
+            cache_emit(0x9ac00d80 | (src<<16) | (dst)); // sdiv	nn, x12, r0
+            cache_emit(0x9b00b002 | (src<<16) | (dst << 5)); // msub	x2, nn, r0, x12
+        } break;
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;
         case SHL:
