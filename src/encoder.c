@@ -27,7 +27,7 @@ void emit_imm(int64_t imm, uint8_t dst) {
     } else {
         uint16_t a = imm & 0xFFFF;
         uint16_t b = (imm>>16) & 0xFFFF;
-        if (a) cache_emit(ASF|MOVZ_I | (a << 5) | dst);
+        cache_emit(ASF|MOVZ_I | (a << 5) | dst);
         if (b) cache_emit(ASF|MOVK_I | (1 << 21) | (b << 5) | dst);
         if (imm >= INT32_MIN && imm <= INT32_MAX) {
             //if (imm < 0) cache.emit(SXTW_REG | (dst << 5) | dst);
