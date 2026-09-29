@@ -81,10 +81,23 @@ extern const uint8_t x86_regs[];
 #define B 0x14000000
 #define BL 0x94000000
 
-#define CSETNE 0x1a9f07e0
-#define CSETEQ 0x1a9f17e0
-#define CSETLO 0x1a9f27e0
-#define CSETHS 0x1a9f37e0
+#define CSETB 0x1a9f37e0
+#define CSETAE 0x1a9f27e0
+#define CSETE 0x1a9f07e0
+#define CSETNE 0x1a9f17e0
+#define CSETBE 0x1a9f97e0
+#define CSETA 0x1a9f87e0
+#define CSETS 0x1a9f47e0
+#define CSETNS 0x1a9f57e0
+
+#define CSELB 0x1A803000
+#define CSELAE 0x1A802000
+#define CSELE 0x1A800000
+#define CSELNE 0x1A801000
+#define CSELBE 0x1A809000
+#define CSELA 0x1A808000
+#define CSELS 0x1A804000
+#define CSELNS 0x1A805000
 
 #define NSF 0x00400000
 

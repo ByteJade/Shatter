@@ -316,8 +316,16 @@ uint32_t neon_group[] = {
 };
 
 uint32_t cset_group[] = {
-    CSETLO, CSETHS,
-    CSETEQ, CSETNE
+    CSETB, CSETAE,
+    CSETE, CSETNE,
+    CSETBE, CSETA,
+    CSETS, CSETNS,
+};
+uint32_t csel_group[] = {
+    CSELB, CSELAE,
+    CSELE, CSELNE,
+    CSELBE, CSELA,
+    CSELS, CSELNS,
 };
 void encode(compiler_t* compiler, X86_64* buf) {
     if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
@@ -336,9 +344,14 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint32_t opcode = neon_group[buf->type - PXOR];
             emit_neon(compiler, buf, opcode, buf->type >= CVTSS2SD);
         } break;
-        case SETB ... SETNE: {
+        case SETB ... SETNS: {
             uint32_t opcode = cset_group[buf->type - SETB];
             cache_emit(opcode | x86_regs[buf->dst.reg]);
+        } break;
+        case CMOVB ... CMOVNS: {
+            uint32_t opcode = csel_group[buf->type - CMOVB];
+            uint8_t dst = x86_regs[buf->dst.reg];
+            cache_emit(opcode | dst | (x86_regs[buf->src.reg] << 5) | (dst << 16));
         } break;
         case CVTSS2SI: 
         case CVTSD2SI: {
