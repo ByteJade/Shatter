@@ -132,7 +132,8 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->reverse = 1;
             buf->type = MOV;
             decode_rm(compiler, &buf->dst, fetch8(compiler));
-            fetch_imm(compiler, buf);
+            buf->src.type = IMM;
+            buf->src.imm = fetch32_imm(compiler);
             break;
         case 0xC9:
             buf->type = LEAVE;
