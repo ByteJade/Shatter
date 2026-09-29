@@ -92,6 +92,10 @@ void emulate_jump(struct sigcontext* sc) {
         if (sc_get_flag(sc, "Z") == 0 && sc_get_flag(sc, "C"))
             imm = get_imm19(instr);
         break;
+    case BMI:
+        if (sc_get_flag(sc, "N"))
+            imm = get_imm19(instr);
+        break;
     }
     if ((instr&B_M) == B)
         imm = get_imm26(instr);

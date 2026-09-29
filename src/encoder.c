@@ -292,6 +292,9 @@ void emit_jump(uint32_t* dst, uint32_t* target) {
     case JA:
         *dst = BHI | ((delta & 0x7FFFF) << 5);
         break;
+    case JS:
+        *dst = BMI | ((delta & 0x7FFFF) << 5);
+        break;
     case JMP:
         *dst = B | (delta & 0x3FFFFFF);
         break;
