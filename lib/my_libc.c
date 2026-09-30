@@ -62,6 +62,7 @@ WRAP_FUNC(strspn)
 WRAP_FUNC(stpcpy)
 WRAP_FUNC(strncpy)
 WRAP_FUNC(strdup)
+WRAP_FUNC(atoi)
 
 // memory
 WRAP_FUNC(__memset_chk)
