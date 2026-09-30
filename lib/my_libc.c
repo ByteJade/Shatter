@@ -92,3 +92,6 @@ WRAP_FUNC(setenv)
 // CXA
 WRAP_FUNC_VOID(__cxa_finalize)
 WRAP_FUNC_VOID(__stack_chk_fail)
+
+WRAP_FUNC(wait)
+WRAP_FUNC(fork)
