@@ -17,7 +17,7 @@ compiler_t* compiler_init(void) {
     compiler->blocks = dynarray_init(sizeof(block_t));
     compiler->points = dynarray_init(sizeof(point_t));
     compiler->patches = dynarray_init(sizeof(patch_t));
-    compiler->reader = 0;
+    compiler->reader = 1;
     compiler->flags = 0;
 
     return compiler;
@@ -188,7 +188,7 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     logger_deb("Start compile: %p", guest);
     if (debugger_enabled()) 
         clock_gettime(CLOCK_MONOTONIC, &start);
-
+    push_jump(compiler, 0);
     compiler->guest = guest;
     decode_step(compiler);
     cache_start_block(guest);
