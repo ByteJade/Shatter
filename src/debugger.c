@@ -111,9 +111,15 @@ void print_memory(struct sigcontext* sc, char* buf) {
     if (sep) {
         imm = strtol(sep, NULL, 0);
     }
-    printf("%s: %lX\n", base, *(uint64_t*)(reg + imm));
+    reg += imm;
+    switch (*com) {
+        case 'b': printf("%s: %x\n", base, *(uint8_t*)(reg));
+        case 'h': printf("%s: %x\n", base, *(uint16_t*)(reg));
+        case 'w': printf("%s: %x\n", base, *(uint32_t*)(reg));
+        case 'd': printf("%s: %lx\n", base, *(uint64_t*)(reg));
+    }
 }
-void debugger_usage() {
+void debugger_help() {
     printf("debugger commands:\n");
     printf("step - single step\n");
     printf("exit - continue execution\n");
@@ -150,11 +156,9 @@ void debugger_step(struct sigcontext* sc) {
             case 'r':
                 sc_print_regs_host(sc);
                 break;
-            case 'm':
+            case 'b': case 'h':
+            case 'w': case 'd':
                 print_memory(sc, buf);
-                break;
-            case 'h':
-                debugger_usage();
                 break;
             case 'l':
                 logger_set_level(strpbrk(buf, " ")+1);
@@ -165,6 +169,8 @@ void debugger_step(struct sigcontext* sc) {
             case 'u':
                 cache_usage();
                 break;
+            default:
+                debugger_help();
         }
     }
     pthread_mutex_unlock(&mut);
