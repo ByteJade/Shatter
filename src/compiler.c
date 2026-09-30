@@ -161,8 +161,10 @@ void decode_step(compiler_t* compiler) {
 }
 void encode_step(compiler_t* compiler, block_t* block) {
     compiler->guest = block->start;
-    if (block->start == compiler->entry)
+    if (block->start == compiler->entry) {
         compiler->entry = (uint8_t*)cache_get_host();
+        emit_entry(compiler);
+    }
     uint32_t end = block->buffer + block->size;
     for (compiler->reader = block->buffer; compiler->reader < end; compiler->reader++) {
         point_t* p = search_point(compiler, compiler->guest);
@@ -194,7 +196,6 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     compiler->entry = guest;
     decode_step(compiler);
     cache_start_block(guest);
-    emit_entry(compiler);
     for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {
         logger_log("start block %i", i);
         block_t* block = compiler->blocks + i;
