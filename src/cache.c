@@ -80,7 +80,7 @@ uint8_t* cache_get_patch(int id) {
 void cache_print() {
     for (uint32_t i = prev_host_p; i < host_p; i++) {
         uint32_t buf = host[i];
-        printf("%X: ", buf);
+        printf("%li %X: ", i - prev_host_p, buf);
         print_aarch64(buf);
     }
 }
@@ -96,14 +96,13 @@ uint32_t* cache_get_host() {
     return host + host_p;
 }
 uint32_t* cache_search(uint8_t* guest) {
-    uint32_t* result = NULL;
     for (size_t i = 0; i < dynarray_size(blocks); i++) {
         code_t* block = blocks + i;
         if (block->guest == guest) {
-            result = block->host;
+            return block->host;
         }
     }
-    return result;
+    return NULL;
 }
 
 void cache_lock() {
