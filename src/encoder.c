@@ -42,7 +42,7 @@ void emit_imm(int64_t imm, uint8_t dst) {
 void emit_add_signed(uint8_t dst, uint8_t src, int64_t imm) {
     if (imm > 4095 || imm < -4096) {
         emit_imm(imm, SC2R);
-        cache_emit(ASF|ADD_R | (dst) | (src<<5) | (SC2R<<10));
+        cache_emit(ASF|ADD_R | (dst) | (src<<5) | (SC2R<<16));
     } else {
         if (imm > 0)
             cache_emit(ASF|ADD_I | (dst) | (src<<5) | (imm<<10));
