@@ -188,8 +188,8 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     logger_deb("Start compile: %p", guest);
     if (debugger_enabled()) 
         clock_gettime(CLOCK_MONOTONIC, &start);
-    push_jump(compiler, 0);
     compiler->guest = guest;
+    push_jump(compiler, 0);
     decode_step(compiler);
     cache_start_block(guest);
     emit_entry(compiler);
