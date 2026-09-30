@@ -138,15 +138,15 @@ int block_compare(const void *a, const void *b) {
     return (ba->start > bb->start) - (ba->start < bb->start);
 }
 void decode_step(compiler_t* compiler) {
+    // TODO: flags
+    compiler->flags |= SMALL_ENTRY;
+    block_start(compiler);
     dynarray_push((void**)&compiler->buffer);
     dynarray_push((void**)&compiler->sizes);
     X86_64* buf = compiler->buffer;
     buf->type = START;
     buf->dst.type = NONE;
     *compiler->sizes = 0;
-    // TODO: flags
-    compiler->flags |= SMALL_ENTRY;
-    block_start(compiler);
     do {
         size_t buf_p = dynarray_push((void**)&compiler->buffer);
         buf = compiler->buffer + buf_p;
