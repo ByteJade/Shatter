@@ -104,7 +104,7 @@ int sc_get_flag(struct sigcontext* sc, const char* flag) {
 }
 size_t sc_get_reg_host(struct sigcontext* sc, const char* reg) {
     #ifdef __aarch64__
-    if (reg[0] == "x") {
+    if (reg[0] == 'x') {
         int num;
         sscanf(reg+1, "%i", &num);
         return sc->regs[num];
