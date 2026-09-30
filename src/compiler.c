@@ -138,7 +138,10 @@ int block_compare(const void *a, const void *b) {
     return (ba->start > bb->start) - (ba->start < bb->start);
 }
 void decode_step(compiler_t* compiler) {
-    X86_64* buf;
+    dynarray_push((void**)&compiler->buffer);
+    X86_64* buf = compiler->buffer;
+    buf->type = START;
+    buf->dst.type = NONE;
     // TODO: flags
     compiler->flags |= SMALL_ENTRY;
     block_start(compiler);
@@ -192,7 +195,6 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     push_jump(compiler, 0);
     decode_step(compiler);
     cache_start_block(guest);
-    emit_entry(compiler);
     for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {
         logger_log("start block %i", i);
         block_t* block = compiler->blocks + i;

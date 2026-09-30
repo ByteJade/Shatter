@@ -11,7 +11,7 @@ enum Registers {
 };
 
 enum Types {
-    TEST, ERR, NOT, NEG,
+    TEST, START, NOT, NEG,
     MUL, IMUL, DIV, IDIV,
 
     ADD, OR, ADC, SBB,

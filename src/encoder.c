@@ -450,6 +450,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case EBR: case NOP: case LEAVE: case HLT: break;
         case JMP: emit_branch(compiler, buf, BR); break;
         case CALL: emit_branch(compiler, buf, BLR); break;
+        case START: emit_entry(compiler); break;
         case RET: emit_ret(compiler); break;
         case JO ... JG: emit_patch(compiler, buf); break;
         case CLTQ: case CLTD:
