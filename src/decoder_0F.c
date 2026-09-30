@@ -85,7 +85,7 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->src.reg = (modrm>>3)&7;
         } break;
         case 0x80 ... 0x8F:
-            buf->type = JO + (byte%0xF);
+            buf->type = JO + (byte&0xF);
             buf->dst.type = IMM;
             buf->dst.imm = fetch32_imm(compiler);
             break;
