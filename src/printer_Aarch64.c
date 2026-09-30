@@ -97,7 +97,7 @@ void print_r_m(uint32_t buf) {
 }
 void print_r_r_m(uint32_t buf) {
     char reg = 'W';
-    if (buf&MSF) reg = 'X';
+    if (buf&ASF) reg = 'X';
     printf(GREEN_COLOR" %c%i, %c%i, [X%i",
         reg, get_reg(buf, 3),
         reg, get_reg(buf, 0),
