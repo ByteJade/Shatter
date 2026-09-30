@@ -102,6 +102,9 @@ int jump(compiler_t* compiler) {
 int emulate(compiler_t* compiler, X86_64* buf) {
     int do_jump = 0;
     switch (buf->type) {
+        case POP:
+            if (buf->dst.reg == RBP) compiler->flags &= ~SMALL_ENTRY;
+            break;
         case LEAVE:
             compiler->flags |= NEED_LEAVE;
             break;
@@ -137,6 +140,7 @@ int block_compare(const void *a, const void *b) {
 void decode_step(compiler_t* compiler) {
     X86_64* buf;
     // TODO: flags
+    compiler->flags |= SMALL_ENTRY;
     block_start(compiler);
     do {
         size_t buf_p = dynarray_push((void**)&compiler->buffer);

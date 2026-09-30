@@ -22,6 +22,7 @@ enum CompileFlags {
     NEED_STACK = 1<<0,
     NEED_ENTRY = 1<<1,
     NEED_LEAVE = 1<<2,
+    SMALL_ENTRY = 1<<3,
 };
 
 typedef struct compiler_t {
