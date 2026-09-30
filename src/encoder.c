@@ -40,9 +40,14 @@ void emit_imm(int64_t imm, uint8_t dst) {
     }
 }
 void emit_add_signed(uint8_t dst, uint8_t src, int64_t imm) {
-    if (imm > 0)
-        cache_emit(ASF|ADD_I | (dst) | (src<<5) | (imm<<10));
-    else cache_emit(ASF|SUB_I | (dst) | (src<<5) | (-imm<<10));
+    if (imm > 4095 || imm < -4096) {
+        emit_imm(imm, SC2R);
+        cache_emit(ASF|ADD_R | (dst) | (src<<5) | (SC2R<<10));
+    } else {
+        if (imm > 0)
+            cache_emit(ASF|ADD_I | (dst) | (src<<5) | (imm<<10));
+        else cache_emit(ASF|SUB_I | (dst) | (src<<5) | (-imm<<10));
+    }
 }
 void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf) {
     uint8_t t = op->type;

@@ -47,6 +47,7 @@ void* cache_mmap_guest(uint64_t size) {
 }
 void cache_start_block(uint8_t* guest) {
     pthread_mutex_lock(&mtx);
+    if (cache_search(guest)) logger_err("Block already existed");
     prev_host_p = host_p;
     size_t block_p = dynarray_push((void**)&blocks);
     code_t* block = blocks + block_p;
