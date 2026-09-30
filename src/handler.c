@@ -103,17 +103,17 @@ int sc_get_flag(struct sigcontext* sc, const char* flag) {
     return 0;
 }
 size_t sc_get_reg_host(struct sigcontext* sc, const char* reg) {
-    int num = 0;
-    sscanf(reg+1, "%i", &num);
     #ifdef __aarch64__
+    if (reg[0] == "x") {
+        int num;
+        sscanf(reg+1, "%i", &num);
+        return sc->regs[num];
+    }
     if (strcmp(reg, "sp") == 0) return sc->sp;
-    return sc->regs[num];
+    if (strcmp(reg, "pc") == 0) return sc->pc;
     #else
     return 0;
     #endif
-}
-size_t sc_get_reg_guest(struct sigcontext* sc, const char* reg) {
-    return 0;
 }
 void sc_print_flags(struct sigcontext* sc) {
     printf("Flags: N%i Z%i C%i V%i\n",
@@ -125,12 +125,10 @@ void sc_print_flags(struct sigcontext* sc) {
 }
 void sc_print_regs_host(struct sigcontext* sc) {
     #ifdef __aarch64__
+    printf("pc: %llX\n", sc->pc);
     for (int i = 0; i < 31; i++) {
         printf("X%i: %llX\n", i, sc->regs[i]);
     }
     printf("sp: %llX\n", sc->sp);
     #endif
-}
-void sc_print_regs_guest(struct sigcontext* sc) {
-
 }
