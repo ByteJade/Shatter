@@ -35,7 +35,8 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
         case 0x69:
             buf->type = IMUL;
             decode_r_rm(compiler, buf);
-            buf->src.imm = fetch32_imm(compiler);
+            buf->dst.type |= IMM;
+            buf->dst.imm = fetch32_imm(compiler);
             break;
         case 0x6A:
             buf->type = PUSH;

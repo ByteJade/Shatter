@@ -410,6 +410,19 @@ void encode(compiler_t* compiler, X86_64* buf) {
             cache_emit(0x9ac00d80 | (src<<16) | (dst)); // sdiv	nn, x12, r0
             cache_emit(0x9b00b002 | (src<<16) | (dst << 5)); // msub	x2, nn, r0, x12
         } break;
+        case IMUL: {
+            uint8_t src;
+            uint8_t dst = x86_regs[buf->dst.reg];
+            if (buf->src.type&MEM) {
+                emit_load(compiler, SC2R, &buf->src, buf, 0, 0);
+            } else src = x86_regs[buf->src.reg];
+            if (buf->dst.type == REG) {
+                cache_emit(SMUL_R | (src<<16) | (dst<<5) | (dst));
+            } else {
+                emit_imm(buf->dst.imm, SC1R);
+                cache_emit(SMUL_R | (SC1R<<16) | (src<<5) | dst);
+            }
+        }
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;
         case SHL:

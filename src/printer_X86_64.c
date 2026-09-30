@@ -80,20 +80,7 @@ void print_imm(int64_t imm) {
 }
 
 void print_op(X86_64* buf, operand_t* op) {
-    if (op->type == REG) {
-        if (buf->size == 64) 
-            printf("%s ", regs64[op->reg]);
-        else if (buf->size == 32) 
-            printf("%s ", regs32[op->reg]);
-        else if (buf->size == 16) 
-            printf("%s ", regs16[op->reg]);
-        else printf("%s ", regs8[op->reg]);
-    } else if (op->type == IMM) {
-        if (op->imm >= 0) printf("%lx ", op->imm);
-        else printf("-%lx ",(~op->imm) + 1);
-    } else if (op->type == (REG|XMM)) {
-        printf("xmm%i ", op->reg);
-    } else {
+    if (op->type&MEM) {
         printf("[ ");
         if (op->type&REG) {
             printf("%s ", regs64[op->reg]);
@@ -114,6 +101,22 @@ void print_op(X86_64* buf, operand_t* op) {
             else if (op->imm < 0) printf("- %lx ",(~op->imm) + 1);
         }
         printf("] ");
+    } else if (op->type == (REG|XMM)) {
+        printf("xmm%i ", op->reg);
+    } else {
+        if (op->type & REG) {
+            if (buf->size == 64) 
+                printf("%s ", regs64[op->reg]);
+            else if (buf->size == 32) 
+                printf("%s ", regs32[op->reg]);
+            else if (buf->size == 16) 
+                printf("%s ", regs16[op->reg]);
+            else printf("%s ", regs8[op->reg]);
+        }
+        if (op->type & IMM) {
+            if (op->imm >= 0) printf("%lx ", op->imm);
+            else printf("-%lx ",(~op->imm) + 1);
+        }
     }
 }
 

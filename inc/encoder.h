@@ -35,6 +35,7 @@ extern const uint8_t x86_regs[];
 #define SBC_R 0x5A000000
 #define ANDS_R 0x6A000000
 #define SBCS_R 0x7A000000
+#define SMUL_R 0x9b207c00
 
 #define LSL_R 0x1AC02000
 #define LSR_R 0x1AC02400
