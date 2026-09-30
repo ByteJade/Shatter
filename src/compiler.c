@@ -18,6 +18,7 @@ compiler_t* compiler_init(void) {
     compiler->points = dynarray_init(sizeof(point_t));
     compiler->patches = dynarray_init(sizeof(patch_t));
     compiler->reader = 0;
+    compiler->entry = NULL;
     compiler->flags = 0;
 
     return compiler;
@@ -99,12 +100,20 @@ int jump(compiler_t* compiler) {
     }
     return 0;
 }
+void tail_optimize(compiler_t* compiler) {
+    compiler->flags |= NEED_ENTRY;
+    size_t buf_p = dynarray_push((void**)&compiler->buffer);
+    size_t size_p = dynarray_push((void**)&compiler->sizes);
+    compiler->sizes[size_p] = 0;
+    X86_64* buf = compiler->buffer + buf_p;
+    buf->type = RET;
+    buf->dst.type = NONE;
+}
 int emulate(compiler_t* compiler, X86_64* buf) {
     int do_jump = 0;
     switch (buf->type) {
         case POP:
-            if (buf->dst.reg == RBP) compiler->flags &= ~SMALL_ENTRY;
-            break;
+            if (buf->dst.reg != RBP) break;
         case LEAVE:
             compiler->flags |= NEED_LEAVE;
             break;
@@ -116,7 +125,10 @@ int emulate(compiler_t* compiler, X86_64* buf) {
             break;
         case JMP:
             if (buf->dst.type == IMM) {
-                push_jump(compiler, buf->dst.imm);
+                if (compiler->guest + buf->dst.imm < compiler->entry) {
+                    buf->type = CALL;
+                    tail_optimize(compiler);
+                } else push_jump(compiler, buf->dst.imm);
             }
             [[fallthrough]];
         case HLT:
@@ -140,15 +152,14 @@ int block_compare(const void *a, const void *b) {
 void decode_step(compiler_t* compiler) {
     X86_64* buf;
     // TODO: flags
-    compiler->flags |= SMALL_ENTRY;
     block_start(compiler);
     do {
         size_t buf_p = dynarray_push((void**)&compiler->buffer);
+        size_t size_p = dynarray_push((void**)&compiler->sizes);
         buf = compiler->buffer + buf_p;
         uint8_t* prev_guest = compiler->guest;
         decode(compiler, buf);
         uint8_t* cur_guest = compiler->guest;
-        size_t size_p = dynarray_push((void**)&compiler->sizes);
         compiler->sizes[size_p] = cur_guest - prev_guest;
     } while (emulate(compiler, buf));
     qsort(
