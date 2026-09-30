@@ -192,7 +192,6 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     compiler->guest = guest;
     decode_step(compiler);
     cache_start_block(guest);
-    uint32_t* ret = cache_get_host();
     emit_entry(compiler);
     for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {
         logger_log("start block %i", i);
@@ -200,6 +199,7 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
         encode_step(compiler, block);
     }
     patch_step(compiler);
+    uint32_t* ret = search_point(compiler, guest)->host;
     if (debugger_enabled()) {
         debugger_brk(ret);
         clock_gettime(CLOCK_MONOTONIC, &end);
