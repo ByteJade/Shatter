@@ -163,6 +163,11 @@ void debugger_step(struct sigcontext* sc) {
             case 'l':
                 logger_set_level(strpbrk(buf, " ")+1);
                 break;
+            case 'g': {
+                char* pos = strpbrk(buf, " ")+1;
+                int delta = atoi(pos)*4;
+                debugger_brk((uint32_t*)(sc_get_pc(sc) + delta));
+            } break;
             case 'c':
                 cache_print();
                 break;
