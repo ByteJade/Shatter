@@ -101,7 +101,7 @@ int jump(compiler_t* compiler) {
     return 0;
 }
 void tail_optimize(compiler_t* compiler) {
-    compiler->flags |= NEED_ENTRY;
+    compiler->flags |= NEED_ENTRY | NEED_STACK;
     size_t buf_p = dynarray_push((void**)&compiler->buffer);
     size_t size_p = dynarray_push((void**)&compiler->sizes);
     compiler->sizes[size_p] = 0;
@@ -114,6 +114,7 @@ int emulate(compiler_t* compiler, X86_64* buf) {
     switch (buf->type) {
         case POP:
             if (buf->dst.reg != RBP) break;
+            [[fallthrough]];
         case LEAVE:
             compiler->flags |= NEED_LEAVE;
             break;
