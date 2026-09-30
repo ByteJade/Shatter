@@ -111,9 +111,8 @@ size_t sc_get_reg_host(struct sigcontext* sc, const char* reg) {
     }
     if (strcmp(reg, "sp") == 0) return sc->sp;
     if (strcmp(reg, "pc") == 0) return sc->pc;
-    #else
-    return 0;
     #endif
+    return 0;
 }
 void sc_print_flags(struct sigcontext* sc) {
     printf("Flags: N%i Z%i C%i V%i\n",
