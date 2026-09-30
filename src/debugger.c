@@ -6,6 +6,7 @@
 #include "../inc/cache.h"
 #include "../inc/printer_Aarch64.h"
 #include <pthread.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -105,7 +106,6 @@ void print_memory(struct sigcontext* sc, char* buf) {
     char com[32];
     char base[32];
     char write[32];
-    int write_f = 0;
     int c = sscanf(buf, "%s %s %s", com, base, write);
     if (c < 2) return;
     int imm = 0;
@@ -160,7 +160,7 @@ void debugger_step(struct sigcontext* sc) {
                 run = 0;
                 break;
             case 'a':
-                exit(EXIT_SUCCESS);
+                _exit(EXIT_SUCCESS);
                 break;
             case 'f':
                 sc_print_flags(sc);
