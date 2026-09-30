@@ -139,9 +139,11 @@ int block_compare(const void *a, const void *b) {
 }
 void decode_step(compiler_t* compiler) {
     dynarray_push((void**)&compiler->buffer);
+    dynarray_push((void**)&compiler->sizes);
     X86_64* buf = compiler->buffer;
     buf->type = START;
     buf->dst.type = NONE;
+    *compiler->sizes = 0;
     // TODO: flags
     compiler->flags |= SMALL_ENTRY;
     block_start(compiler);
