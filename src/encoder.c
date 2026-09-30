@@ -404,11 +404,11 @@ void encode(compiler_t* compiler, X86_64* buf) {
             cache_emit(MOV_N | (buf->dst.reg) | (src << 5) | (src << 16));
         } break;
         case IDIV: {
-            uint8_t dst = x86_regs[buf->dst.reg];
-            uint8_t src = x86_regs[buf->src.reg];
+            uint8_t dst = x86_regs[buf->dst.reg]; // куда записывать частное. Зачастую rax
+            uint8_t src = x86_regs[buf->src.reg]; // делитель
             cache_emit(ADD_I | SC1R | (dst<<5));
-            cache_emit(0x9ac00000 | (src<<16) | (SC1R<<5) | (dst)); // sdiv
-            cache_emit(0x9b000000 | (src<<16) | (SC1R<<10) | (dst << 5) | 2); // msub
+            cache_emit(0x9ac00c00 | (src<<16) | (SC1R<<5) | (dst)); // sdiv
+            cache_emit(0x9b008000 | (src<<16) | (SC1R<<10) | (dst << 5) | 2); // msub
         } break;
         case IMUL: {
             uint8_t src = SC2R;
