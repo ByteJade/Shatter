@@ -409,7 +409,10 @@ void encode(compiler_t* compiler, X86_64* buf) {
             cache_emit(MOV_N | (buf->dst.reg) | (src << 5) | (src << 16));
         } break;
         case IDIV: {
-            uint8_t dst = x86_regs[buf->dst.reg]; // куда записывать частное. Зачастую rax
+            uint8_t dst = SC2R;
+            if (buf->src.type&MEM) {
+                emit_load(compiler, SC2R, &buf->src, buf, 0, 0);
+            } else dst = x86_regs[buf->dst.reg];
             uint8_t src = x86_regs[buf->src.reg]; // делитель
             uint32_t sf = ASF * (buf->size == 64);
             cache_emit(ADD_I | SC1R | (dst<<5));
