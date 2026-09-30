@@ -2,7 +2,7 @@
 #include "../inc/logger.h"
 
 const char* instr_types[] = {
-    "test", "start", "not", "neg",
+    "test", "err", "not", "neg",
     "mul", "imul", "div", "idiv",
 
     "add", "or", "adc", "sbb",
