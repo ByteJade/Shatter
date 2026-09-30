@@ -145,6 +145,7 @@ main(int argc, char *argv[])
    GLXContext ctx;
    char *dpyName = NULL;
    VisualID visId;
+   printf("Open display\n");
    dpy = XOpenDisplay(dpyName);
    if (!dpy) {
       printf("Error: couldn't open display %s\n",
@@ -152,8 +153,11 @@ main(int argc, char *argv[])
       return -1;
    }
 
+   printf("Make window %p\n", dpy);
    make_window(dpy, "glxgears", x, y, winWidth, winHeight, &win, &ctx, &visId);
+   printf("Map window %p 0x%lx\n", dpy, win);
    XMapWindow(dpy, win);
+   printf("Make current %p %lx\n", dpy, win);
    glXMakeCurrent(dpy, win, ctx);
 
    event_loop(dpy, win);
