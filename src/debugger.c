@@ -113,10 +113,10 @@ void print_memory(struct sigcontext* sc, char* buf) {
     }
     reg += imm;
     switch (*com) {
-        case 'b': printf("%s: %x\n", base, *(uint8_t*)(reg));
-        case 'h': printf("%s: %x\n", base, *(uint16_t*)(reg));
-        case 'w': printf("%s: %x\n", base, *(uint32_t*)(reg));
-        case 'd': printf("%s: %lx\n", base, *(uint64_t*)(reg));
+        case 'b': printf("%s: %x\n", base, *(uint8_t*)(reg)); break;
+        case 'h': printf("%s: %x\n", base, *(uint16_t*)(reg)); break;
+        case 'w': printf("%s: %x\n", base, *(uint32_t*)(reg)); break;
+        case 'd': printf("%s: %lx\n", base, *(uint64_t*)(reg)); break;
     }
 }
 void debugger_help() {
