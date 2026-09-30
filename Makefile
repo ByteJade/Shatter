@@ -5,7 +5,7 @@ LIBFLAGS=-fPIC -shared -O3
 BUILD_DIR = build
 LIB_DIR = $(BUILD_DIR)/lib
 
-all: directories $(BUILD_DIR)/shatter $(LIB_DIR)/my_libc.so.6 $(LIB_DIR)/my_libm.so.6 $(LIB_DIR)/my_libX11.so.6 $(LIB_DIR)/my_libGL.so.1
+all: directories $(BUILD_DIR)/shatter $(LIB_DIR)/my_libc.so.6 $(LIB_DIR)/my_libm.so.6 $(LIB_DIR)/my_libX11.so.6 $(LIB_DIR)/my_libGL.so.1 $(LIB_DIR)/my_libpthread.so.0
 
 directories:
 	mkdir -p $(LIB_DIR)
@@ -24,6 +24,9 @@ $(LIB_DIR)/my_libX11.so.6: lib/my_libX11.c
 
 $(LIB_DIR)/my_libGL.so.1: lib/my_libGL.c
 	$(CC) $(LIBFLAGS) $< -o $@ -lGL
+
+$(LIB_DIR)/my_libpthread.so.0: lib/my_libpthread.c
+	$(CC) $(LIBFLAGS) $< -o $@ -lpthread
 
 clean:
 	rm -rf $(BUILD_DIR)
