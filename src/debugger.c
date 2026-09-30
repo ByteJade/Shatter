@@ -104,7 +104,11 @@ void emulate_jump(struct sigcontext* sc) {
 void print_memory(struct sigcontext* sc, char* buf) {
     char com[32];
     char base[32];
-    sscanf(buf, "%s %s", com, base);
+    char write[32];
+    int write_f = 0;
+    int c = sscanf(buf, "%s %s %s", com, base, write);
+    if (c < 2) return;
+    if (c == 3) write_f = 1;
     int imm = 0;
     size_t reg = sc_get_reg_host(sc, base+1);
     char* sep = strpbrk(base, "+-");
@@ -112,6 +116,15 @@ void print_memory(struct sigcontext* sc, char* buf) {
         imm = strtol(sep, NULL, 0);
     }
     reg += imm;
+    if (write_f) {
+        uint64_t write_d = strtol(sep, NULL, 0);
+        switch (*com) {
+            case 'b': *(uint8_t*)(reg) = write_d; break;
+            case 'h': *(uint16_t*)(reg) = write_d; break;
+            case 'w': *(uint32_t*)(reg) = write_d; break;
+            case 'd': *(uint64_t*)(reg) = write_d; break;
+        }
+    }
     switch (*com) {
         case 'b': printf("%s: %x\n", base, *(uint8_t*)(reg)); break;
         case 'h': printf("%s: %x\n", base, *(uint16_t*)(reg)); break;
