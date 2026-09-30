@@ -23,4 +23,7 @@ void cache_usage();
 uint32_t* cache_get_host();
 uint32_t* cache_search(uint8_t* guest);
 
+void cache_lock();
+void cache_unlock();
+
 #endif

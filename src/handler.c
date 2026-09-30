@@ -10,11 +10,13 @@
 #include <string.h>
 
 uint32_t* compile(size_t pc) {
+    cache_lock();
     uint32_t* target = cache_search((uint8_t*)pc);
     if (target == NULL) {
         compiler_t* compiler = compiler_init();
         target = compiler_step(compiler, (uint8_t*)pc);
     }
+    cache_unlock();
     return target;
 }
 

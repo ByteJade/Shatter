@@ -21,11 +21,13 @@ void cache_init(void) {
     blocks = dynarray_init(sizeof(code_t));
     patches = dynarray_init(sizeof(uint8_t*));
     reuse = dynarray_init(sizeof(int));
+    pthread_mutex_init(&mtx, NULL);
 }
 void cache_fini(void) {
     dynarray_fini(blocks);
     dynarray_fini(patches);
     dynarray_fini(reuse);
+    pthread_mutex_destroy(&mtx);
 }
 
 void* cache_mmap_guest(uint64_t size) {
@@ -46,8 +48,6 @@ void* cache_mmap_guest(uint64_t size) {
     return map;
 }
 void cache_start_block(uint8_t* guest) {
-    pthread_mutex_lock(&mtx);
-    if (cache_search(guest)) logger_err("Block already existed");
     prev_host_p = host_p;
     size_t block_p = dynarray_push((void**)&blocks);
     code_t* block = blocks + block_p;
@@ -56,7 +56,6 @@ void cache_start_block(uint8_t* guest) {
 }
 void cache_end_block() {
     __builtin___clear_cache(host+prev_host_p, host+host_p);
-    pthread_mutex_unlock(&mtx);
 }
 void cache_emit(uint32_t data) {
     host[host_p++] = data;
@@ -97,11 +96,19 @@ uint32_t* cache_get_host() {
     return host + host_p;
 }
 uint32_t* cache_search(uint8_t* guest) {
+    uint32_t* result = NULL;
     for (size_t i = 0; i < dynarray_size(blocks); i++) {
         code_t* block = blocks + i;
         if (block->guest == guest) {
-            return block->host;
+            result = block->host;
         }
     }
-    return NULL;
+    return result;
+}
+
+void cache_lock() {
+    pthread_mutex_lock(&mtx);
+}
+void cache_unlock() {
+    pthread_mutex_unlock(&mtx);
 }
