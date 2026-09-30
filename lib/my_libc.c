@@ -64,6 +64,7 @@ WRAP_FUNC(strspn)
 WRAP_FUNC(stpcpy)
 WRAP_FUNC(strncpy)
 WRAP_FUNC(strdup)
+WRAP_FUNC(strerror)
 WRAP_FUNC(atoi)
 
 // memory
