@@ -1,4 +1,5 @@
 #include "wrapper.h"
+#include <stdio.h>
 #include <unistd.h>
 
 void my___libc_start_main(
@@ -11,6 +12,7 @@ void my___libc_start_main(
     int stat = main(argc, argv, __environ);
     // if (fini) fini();
     //if (rtld_fini) rtld_fini();
+    fflush(stdout);
     _exit(stat);
 }
 void my_exit(int stat) {
