@@ -17,7 +17,7 @@ compiler_t* compiler_init(void) {
     compiler->blocks = dynarray_init(sizeof(block_t));
     compiler->points = dynarray_init(sizeof(point_t));
     compiler->patches = dynarray_init(sizeof(patch_t));
-    compiler->reader = 1;
+    compiler->reader = 0;
     compiler->flags = 0;
 
     return compiler;
@@ -138,15 +138,10 @@ int block_compare(const void *a, const void *b) {
     return (ba->start > bb->start) - (ba->start < bb->start);
 }
 void decode_step(compiler_t* compiler) {
+    X86_64* buf;
     // TODO: flags
     compiler->flags |= SMALL_ENTRY;
     block_start(compiler);
-    dynarray_push((void**)&compiler->buffer);
-    dynarray_push((void**)&compiler->sizes);
-    X86_64* buf = compiler->buffer;
-    buf->type = START;
-    buf->dst.type = NONE;
-    *compiler->sizes = 0;
     do {
         size_t buf_p = dynarray_push((void**)&compiler->buffer);
         buf = compiler->buffer + buf_p;
@@ -166,6 +161,8 @@ void decode_step(compiler_t* compiler) {
 }
 void encode_step(compiler_t* compiler, block_t* block) {
     compiler->guest = block->start;
+    if (block->start == compiler->entry)
+        compiler->entry = (uint8_t*)cache_get_host();
     uint32_t end = block->buffer + block->size;
     for (compiler->reader = block->buffer; compiler->reader < end; compiler->reader++) {
         point_t* p = search_point(compiler, compiler->guest);
@@ -194,16 +191,17 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     if (debugger_enabled()) 
         clock_gettime(CLOCK_MONOTONIC, &start);
     compiler->guest = guest;
-    push_jump(compiler, 0);
+    compiler->entry = guest;
     decode_step(compiler);
     cache_start_block(guest);
+    emit_entry(compiler);
     for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {
         logger_log("start block %i", i);
         block_t* block = compiler->blocks + i;
         encode_step(compiler, block);
     }
     patch_step(compiler);
-    uint32_t* ret = search_point(compiler, guest)->host;
+    uint32_t* ret = (uint32_t*)compiler->entry;
     if (debugger_enabled()) {
         debugger_brk(ret);
         clock_gettime(CLOCK_MONOTONIC, &end);

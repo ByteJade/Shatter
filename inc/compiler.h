@@ -35,6 +35,7 @@ typedef struct compiler_t {
     patch_t* patches;
 
     uint32_t reader;
+    uint8_t* entry;
     int flags;
 } compiler_t;
 
