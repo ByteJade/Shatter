@@ -85,6 +85,7 @@ WRAP_FUNC(clock_gettime)
 WRAP_FUNC(gettimeofday)
 WRAP_FUNC(nanosleep)
 WRAP_FUNC(sleep)
+WRAP_FUNC(usleep)
 
 // env
 WRAP_FUNC(getenv)
