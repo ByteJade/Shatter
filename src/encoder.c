@@ -158,7 +158,9 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
 void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode, int small) {
     uint8_t r0 = buf->dst.reg;
     uint8_t r1 = buf->src.reg;
-    uint32_t msf = (buf->size == 64) * MSF;
+    uint32_t msf = MSF;
+    if (buf->type != COMISD)
+        msf *= (buf->prefix == REPN);
     if (buf->dst.type & MEM) {
         emit_address(compiler, SC1R, &buf->dst, buf);
         cache_emit(msf|LDR_N | (SC1R<<5) | 16);
@@ -377,12 +379,12 @@ void encode(compiler_t* compiler, X86_64* buf) {
         } break;
         case CVTSS2SI: 
         case CVTSD2SI: {
-            uint32_t prefix = NSF * (buf->size == 64);
+            uint32_t prefix = NSF * (buf->prefix == REPN);
             cache_emit(prefix | FCVTZS | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
         } break;
         case CVTSI2SS: 
         case CVTSI2SD: {
-            uint32_t prefix = (ASF|NSF) * (buf->size == 64);
+            uint32_t prefix = (ASF|NSF) * (buf->prefix == REPN);
             if (buf->src.type&MEM) {
                 emit_load(compiler, SC1R, &buf->src, buf, 0, 0);
                 cache_emit(prefix|SCVTF_N | (buf->dst.reg) | (SC1R << 5));
@@ -399,7 +401,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
             break;
         case MOVSS: 
         case MOVSD:{
-            uint32_t sf = (buf->size == 64) * MSF;
+            uint32_t sf = (buf->prefix == REPN) * MSF;
             if (buf->dst.type & MEM) {
                 emit_address(compiler, SC1R, &buf->dst, buf);
                 cache_emit(sf|STR_N | (SC1R<<5) | buf->src.reg);
