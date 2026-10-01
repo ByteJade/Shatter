@@ -63,7 +63,8 @@ void cache_emit(uint32_t data) {
 int cache_set_patch(uint8_t* guest) {
     int id;
     if (dynarray_size(reuse)) {
-        id = dynarray_pop((void*)reuse);
+        size_t reuse_p = dynarray_pop((void*)reuse);
+        id = reuse[reuse_p];
     } else {
         id = dynarray_push((void**)&patches);
     }
