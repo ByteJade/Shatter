@@ -11,7 +11,7 @@ typedef struct  {
 void cache_init(void);
 void cache_fini(void);
 
-void* cache_mmap_guest(uint64_t size);
+void* cache_mmap_guest(uint8_t* base, uint64_t size);
 void cache_start_block(uint8_t* guest);
 void cache_end_block();
 void cache_emit(uint32_t data);

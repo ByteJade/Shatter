@@ -30,9 +30,9 @@ void cache_fini(void) {
     pthread_mutex_destroy(&mtx);
 }
 
-void* cache_mmap_guest(uint64_t size) {
+void* cache_mmap_guest(uint8_t* base, uint64_t size) {
     void* map = mmap(
-        NULL, size+size,
+        base, size+size,
         PROT_READ | PROT_WRITE | PROT_EXEC,
         MAP_ANON | MAP_PRIVATE,
         -1, 0

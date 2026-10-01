@@ -4,12 +4,14 @@
 #include "../inc/logger.h"
 #include "../inc/launcher.h"
 #include <elf.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define PAGE_SIZE 0x1000
 
 void mmap_base(elf_t* elf) {
+    uint8_t* base = NULL;
     size_t max = 0;
     size_t min = SIZE_MAX;
     for (int i = 0; i < elf->head.e_phnum; i++) {
@@ -21,9 +23,13 @@ void mmap_base(elf_t* elf) {
             if (end > max) max = end;
         }
     }
+    if (elf->head.e_type == ET_EXEC){
+        logger_warn("Non-PIE file");
+        base = (uint8_t*)min;
+    }
     min &= ~(PAGE_SIZE - 1);
     max = (max + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-    elf->base = (Elf64_Addr)cache_mmap_guest(max - min);
+    elf->base = (Elf64_Addr)cache_mmap_guest(base, max - min);
     elf->base -= min;
 }
 void reloc_relr(elf_t* elf, Elf64_Relr* relr, int relrsz) {
@@ -158,7 +164,7 @@ void elf_read_dynamic(elf_t* elf) {
                 relasz = dyn->d_un.d_val;
                 break;
             case DT_INIT:
-                elf->init = dyn->d_un.d_ptr;
+                elf->init = elf->base + dyn->d_un.d_ptr;
                 break;
             case DT_JMPREL:
                 jmprel = (Elf64_Rela*)(elf->base + dyn->d_un.d_ptr);
@@ -190,13 +196,13 @@ void elf_read_dynamic(elf_t* elf) {
 void elf_start(elf_t* elf) {
     if (elf->init) {
         logger_deb("Jump to init");
-        execute(elf_get_ptr(elf->base, elf->init));
+        execute((void*)elf->init);
     }
     if (elf->init_array) {
         size_t count = elf->init_arraysz / sizeof(Elf64_Addr);
         for (size_t i = 0; i < count; i++) {
             logger_deb("Jump to init_array[%i]", i);
-            execute(elf_get_ptr(elf->base, elf->init_array[i]));
+            execute((void*)elf->init_array[i]);
         }
     }
 }
