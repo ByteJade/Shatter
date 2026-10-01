@@ -377,12 +377,12 @@ void encode(compiler_t* compiler, X86_64* buf) {
         } break;
         case CVTSS2SI: 
         case CVTSD2SI: {
-            uint32_t prefix = NSF * (buf->prefix == REPN);
+            uint32_t prefix = NSF * (buf->size == 64);
             cache_emit(prefix | FCVTZS | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
         } break;
         case CVTSI2SS: 
         case CVTSI2SD: {
-            uint32_t prefix = (ASF|NSF) * (buf->prefix == REPN);
+            uint32_t prefix = (ASF|NSF) * (buf->size == 64);
             if (buf->src.type&MEM) {
                 emit_load(compiler, SC1R, &buf->src, buf, 0, 0);
                 cache_emit(prefix|SCVTF_N | (buf->dst.reg) | (SC1R << 5));
@@ -399,7 +399,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
             break;
         case MOVSS: 
         case MOVSD:{
-            uint32_t sf = (buf->prefix == REPN) * MSF;
+            uint32_t sf = (buf->size == 64) * MSF;
             if (buf->dst.type & MEM) {
                 emit_address(compiler, SC1R, &buf->dst, buf);
                 cache_emit(sf|STR_N | (SC1R<<5) | buf->src.reg);
