@@ -327,6 +327,7 @@ uint32_t math_group[] = {
 uint32_t neon_group[] = {
     EOR_N,
     CMP_N, NSF|CMP_N,
+    CMPE_N, NSF|CMPE_N,
     ADD_N, NSF|ADD_N,
     MUL_N, NSF|MUL_N,
     SUB_N, NSF|SUB_N,

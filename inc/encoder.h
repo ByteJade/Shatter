@@ -117,6 +117,7 @@ extern const uint8_t x86_regs[];
 #define MUL_N 0x1E200800
 #define SUB_N 0x1E203800
 #define DIV_N 0x1E201800
+#define CMPE_N 0x1E202010
 #define CMP_N 0x1E202000
 #define FCVTU_N 0x1E22C000
 #define FCVT_N 0x1e624000

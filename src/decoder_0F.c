@@ -39,6 +39,11 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->type = CVTSS2SI;
             decode_rm_r_XMM(compiler, buf,0);
             break;
+        case 0x2E:
+            if (buf->type == 0x66) buf->type = UCOMISS;
+            else buf->type = UCOMISD;
+            decode_r_rm_XMM(compiler, buf,1);
+            break;
         case 0x2F:
             if (buf->type == 0x66) buf->type = COMISS;
             else buf->type = COMISD;
