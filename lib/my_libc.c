@@ -23,7 +23,6 @@ WRAP_FUNC(puts)
 WRAP_FUNC(putchar)
 WRAP_BIG_FUNC(printf)
 WRAP_BIG_FUNC(sprintf)
-WRAP_BIG_FUNC(vprintf)
 WRAP_BIG_FUNC(snprintf)
 WRAP_BIG_FUNC(scanf)
 WRAP_BIG_FUNC(sscanf)
@@ -100,5 +99,16 @@ WRAP_FUNC_VOID(__stack_chk_fail)
 
 WRAP_FUNC(wait)
 WRAP_FUNC(fork)
-WRAP_FUNC(backtrace)
-WRAP_FUNC(backtrace_symbols)
+
+void my_vprintf() {
+    printf("TODO: my_vprintf\n");
+}
+void my_backtrace() {
+    printf("TODO: my_backtrace\n");
+}
+void my_backtrace_symbols() {
+    printf("TODO: my_backtrace_symbols\n");
+}
+void my_syscall() {
+    printf("TODO: my_syscall\n");
+}
