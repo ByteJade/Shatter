@@ -435,6 +435,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
                 emit_imm(buf->dst.imm, SC1R);
                 cache_emit(SMUL_R | (SC1R<<16) | (src<<5) | dst);
             }
+            cache_emit(0x9360FC00 | 2 | (8 << 5));
         } break;
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;
