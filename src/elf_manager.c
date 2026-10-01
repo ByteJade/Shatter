@@ -29,7 +29,7 @@ void elf_manager_fini(void) {
     dynarray_fini(libraries);
 }
 
-void* get_ptr(uint64_t base, uint64_t link) {
+void* elf_get_ptr(Elf64_Addr base, Elf64_Addr link) {
     if (link < base) return (void*)(base + link);
     return (void*)link;
 }
@@ -54,13 +54,13 @@ static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
     for (; dyn->d_tag != DT_NULL; ++dyn) {
         switch (dyn->d_tag) {
             case DT_STRTAB:
-                strtab = (const char*)get_ptr(base, dyn->d_un.d_ptr);
+                strtab = (const char*)elf_get_ptr(base, dyn->d_un.d_ptr);
                 break;
             case DT_SYMTAB:
-                symtab = (Elf64_Sym*)get_ptr(base, dyn->d_un.d_ptr);
+                symtab = (Elf64_Sym*)elf_get_ptr(base, dyn->d_un.d_ptr);
                 break;
             case DT_RELA:
-                rela = (Elf64_Rela*)get_ptr(base, dyn->d_un.d_ptr);
+                rela = (Elf64_Rela*)elf_get_ptr(base, dyn->d_un.d_ptr);
                 break;
             case DT_RELASZ:
                 rela_size = dyn->d_un.d_val;
