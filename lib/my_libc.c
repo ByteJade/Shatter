@@ -77,13 +77,14 @@ WRAP_FUNC(memcmp)
 WRAP_FUNC(malloc)
 WRAP_FUNC(calloc)
 WRAP_FUNC(realloc)
-WRAP_FUNC(free)
+WRAP_FUNC_VOID(free)
 
 // time
 WRAP_FUNC(time)
 WRAP_FUNC(clock_gettime)
 WRAP_FUNC(gettimeofday)
 WRAP_FUNC(nanosleep)
+WRAP_FUNC(sleep)
 
 // env
 WRAP_FUNC(getenv)
