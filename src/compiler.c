@@ -109,8 +109,9 @@ int emulate(compiler_t* compiler, X86_64* buf) {
         case JMP:
             if (buf->dst.type == IMM) {
                 push_jump(compiler, buf->dst.imm);
-            } else compiler->flags &= ~NEED_ENTRY;
-            [[fallthrough]];
+            } else if (buf->dst.type != REG) {
+                compiler->flags &= ~NEED_ENTRY;
+            } [[fallthrough]];
         case RET:
             do_jump = 1;
             break;
