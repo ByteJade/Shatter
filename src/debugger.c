@@ -151,7 +151,7 @@ void debugger_step(struct sigcontext* sc) {
     while (run) {
         char buf[256];
         printf("> ");
-        fgets(buf, sizeof(buf), stdin);
+        if (fgets(buf, sizeof(buf), stdin) != buf) break;
         switch (buf[0]) {
             case 's':
                 emulate_jump(sc);
