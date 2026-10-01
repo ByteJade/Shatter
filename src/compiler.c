@@ -100,43 +100,22 @@ int jump(compiler_t* compiler) {
     }
     return 0;
 }
-void tail_optimize(compiler_t* compiler) {
-    compiler->flags |= NEED_ENTRY | NEED_STACK;
-    size_t buf_p = dynarray_push((void**)&compiler->buffer);
-    size_t size_p = dynarray_push((void**)&compiler->sizes);
-    compiler->sizes[size_p] = 0;
-    X86_64* buf = compiler->buffer + buf_p;
-    buf->type = RET;
-    buf->dst.type = NONE;
-}
 int emulate(compiler_t* compiler, X86_64* buf) {
     int do_jump = 0;
     switch (buf->type) {
-        case POP:
-            if (buf->dst.reg != RBP) break;
-            [[fallthrough]];
-        case LEAVE:
-            compiler->flags |= NEED_LEAVE;
-            break;
-        case CALL:
-            compiler->flags |= NEED_STACK;
-            break;
         case JO ... JG:
             push_jump(compiler, buf->dst.imm);
             break;
         case JMP:
             if (buf->dst.type == IMM) {
-                if (compiler->guest + buf->dst.imm < compiler->entry) {
-                    buf->type = CALL;
-                    tail_optimize(compiler);
-                } else push_jump(compiler, buf->dst.imm);
-            }
+                push_jump(compiler, buf->dst.imm);
+            } else compiler->flags &= ~NEED_ENTRY;
             [[fallthrough]];
-        case HLT:
+        case RET:
             do_jump = 1;
             break;
-        case RET:
-            compiler->flags |= NEED_ENTRY;
+        case HLT:
+            compiler->flags &= ~NEED_ENTRY;
             do_jump = 1;
             break;
     }
@@ -206,6 +185,7 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
         clock_gettime(CLOCK_MONOTONIC, &start);
     compiler->guest = guest;
     compiler->entry = guest;
+    compiler->flags = NEED_ENTRY;
     decode_step(compiler);
     cache_start_block(guest);
     for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {

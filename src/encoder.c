@@ -221,11 +221,7 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
         emit_load(compiler, SC1R, &buf->dst, buf, 0, 0);
         dst = SC1R;
     } else {
-        if (buf->dst.reg == RBP) {
-            if (next(compiler)->type == MOV)
-                skip(compiler);
-            return;
-        } if (buf->dst.reg == RSP) {
+        if (buf->dst.reg == RSP) {
             cache_emit(ASF|ADD_I | SC1R | (31<<5));
             dst = SC1R;
         } else dst = x86_regs[buf->dst.reg];
@@ -237,7 +233,6 @@ void emit_pop(compiler_t* compiler, X86_64* buf) {
     if (buf->dst.type&MEM) {
         logger_err("pop []; not supported");
     } else {
-        if (buf->dst.reg == RBP) return;
         uint8_t dst = x86_regs[buf->dst.reg];
         cache_emit(MSF|LDR_POST | (8<<12) | dst | (TSP<<5));
     }
@@ -250,27 +245,14 @@ void emit_patch(compiler_t* compiler, X86_64* buf) {
     cache_emit(buf->type);
 }
 void emit_entry(struct compiler_t* compiler) {
-    if (compiler->flags&NEED_STACK) {
+    if (compiler->flags&NEED_ENTRY) {
         cache_emit(ASF|ADD_I | TSP | (31<<5));
-        if (compiler->flags&NEED_LEAVE) {
-            if (compiler->flags&NEED_ENTRY)
-                cache_emit(ASF|STP_PRE | ((-16&0x3FF)<<12) | 29 | (TSP<<5) | (30<<10));
-            cache_emit(ASF|ADD_I | 29 | (TSP<<5));
-        } else if (compiler->flags&NEED_ENTRY) {
-            cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
-        }
+        cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
     }
 }
 void emit_ret(struct compiler_t* compiler) {
-    if (compiler->flags&NEED_STACK) {
-        if (compiler->flags&NEED_LEAVE) {
-            cache_emit(ASF|ADD_I | 31 | (29<<5));
-            cache_emit(ASF|LDP_POST | (16<<12) | 29 | (31<<5) | (30<<10));
-        } else {
-            cache_emit(MSF|LDR_POST | (8<<12) | 30 | (TSP<<5));
-            cache_emit(ASF|ADD_I | 31 | (TSP<<5));
-        }
-    }
+    cache_emit(MSF|LDR_POST | (8<<12) | 30 | (TSP<<5));
+    cache_emit(ASF|ADD_I | 31 | (TSP<<5));
     cache_emit(RET_R | (30 << 5));
 }
 void emit_jump(uint32_t* dst, uint32_t* target) {
@@ -445,13 +427,17 @@ void encode(compiler_t* compiler, X86_64* buf) {
                 cache_emit(SMUL_R | (SC1R<<16) | (src<<5) | dst);
             }
         } break;
+        case LEAVE:
+            cache_emit(ASF|ADD_I | TSP | (29<<5));
+            cache_emit(MSF|LDR_POST | (8<<12) | 29 | (TSP<<5));
+            break;
         case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
         case ROR: emit_math(compiler, buf, ROR_R, 0); break;
         case SHL:
         case SAL: emit_math(compiler, buf, LSL_R, 0); break;
         case SHR: emit_math(compiler, buf, LSR_R, 0); break;
         case SAR: emit_math(compiler, buf, ASR_R, 0); break;
-        case EBR: case NOP: case LEAVE: case HLT: break;
+        case EBR: case NOP: case HLT: break;
         case JMP: emit_branch(compiler, buf, BR); break;
         case CALL: emit_branch(compiler, buf, BLR); break;
         case RET: emit_ret(compiler); break;

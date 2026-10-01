@@ -19,9 +19,7 @@ typedef struct {
 } patch_t;
 
 enum CompileFlags {
-    NEED_STACK = 1<<0,
-    NEED_ENTRY = 1<<1,
-    NEED_LEAVE = 1<<2,
+    NEED_ENTRY = 1<<0,
 };
 
 typedef struct compiler_t {
