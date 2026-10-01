@@ -412,7 +412,12 @@ void encode(compiler_t* compiler, X86_64* buf) {
         } break;
         case MOVAPD: {
             uint8_t src = buf->src.reg;
-            cache_emit(MOV_N | (buf->dst.reg) | (src << 5) | (src << 16));
+            if (buf->dst.type & MEM) {
+                emit_address(compiler, SC1R, &buf->dst, buf);
+                cache_emit(STR_N | (SC1R<<5) | src);
+            }else {
+                cache_emit(MOV_N | (buf->dst.reg) | (src << 5) | (src << 16));
+            }
         } break;
         case IDIV: {
             uint8_t dst = SC2R;
