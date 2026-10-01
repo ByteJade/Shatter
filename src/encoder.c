@@ -245,9 +245,11 @@ void emit_patch(compiler_t* compiler, X86_64* buf) {
     cache_emit(buf->type);
 }
 void emit_entry(struct compiler_t* compiler) {
-    if (compiler->flags&NEED_ENTRY) {
+    if (compiler->flags&NEED_STACK) {
         cache_emit(ASF|ADD_I | TSP | (31<<5));
-        cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
+        if (compiler->flags&NEED_ENTRY) {
+            cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
+        }
     }
 }
 void emit_ret(struct compiler_t* compiler) {

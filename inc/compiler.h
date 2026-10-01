@@ -20,6 +20,7 @@ typedef struct {
 
 enum CompileFlags {
     NEED_ENTRY = 1<<0,
+    NEED_STACK = 1<<1,
 };
 
 typedef struct compiler_t {
