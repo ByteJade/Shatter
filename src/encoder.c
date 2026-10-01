@@ -158,7 +158,7 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
 void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode, int small) {
     uint8_t r0 = buf->dst.reg;
     uint8_t r1 = buf->src.reg;
-    uint32_t msf = (buf->prefix == REPN) * MSF;
+    uint32_t msf = (buf->size == 64) * MSF;
     if (buf->dst.type & MEM) {
         emit_address(compiler, SC1R, &buf->dst, buf);
         cache_emit(msf|LDR_N | (SC1R<<5) | 16);

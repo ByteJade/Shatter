@@ -40,8 +40,12 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             decode_rm_r_XMM(compiler, buf,0);
             break;
         case 0x2F:
-            if (buf->type == 0x66) buf->type = COMISS;
-            else buf->type = COMISD;
+            if (buf->type == 0x66)
+                buf->type = COMISS;
+            else {
+                buf->size = 64;
+                buf->type = COMISD;
+            }
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x40 ... 0x4F:
