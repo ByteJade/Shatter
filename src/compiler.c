@@ -116,6 +116,7 @@ int emulate(compiler_t* compiler, X86_64* buf) {
                 compiler->flags &= ~NEED_ENTRY;
             } [[fallthrough]];
         case RET:
+            compiler->flags |= NEED_STACK;
             do_jump = 1;
             break;
         case HLT:
