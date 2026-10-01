@@ -122,4 +122,7 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             logger_err("Unknown instruction: 0x0F 0x%X", byte);
             exit(EXIT_FAILURE);
     }
+    if (buf->prefix == REPN && byte >= MOVSS && byte <= CVTSD2SS) {
+        buf->size = 64;
+    }
 }
