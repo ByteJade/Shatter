@@ -18,6 +18,7 @@ void my___libc_start_main(
 void my_exit(int stat) {
     _exit(stat);
 }
+WRAP_FUNC_VOID(_exit)
 // IO
 WRAP_FUNC(puts)
 WRAP_FUNC(putchar)
@@ -28,7 +29,10 @@ WRAP_BIG_FUNC(scanf)
 WRAP_BIG_FUNC(sscanf)
 WRAP_BIG_FUNC(perror)
 WRAP_BIG_FUNC(__printf_chk)
+WRAP_BIG_FUNC(__fprintf_chk)
+WRAP_BIG_FUNC(__asprintf_chk)
 WRAP_BIG_FUNC(__snprintf_chk)
+WRAP_BIG_FUNC(__vsnprintf_chk)
 
 // file
 WRAP_FUNC(fflush)
@@ -37,6 +41,7 @@ WRAP_FUNC(fputs)
 WRAP_FUNC(fputs_unlocked)
 WRAP_BIG_FUNC(fprintf)
 WRAP_FUNC(fread)
+WRAP_FUNC(fwrite)
 WRAP_FUNC(opendir)
 WRAP_FUNC(readdir)
 WRAP_FUNC(closedir)
@@ -47,10 +52,17 @@ WRAP_FUNC(fopen)
 WRAP_FUNC(fclose)
 WRAP_FUNC(open)
 WRAP_FUNC(close)
+WRAP_FUNC(mkdir)
 
 // string
 WRAP_FUNC(__strcpy_chk)
 WRAP_FUNC(__stpcpy_chk)
+WRAP_FUNC(__strcat_chk)
+WRAP_FUNC(__realpath_chk)
+WRAP_FUNC(realpath)
+WRAP_FUNC(strcasecmp)
+WRAP_FUNC(strcpy)
+WRAP_FUNC(strtok)
 WRAP_FUNC(strsep)
 WRAP_FUNC(strlen)
 WRAP_FUNC(strcmp)
@@ -71,6 +83,8 @@ WRAP_FUNC(atoi)
 
 // memory
 WRAP_FUNC(__memset_chk)
+WRAP_FUNC(__memcpy_chk)
+WRAP_FUNC(__memmove_chk)
 WRAP_FUNC(mempcpy)
 WRAP_FUNC(memcpy)
 WRAP_FUNC(memmove)
@@ -83,6 +97,8 @@ WRAP_FUNC_VOID(free)
 
 // time
 WRAP_FUNC(time)
+WRAP_FUNC(ctime)
+WRAP_FUNC(clock_getres)
 WRAP_FUNC(clock_gettime)
 WRAP_FUNC(gettimeofday)
 WRAP_FUNC(nanosleep)
@@ -92,6 +108,7 @@ WRAP_FUNC(usleep)
 // env
 WRAP_FUNC(getenv)
 WRAP_FUNC(setenv)
+WRAP_FUNC(getauxval)
 
 // CXA
 WRAP_FUNC_VOID(__cxa_finalize)
