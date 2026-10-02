@@ -13,9 +13,10 @@ uint8_t** patches;
 int* reuse;
 
 pthread_mutex_t mtx;
-uint32_t* host;
-size_t prev_host_p;
-size_t host_p;
+uint32_t* host      = NULL;
+size_t host_size    = 0;
+size_t prev_host_p  = 0;
+size_t host_p       = 0;
 
 void cache_init(void) {
     blocks = dynarray_init(sizeof(code_t));
@@ -31,8 +32,9 @@ void cache_fini(void) {
 }
 
 void* cache_mmap_guest(uint8_t* base, uint64_t size) {
+    host_size = size;
     void* map = mmap(
-        base, size+size,
+        base, size+host_size,
         PROT_READ | PROT_WRITE | PROT_EXEC,
         MAP_ANON | MAP_PRIVATE,
         -1, 0
@@ -58,13 +60,16 @@ void cache_end_block() {
     __builtin___clear_cache(host+prev_host_p, host+host_p);
 }
 void cache_emit(uint32_t data) {
+    if (host_p > host_size) {
+        logger_err("Cache overflow");
+        exit(EXIT_FAILURE);
+    }
     host[host_p++] = data;
 }
 int cache_set_patch(uint8_t* guest) {
     int id;
     if (dynarray_size(reuse)) {
-        size_t reuse_p = dynarray_pop((void*)reuse);
-        id = reuse[reuse_p];
+        id = reuse[dynarray_pop(reuse)];
     } else {
         id = dynarray_push((void**)&patches);
     }

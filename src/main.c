@@ -42,8 +42,6 @@ int main(int argc, char** argv, char** envp) {
     cache_init();
     handler_init();
     elf_manager_init();
-    stack_t* stack = stack_init();
-    stack_setup(stack, argc - user_argc, argv + user_argc, envp);
     elf_t* elf = elf_init(argv[user_argc]);
     if (!elf) {
         logger_err("Cannot open file");
@@ -51,6 +49,8 @@ int main(int argc, char** argv, char** envp) {
     }
     elf_read_dynamic(elf);
     elf_start(elf);
+    stack_t* stack = stack_init();
+    stack_setup(stack, argc - user_argc, argv + user_argc, envp);
     launch((void*)(elf->base + elf->head.e_entry), stack);
 
     elf_fini(elf);
