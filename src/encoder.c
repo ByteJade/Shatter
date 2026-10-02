@@ -316,9 +316,9 @@ uint32_t neon_group[] = {
     MUL_N, NSF|MUL_N,
     SUB_N, NSF|SUB_N,
     DIV_N, NSF|DIV_N,
+    FCVTU_N, FCVT_N,
     CMP_N, NSF|CMP_N,
     CMPE_N, NSF|CMPE_N,
-    FCVTU_N, FCVT_N
 };
 
 uint32_t cset_group[] = {
@@ -351,7 +351,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint32_t opcode = math_group[buf->type - ADD];
             emit_math(compiler, buf, opcode);
         } break;
-        case PXOR ... CVTSD2SS: {
+        case PXOR ... COMISD: {
             uint32_t opcode = neon_group[buf->type - PXOR];
             emit_neon(compiler, buf, opcode);
         } break;
