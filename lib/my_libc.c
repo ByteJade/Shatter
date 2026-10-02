@@ -116,7 +116,7 @@ int syscall_override[] = {
     [11] = 215,
 };
 long my_syscall(long sysno, long arg1, long arg2, long arg3, long arg4, long arg5, long arg6) {
-    long ret = syscall(sysno, arg1, arg2, arg3, arg4, arg5, arg6);
+    long ret = syscall(syscall_override[sysno], arg1, arg2, arg3, arg4, arg5, arg6);
     #ifdef __aarch64__
     asm volatile (
         "mov x8, %0\n"
