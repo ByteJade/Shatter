@@ -9,4 +9,5 @@ WRAP_FUNC(pow)
 WRAP_FUNC(round)
 
 WRAP_FUNC(log10)
+WRAP_FUNC(dup)
 WRAP_FUNC(dup2)
