@@ -126,7 +126,7 @@ void emit_store(compiler_t* compiler, uint8_t src, operand_t* op, X86_64* buf, i
         cache_emit(instruction | (SC1R<<5) | src);
     }
 }
-void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
+void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     // ADD, SUB, OR, XOR, AND
     uint8_t src;
     uint8_t dst;
@@ -148,31 +148,33 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode, int unsave) {
     
     uint32_t sf = (buf->size == 64) * ASF;
     if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
-    if (unsave) {
+    if (buf->type == CMP || buf->type == TEST) {
         cache_emit(sf | opcode | XZR | (dst<<5) | (src<<16));
     } else {
         cache_emit(sf | opcode | dst | (dst<<5) | (src<<16));
         if (buf->dst.type&MEM) emit_store(compiler, dst, &buf->dst, buf, 1);
     }
 }
-void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode, int small) {
-    uint8_t r0 = buf->dst.reg;
-    uint8_t r1 = buf->src.reg;
+void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
+    uint8_t dst = buf->dst.reg;
+    uint8_t src = buf->src.reg;
     uint32_t msf = MSF;
-    if (buf->type != COMISD)
+    if (buf->type != COMISD && buf->type != UCOMISD)
         msf *= (buf->prefix == REPN);
     if (buf->dst.type & MEM) {
         emit_address(compiler, SC1R, &buf->dst, buf);
         cache_emit(msf|LDR_N | (SC1R<<5) | 16);
-        r0 = 16;
+        dst = 16;
     } else if (buf->src.type & MEM) {
         emit_address(compiler, SC1R, &buf->src,  buf);
         cache_emit(msf|LDR_N | (SC1R<<5) | 16);
-        r1 = 16;
+        src = 16;
     }
-    if (small)
-        cache_emit(opcode|(r0)|(r1<<5));
-    else cache_emit(opcode|(r0)|(r0<<5)|(r1<<16));
+    if (buf->type >= UCOMISS)
+        cache_emit(opcode | (dst<<5) | (src<<16));
+    else if (buf->type >= CVTSS2SD)
+        cache_emit(opcode | (dst) | (src<<5));
+    else cache_emit(opcode | (dst) | (dst<<5) | (src<<16));
     if (buf->dst.type & MEM) cache_emit(msf|STR_N | (SC1R<<5) | 16);
 }
 void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
@@ -310,12 +312,12 @@ uint32_t math_group[] = {
 };
 uint32_t neon_group[] = {
     EOR_N,
-    CMP_N, NSF|CMP_N,
-    CMPE_N, NSF|CMPE_N,
     ADD_N, NSF|ADD_N,
     MUL_N, NSF|MUL_N,
     SUB_N, NSF|SUB_N,
     DIV_N, NSF|DIV_N,
+    CMP_N, NSF|CMP_N,
+    CMPE_N, NSF|CMPE_N,
     FCVTU_N, FCVT_N
 };
 
@@ -347,11 +349,11 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case LEA: emit_address(compiler, x86_regs[buf->dst.reg], &buf->src, buf); break;
         case ADD ... CMP: {
             uint32_t opcode = math_group[buf->type - ADD];
-            emit_math(compiler, buf, opcode, buf->type == CMP);
+            emit_math(compiler, buf, opcode);
         } break;
         case PXOR ... CVTSD2SS: {
             uint32_t opcode = neon_group[buf->type - PXOR];
-            emit_neon(compiler, buf, opcode, buf->type >= CVTSS2SD);
+            emit_neon(compiler, buf, opcode);
         } break;
         case SETB ... SETGE: {
             uint32_t opcode = cset_group[buf->type - SETB];
@@ -433,12 +435,12 @@ void encode(compiler_t* compiler, X86_64* buf) {
             cache_emit(ASF|ADD_I | TSP | (29<<5));
             cache_emit(MSF|LDR_POST | (8<<12) | 29 | (TSP<<5));
             break;
-        case TEST: emit_math(compiler, buf, ANDS_R, 1); break;
-        case ROR: emit_math(compiler, buf, ROR_R, 0); break;
+        case TEST: emit_math(compiler, buf, ANDS_R); break;
+        case ROR: emit_math(compiler, buf, ROR_R); break;
         case SHL:
-        case SAL: emit_math(compiler, buf, LSL_R, 0); break;
-        case SHR: emit_math(compiler, buf, LSR_R, 0); break;
-        case SAR: emit_math(compiler, buf, ASR_R, 0); break;
+        case SAL: emit_math(compiler, buf, LSL_R); break;
+        case SHR: emit_math(compiler, buf, LSR_R); break;
+        case SAR: emit_math(compiler, buf, ASR_R); break;
         case EBR: case NOP: case HLT: break;
         case JMP: emit_branch(compiler, buf, BR); break;
         case CALL: emit_branch(compiler, buf, BLR); break;

@@ -30,11 +30,11 @@ const char* instr_types[] = {
     "cvtss2si", "cvtsd2si",
 
     "pxor",
-    "ucomiss", "ucomisd",
-    "comiss", "comisd",
     "addss", "addsd", "mulss", "mulsd", 
     "subss", "subsd", "divss", "divsd",
     "cvtss2sd", "cvtsd2ss",
+    "ucomiss", "ucomisd",
+    "comiss", "comisd",
     
     "movzx8", "movzx16", "movsx8", "movsx16",
 
