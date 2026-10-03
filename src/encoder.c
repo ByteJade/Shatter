@@ -153,6 +153,7 @@ void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t dst = buf->dst.reg;
     uint8_t src = buf->src.reg;
     if (buf->type%2) buf->size = 64;
+    else buf->size = 32;
     if (buf->dst.type & MEM) {
         emit_mem(compiler, LDN_GRP|16, &buf->dst, buf, 0);
         dst = 16;
