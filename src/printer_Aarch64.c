@@ -94,7 +94,7 @@ void print_r_m(uint32_t buf) {
         else printf(", %i]", imm);
         if (addent == 3) printf("!");
     } else {
-        int imm = get_imm12(buf) * (buf&MSF+1)*4;
+        int imm = get_imm12(buf) * ((buf&MSF)+1)*4;
         if (imm) printf(", %i]", imm);
         else printf("]");
     }
