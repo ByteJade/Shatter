@@ -114,8 +114,7 @@ void print_memory(struct sigcontext* sc, char* buf) {
     if (sep) imm = strtol(sep, NULL, 0);
     reg += imm;
     if (c == 3) {
-        sep = strpbrk(sep, " ")+1;
-        uint64_t write_d = strtol(sep, NULL, 0);
+        uint64_t write_d = strtol(write, NULL, 0);
         switch (*com) {
             case 'b': *(uint8_t*)(reg) = write_d; break;
             case 'h': *(uint16_t*)(reg) = write_d; break;
@@ -138,6 +137,7 @@ void debugger_help() {
     printf("flags - print cpu flags\n");
     printf("regs - print cpu regs\n");
     printf("(b,h,w,d) [<reg>+<imm>] - print data in this location\n");
+    printf("(b,h,w,d) [<reg>+<imm>] <data>- write data to this location\n");
     printf("help - print this message\n");
     printf("level <log_level> - set log level (log, deb, warn, err)\n");
     printf("goto <imm> - set break point at [pc+imm]\n");
