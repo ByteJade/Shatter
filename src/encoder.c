@@ -49,21 +49,25 @@ void emit_add_signed(uint8_t dst, uint8_t src, int64_t imm) {
         else cache_emit(ASF|SUB_I | (dst) | (src<<5) | (-imm<<10));
     }
 }
+uint16_t emit_rip(compiler_t* compiler, operand_t* op, uint8_t dst) {
+    uint64_t full = (uint64_t)(compiler->guest + op->imm);
+    int64_t target = full & ~0xFFF;
+    int64_t current = (uint64_t)(cache_get_host()) & ~0xFFF;
+    int64_t delta = (target - current) >> 12;
+    if (delta < -4294967296LL || delta > 4294967296LL) {
+        logger_err("Too large rip distance");
+    }
+    cache_emit(ADRP | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | dst);
+    return full & 0xFFF;
+}
 void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf) {
     uint8_t t = op->type;
     if (buf->prefix == FS) {
         cache_emit(GET_FS | dst);
         emit_add_signed(dst, dst, op->imm);
     } else if (op->type == (MEM|IMM)) {
-        uint64_t full = (uint64_t)(compiler->guest + op->imm);
-        int64_t target = full & ~0xFFF;
-        int64_t current = (uint64_t)(cache_get_host()) & ~0xFFF;
-        int64_t delta = (target - current) >> 12;
-        if (delta < -4294967296LL || delta > 4294967296LL) {
-            logger_err("Too large rip distance");
-        }
-        cache_emit(ADRP | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | dst);
-        if (full & 0xFFF) cache_emit((ASF|ADD_I | ((full & 0xFFF) << 10) | (dst << 5) | dst));
+        uint16_t full = emit_rip(compiler, op, dst);
+        if (full) cache_emit((ASF|ADD_I | (full << 10) | (dst << 5) | dst));
     } else if (op->type&IDX) {
         if (op->scale != 0) {
             cache_emit(UBFM | ((-(op->scale) & 0x3F) << 16) |
@@ -99,6 +103,12 @@ void emit_mem(compiler_t* compiler, uint32_t grp, operand_t* op, X86_64* buf, in
     grp |= U_GRP;
     if (op->type == (MEM|REG)) {
         cache_emit(grp | (x86_regs[op->reg]<<5));
+    }  else if (op->type == (MEM|IMM)) {
+        uint16_t full;
+        if (!fast) {
+            full = emit_rip(compiler, op, SC1R);
+        } else full = (uint64_t)(compiler->guest + op->imm) & 0xFFF;
+        cache_emit(grp | (full << 10) | SC1R);
     } else {
         if (!fast) emit_address(compiler, SC1R, op, buf);
         cache_emit(grp | (SC1R<<5));
