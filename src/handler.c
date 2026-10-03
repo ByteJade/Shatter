@@ -21,6 +21,7 @@ uint32_t* compile(size_t pc) {
 }
 
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
+    (void)sig; (void)info;
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
     
@@ -57,6 +58,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     _exit(0);
 }
 void segi_handler(int sig, siginfo_t* info, void* ucontext) {
+    (void)sig; (void)info;
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
     if (!debugger_enabled()) _exit(0);
