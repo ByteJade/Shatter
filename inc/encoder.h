@@ -70,6 +70,15 @@ extern const uint8_t x86_regs[];
 #define LDRSH 0x79C00000
 #define LDRSB 0x39C00000
 
+#define ST_GRP 0x08000000
+#define LD_GRP 0x08400000
+#define D_GRP 0xF0000000
+#define W_GRP 0xB0000000
+#define SX_GRP 0x00900000
+#define H_GRP 0x70000000
+#define B_GRP 0x30000000
+#define U_GRP 0x01000000
+
 #define BR 0xD61F0000
 #define BLR 0xD63F0000
 #define BRK 0xD4200000
@@ -133,21 +142,8 @@ extern const uint8_t x86_regs[];
 
 struct compiler_t;
 
-void emit_imm(int64_t imm, uint8_t dst);
-void emit_address(struct compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf);
-void emit_load(struct compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf, int fast, int sx);
-void emit_store(struct compiler_t* compiler, uint8_t src, operand_t* op, X86_64* buf, int fast);
-void emit_math(struct compiler_t* compiler, X86_64* buf, uint32_t opcode);
-void emit_neon(struct compiler_t* compiler, X86_64* buf, uint32_t opcode);
-void emit_branch(struct compiler_t* compiler, X86_64* buf, uint32_t opcode);
-void emit_mov(struct compiler_t* compiler, X86_64* buf, int sx);
-void emit_push(struct compiler_t* compiler, X86_64* buf);
-void emit_pop(struct compiler_t* compiler, X86_64* buf);
-void emit_patch(struct compiler_t* compiler, X86_64* buf);
 void emit_entry(struct compiler_t* compiler);
-void emit_ret(struct compiler_t* compiler);
 void emit_jump(uint32_t* dst, uint32_t* target);
-void emit_call(uint32_t* dst, uint32_t* target);
 void encode(struct compiler_t* compiler, X86_64* buf);
 
 #endif
