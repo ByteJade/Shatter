@@ -379,20 +379,16 @@ void encode(compiler_t* compiler, X86_64* buf) {
             break;
         case MOVSS: 
         case MOVSD:{
-            uint32_t sf = (buf->prefix == REPN) * MSF;
-            if (buf->dst.type & MEM) {
-                emit_address(compiler, SC1R, &buf->dst, buf);
-                cache_emit(sf|STR_N | (SC1R<<5) | buf->src.reg);
-            }else {
-                emit_address(compiler, SC1R, &buf->src, buf);
-                cache_emit(sf|LDR_N | (SC1R<<5) | buf->dst.reg);
-            }
+            if (buf->prefix == REPN) buf->size = 64;
+            if (buf->dst.type & MEM)
+                emit_mem(compiler, STN_GRP|buf->src.reg, &buf->dst, buf, 0);
+            else emit_mem(compiler, LDN_GRP|buf->dst.reg, &buf->src, buf, 0);
         } break;
         case MOVAPD: {
+            buf->size = 64;
             uint8_t src = buf->src.reg;
             if (buf->dst.type & MEM) {
-                emit_address(compiler, SC1R, &buf->dst, buf);
-                cache_emit(STR_N | (SC1R<<5) | src);
+                emit_mem(compiler, STN_GRP|src, &buf->dst, buf, 0);
             }else {
                 cache_emit(MOV_N | (buf->dst.reg) | (src << 5) | (src << 16));
             }
