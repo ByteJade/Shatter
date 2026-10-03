@@ -252,6 +252,7 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
         dst = x86_regs[buf->dst.reg];
         X86_64* n = next(compiler);
         if (n->type == PUSH && n->dst.type == REG) {
+            skip(compiler);
             uint8_t dst1 = x86_regs[n->dst.reg];
             cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | dst | (TSP<<5) | (dst1<<10));
             return;
@@ -267,6 +268,7 @@ void emit_pop(compiler_t* compiler, X86_64* buf) {
         uint8_t dst = x86_regs[buf->dst.reg];
         X86_64* n = next(compiler);
         if (n->type == POP && n->dst.type == REG) {
+            skip(compiler);
             uint8_t dst1 = x86_regs[n->dst.reg];
             cache_emit(ASF|LDP_POST | (16<<12) | dst | (TSP<<5) | (dst1<<10));
         }else cache_emit(MSF|LDR_POST | (8<<12) | dst | (TSP<<5));
@@ -276,7 +278,12 @@ void emit_entry(struct compiler_t* compiler) {
     if (compiler->flags&NEED_STACK) {
         cache_emit(ASF|ADD_I | TSP | (31<<5));
         if (compiler->flags&NEED_ENTRY) {
-            cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
+            X86_64* n = next(compiler);
+            if (n->type == PUSH && n->dst.type == REG) {
+                skip(compiler);
+                uint8_t dst1 = x86_regs[n->dst.reg];
+                cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | 30 | (TSP<<5) | (dst1<<10));
+            } else cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
         }
     }
 }
