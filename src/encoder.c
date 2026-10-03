@@ -249,10 +249,7 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
         emit_mem(compiler, LD_GRP|SC1R, &buf->dst, buf, 0);
         dst = SC1R;
     } else {
-        if (buf->dst.reg == RSP) {
-            cache_emit(ASF|ADD_I | SC1R | (31<<5));
-            dst = SC1R;
-        } else dst = x86_regs[buf->dst.reg];
+        dst = x86_regs[buf->dst.reg];
         X86_64* n = next(compiler);
         if (n->type == PUSH && n->dst.type == REG) {
             uint8_t dst1 = x86_regs[n->dst.reg];
