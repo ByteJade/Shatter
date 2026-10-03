@@ -184,7 +184,7 @@ void emit_mov(compiler_t* compiler, X86_64* buf, int sx) {
         if (buf->src.type == IMM) {
             emit_imm(buf->src.imm, dst);
         } else if (buf->src.type&MEM) {
-            emit_mem(compiler, LD_GRP|SX_GRP|dst, &buf->src, buf, 0);
+            emit_mem(compiler, LD_GRP|(SX_GRP*sx)|dst, &buf->src, buf, 0);
         } else {
             cache_emit(ASF|ADD_I | dst | (x86_regs[buf->src.reg]<<5));
         }
