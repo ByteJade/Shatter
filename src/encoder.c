@@ -18,6 +18,36 @@ const uint8_t x86_regs[] = {
     4, 5, 6, 7,
     20, 21, 22, 23,
 };
+uint32_t math_group[] = {
+    ADDS_R, ORR_R, ADCS_R, SBCS_R,
+    ANDS_R, SUBS_R, EOR_R, SUBS_R,
+};
+uint32_t neon_group[] = {
+    EOR_N,
+    ADD_N, NSF|ADD_N,
+    MUL_N, NSF|MUL_N,
+    SUB_N, NSF|SUB_N,
+    DIV_N, NSF|DIV_N,
+    FCVTU_N, FCVT_N,
+    CMP_N, NSF|CMP_N,
+    CMPE_N, NSF|CMPE_N,
+};
+uint32_t cset_group[] = {
+    CSETB, CSETAE,
+    CSETE, CSETNE,
+    CSETBE, CSETA,
+    CSETS, CSETNS,
+    UNK, UNK,
+    CSETL, CSETGE,
+};
+uint32_t csel_group[] = {
+    CSELB, CSELAE,
+    CSELE, CSELNE,
+    CSELBE, CSELA,
+    CSELS, CSELNS,
+    UNK, UNK,
+    CSELL, CSELGE,
+};
 
 void emit_imm(int64_t imm, uint8_t dst) {
     if (imm >= 0 && imm <= INT16_MAX) {
@@ -296,37 +326,6 @@ void emit_call(uint32_t* dst, uint32_t* target) {
     *dst = BL | (offset & 0x3FFFFFF);
     __builtin___clear_cache(dst, dst+1);
 }
-uint32_t math_group[] = {
-    ADDS_R, ORR_R, ADCS_R, SBCS_R,
-    ANDS_R, SUBS_R, EOR_R, SUBS_R,
-};
-uint32_t neon_group[] = {
-    EOR_N,
-    ADD_N, NSF|ADD_N,
-    MUL_N, NSF|MUL_N,
-    SUB_N, NSF|SUB_N,
-    DIV_N, NSF|DIV_N,
-    FCVTU_N, FCVT_N,
-    CMP_N, NSF|CMP_N,
-    CMPE_N, NSF|CMPE_N,
-};
-
-uint32_t cset_group[] = {
-    CSETB, CSETAE,
-    CSETE, CSETNE,
-    CSETBE, CSETA,
-    CSETS, CSETNS,
-    UNK, UNK,
-    CSETL, CSETGE,
-};
-uint32_t csel_group[] = {
-    CSELB, CSELAE,
-    CSELE, CSELNE,
-    CSELBE, CSELA,
-    CSELS, CSELNS,
-    UNK, UNK,
-    CSELL, CSELGE,
-};
 void encode(compiler_t* compiler, X86_64* buf) {
     switch (buf->type) {
         case MOVZX8: buf->size = 8; emit_mov(compiler, buf, 0); break;
@@ -337,7 +336,12 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case PUSH: emit_push(compiler, buf); break;
         case POP: emit_pop(compiler, buf); break;
         case LEA: emit_address(compiler, x86_regs[buf->dst.reg], &buf->src, buf); break;
-        case ADD ... CMP: {
+        case ADD:
+            if (buf->dst.type == REG && buf->src.type == IMM) {
+                uint8_t dst = x86_regs[buf->dst.reg];
+                emit_add_signed(dst, dst, buf->src.imm);
+            } [[fallthrough]];
+        case OR ... CMP: {
             uint32_t opcode = math_group[buf->type - ADD];
             emit_math(compiler, buf, opcode);
         } break;
