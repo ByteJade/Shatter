@@ -102,31 +102,26 @@ void emulate_jump(struct sigcontext* sc) {
         imm = get_imm26(instr);
     debugger_brk(pc + imm);
 }
-void print_memory(struct sigcontext* sc, char* buf) {
-    char com[32];
-    char base[32];
-    char write[32];
-    int c = sscanf(buf, "%s %s %s", com, base, write);
-    if (c < 2) return;
-    int imm = 0;
-    size_t reg = sc_get_reg_host(sc, base+1);
-    char* sep = strpbrk(base, "+-");
-    if (sep) imm = strtol(sep, NULL, 0);
-    reg += imm;
-    if (c == 3) {
-        uint64_t write_d = strtol(write, NULL, 0);
-        switch (*com) {
+void print_memory(struct sigcontext* sc, char argv[3][64], int argc) {
+    if (argc < 2) return;
+    size_t reg = sc_get_reg_host(sc, argv[1]+1);
+    char* sep = strpbrk(argv[1], "+-");
+    if (sep) reg += strtol(sep, NULL, 0);
+    if (argc == 3) {
+        uint64_t write_d = strtol(argv[2], NULL, 0);
+        switch (*argv[0]) {
             case 'b': *(uint8_t*)(reg) = write_d; break;
             case 'h': *(uint16_t*)(reg) = write_d; break;
             case 'w': *(uint32_t*)(reg) = write_d; break;
             case 'd': *(uint64_t*)(reg) = write_d; break;
         }
-    }
-    switch (*com) {
-        case 'b': printf("%s: %x\n", base, *(uint8_t*)(reg)); break;
-        case 'h': printf("%s: %x\n", base, *(uint16_t*)(reg)); break;
-        case 'w': printf("%s: %x\n", base, *(uint32_t*)(reg)); break;
-        case 'd': printf("%s: %lx\n", base, *(uint64_t*)(reg)); break;
+    } else {
+        switch (*argv[0]) {
+            case 'b': printf("%s: %x\n", argv[1], *(uint8_t*)(reg)); break;
+            case 'h': printf("%s: %x\n", argv[1], *(uint16_t*)(reg)); break;
+            case 'w': printf("%s: %x\n", argv[1], *(uint32_t*)(reg)); break;
+            case 'd': printf("%s: %lx\n", argv[1], *(uint64_t*)(reg)); break;
+        }
     }
 }
 void debugger_help() {
@@ -149,11 +144,13 @@ void debugger_step(struct sigcontext* sc) {
     pthread_mutex_lock(&mut);
     debugger_ret((uint32_t*)sc_get_pc(sc));
     int run = 1;
+    char argv[3][64];
+    int argc;
     while (run) {
-        char buf[256];
         printf("> ");
-        if (fgets(buf, sizeof(buf), stdin) != buf) break;
-        switch (buf[0]) {
+        argc = scanf("%s %s %s", argv[0], argv[1], argv[2]);
+        if (!argc) break;
+        switch (*argv[0]) {
             case 's':
                 emulate_jump(sc);
                 [[fallthrough]];
@@ -171,14 +168,15 @@ void debugger_step(struct sigcontext* sc) {
                 break;
             case 'b': case 'h':
             case 'w': case 'd':
-                print_memory(sc, buf);
+                print_memory(sc, argv, argc);
                 break;
             case 'l':
-                logger_set_level(strpbrk(buf, " ")+1);
+                if (argc < 2) break;
+                logger_set_level(argv[1]);
                 break;
             case 'g': {
-                char* pos = strpbrk(buf, " ")+1;
-                int delta = atoi(pos)*4;
+                if (argc < 2) break;
+                int delta = atoi(argv[1])*4;
                 debugger_brk((uint32_t*)(sc_get_pc(sc) + delta));
             } break;
             case 'c':
