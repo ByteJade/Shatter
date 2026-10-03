@@ -82,10 +82,10 @@ void print_r_i(uint32_t buf) {
 void print_r_m(uint32_t buf) {
     char reg = 'W';
     if (buf&MSF) reg = 'X';
-    char* post = "r";
+    char* post = "ur";
     switch (buf&0xF1900000) {
         case W_GRP|U_GRP: case D_GRP|U_GRP:
-            post = "ur"; break;
+            post = "r"; break;
         case W_GRP|SX_GRP:
             post = "ush"; break;
         case B_GRP|SX_GRP:
