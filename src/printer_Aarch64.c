@@ -82,7 +82,21 @@ void print_r_i(uint32_t buf) {
 void print_r_m(uint32_t buf) {
     char reg = 'W';
     if (buf&MSF) reg = 'X';
-    printf(GREEN_COLOR" %c%i, [X%i",
+    char* post = "r";
+    switch (buf&0xF1900000) {
+        case W_GRP|U_GRP: case D_GRP|U_GRP:
+            post = "ur"; break;
+        case W_GRP|SX_GRP:
+            post = "ush"; break;
+        case B_GRP|SX_GRP:
+            post = "usb"; break;
+        case W_GRP:
+            post = "uh"; break;
+        case B_GRP:
+            post = "ub"; break;
+    }
+    printf("%s"GREEN_COLOR" %c%i, [X%i",
+        post,
         reg, get_reg(buf, 0),
         get_reg(buf, 1)
     );
@@ -155,22 +169,22 @@ void decode_aarch64(uint32_t buf) {
         print_r_r_r(buf);
         return;
     }
-    if ((buf&MEM_M) == STUR) {
-        printf("str");
+    if ((buf&MEM_M) == ST_GRP) {
+        printf("st");
         print_r_m(buf);
         return;
     }
-    if ((buf&MEM_M) == LDUR) {
-        printf("ldr");
+    if ((buf&MEM_M) == LD_GRP) {
+        printf("ld");
         print_r_m(buf);
         return;
     }
-    if ((buf&MEMP_M) == STP_POST) {
+    if ((buf&MEM_M) == STP_POST) {
         printf("stp");
         print_r_r_m(buf);
         return;
     }
-    if ((buf&MEMP_M) == LDP_POST) {
+    if ((buf&MEM_M) == LDP_POST) {
         printf("ldp");
         print_r_r_m(buf);
         return;
