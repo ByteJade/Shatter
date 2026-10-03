@@ -359,8 +359,10 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint32_t prefix = NSF * (buf->prefix == REPN);
             cache_emit(prefix | FCVTZS | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
         } break;
-        case CVTSI2SS: 
-        case CVTSI2SD: {
+        case CVTSI2SD:
+            buf->size = 64;
+            [[fallthrough]];
+        case CVTSI2SS:{
             uint32_t prefix = (ASF|NSF) * (buf->prefix == REPN);
             if (buf->src.type&MEM) {
                 emit_mem(compiler, LD_GRP|SC1R, &buf->src, buf, 0);
@@ -376,9 +378,10 @@ void encode(compiler_t* compiler, X86_64* buf) {
             if (buf->src.type&XMM) cache_emit(FMOV_N | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
             else cache_emit(FMOVR_N | (buf->dst.reg) | (x86_regs[buf->src.reg] << 5));
             break;
-        case MOVSS: 
-        case MOVSD:{
-            if (buf->prefix == REPN) buf->size = 64;
+        case MOVSD: 
+            buf->size = 64;
+            [[fallthrough]];
+        case MOVSS:{
             if (buf->dst.type & MEM)
                 emit_mem(compiler, STN_GRP|buf->src.reg, &buf->dst, buf, 0);
             else emit_mem(compiler, LDN_GRP|buf->dst.reg, &buf->src, buf, 0);
