@@ -144,6 +144,7 @@ struct compiler_t;
 
 void emit_entry(struct compiler_t* compiler);
 void emit_jump(uint32_t* dst, uint32_t* target);
+void emit_call(uint32_t* dst, uint32_t* target);
 void encode(struct compiler_t* compiler, X86_64* buf);
 
 #endif
