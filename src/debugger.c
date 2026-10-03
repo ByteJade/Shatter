@@ -111,11 +111,10 @@ void print_memory(struct sigcontext* sc, char* buf) {
     int imm = 0;
     size_t reg = sc_get_reg_host(sc, base+1);
     char* sep = strpbrk(base, "+-");
-    if (sep) {
-        imm = strtol(sep, NULL, 0);
-    }
+    if (sep) imm = strtol(sep, NULL, 0);
     reg += imm;
     if (c == 3) {
+        sep = strpbrk(sep, " ")+1;
         uint64_t write_d = strtol(sep, NULL, 0);
         switch (*com) {
             case 'b': *(uint8_t*)(reg) = write_d; break;
@@ -138,11 +137,12 @@ void debugger_help() {
     printf("abort - exit from programm\n");
     printf("flags - print cpu flags\n");
     printf("regs - print cpu regs\n");
-    printf("memory [<reg>+<imm>] - print data in this location\n");
+    printf("(b,h,w,d) [<reg>+<imm>] - print data in this location\n");
     printf("help - print this message\n");
     printf("level <log_level> - set log level (log, deb, warn, err)\n");
+    printf("goto <imm> - set break point at [pc+imm]\n");
     printf("cache - print last compiled block\n");
-    printf("usage - print cache memory usage\n");
+    printf("usage - print memory usage\n");
 }
 void debugger_step(struct sigcontext* sc) {
     if (!enabled) return;
