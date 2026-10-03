@@ -253,6 +253,12 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
             cache_emit(ASF|ADD_I | SC1R | (31<<5));
             dst = SC1R;
         } else dst = x86_regs[buf->dst.reg];
+        X86_64* n = next(compiler);
+        if (n->type == PUSH && n->dst.type == REG) {
+            uint8_t dst1 = x86_regs[n->dst.reg];
+            cache_emit(MSF|STP_PRE | ((-16&0x3FF)<<12) | dst | (TSP<<5) | (dst1<<10));
+            return;
+        }
     }
     cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | dst | (TSP<<5));
 }
@@ -262,7 +268,11 @@ void emit_pop(compiler_t* compiler, X86_64* buf) {
         logger_err("pop []; not supported");
     } else {
         uint8_t dst = x86_regs[buf->dst.reg];
-        cache_emit(MSF|LDR_POST | (8<<12) | dst | (TSP<<5));
+        X86_64* n = next(compiler);
+        if (n->type == POP && n->dst.type == REG) {
+            uint8_t dst1 = x86_regs[n->dst.reg];
+            cache_emit(MSF|LDP_POST | (16<<12) | dst | (TSP<<5) | (dst1<<10));
+        }else cache_emit(MSF|LDR_POST | (8<<12) | dst | (TSP<<5));
     }
 }
 void emit_entry(struct compiler_t* compiler) {
