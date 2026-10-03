@@ -143,11 +143,13 @@ void debugger_step(struct sigcontext* sc) {
     pthread_mutex_lock(&mut);
     debugger_ret((uint32_t*)sc_get_pc(sc));
     int run = 1;
+    char line[256];
     char argv[3][64];
     int argc;
     while (run) {
         printf("> ");
-        argc = scanf("%s %s %s", argv[0], argv[1], argv[2]);
+        if (!fgets(line, sizeof(line), stdin)) break;
+        argc = sscanf(line, "%s %s %s", argv[0], argv[1], argv[2]);
         if (!argc) break;
         switch (*argv[0]) {
             case 's':
