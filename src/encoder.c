@@ -60,7 +60,7 @@ void emit_imm(int64_t imm, uint8_t dst) {
         cache_emit(ASF|MOVZ_I | (a << 5) | dst);
         if (b) cache_emit(ASF|MOVK_I | (1 << 21) | (b << 5) | dst);
         if (imm >= INT32_MIN && imm <= INT32_MAX) {
-            //if (imm < 0) cache.emit(SXTW_REG | (dst << 5) | dst);
+            if (imm < 0) cache_emit(SXTW_R | (dst << 5) | dst);
             return;
         }
         uint16_t c = (imm>>32) & 0xFFFF;
@@ -261,7 +261,6 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
     cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | dst | (TSP<<5));
 }
 void emit_pop(compiler_t* compiler, X86_64* buf) {
-    (void)compiler; // for future use
     if (buf->dst.type&MEM) {
         logger_err("pop []; not supported");
     } else {
@@ -278,12 +277,7 @@ void emit_entry(struct compiler_t* compiler) {
     if (compiler->flags&NEED_STACK) {
         cache_emit(ASF|ADD_I | TSP | (31<<5));
         if (compiler->flags&NEED_ENTRY) {
-            X86_64* n = next(compiler);
-            if (n->type == PUSH && n->dst.type == REG) {
-                skip(compiler);
-                uint8_t dst1 = x86_regs[n->dst.reg];
-                cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | 30 | (TSP<<5) | (dst1<<10));
-            } else cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
+            cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
         }
     }
 }
