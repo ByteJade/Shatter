@@ -145,6 +145,7 @@ void debugger_help() {
     printf("usage - print cache memory usage\n");
 }
 void debugger_step(struct sigcontext* sc) {
+    if (!enabled) return;
     pthread_mutex_lock(&mut);
     debugger_ret((uint32_t*)sc_get_pc(sc));
     int run = 1;

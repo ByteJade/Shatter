@@ -15,8 +15,8 @@ void* cache_mmap_guest(uint8_t* base, uint64_t size);
 void cache_start_block(uint8_t* guest);
 void cache_end_block();
 void cache_emit(uint32_t data);
-int cache_set_patch(uint8_t* guest);
-uint8_t* cache_get_patch(int id);
+uint32_t cache_set_patch(uint8_t* guest);
+uint8_t* cache_get_patch(uint32_t id);
 
 void cache_print();
 void cache_usage();

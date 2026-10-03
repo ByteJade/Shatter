@@ -49,20 +49,18 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     }
     const char* name;
     if (sig == SIGBUS) name = "SIGBUS";
-    else name = "segfault";
-        logger_err("%s", name);
-    if (debugger_enabled()) {
-        debugger_step(sc);
-    }
+    else if (sig == SIGILL) name = "SIGILL";
+    else name = "SIGSEGV";
+    logger_err("%s", name);
+    debugger_step(sc);
     sc_print_regs_host(sc);
     _exit(0);
 }
 void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
-    if (debugger_enabled()) {
-        debugger_step(sc);
-    } else _exit(0);
+    if (!debugger_enabled()) _exit(0);
+    debugger_step(sc);
 }
 void handler_init(void) {
     struct sigaction sa_trap = {0};

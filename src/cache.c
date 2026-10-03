@@ -10,7 +10,7 @@
 
 code_t* blocks;
 uint8_t** patches;
-int* reuse;
+uint32_t* reuse;
 
 pthread_mutex_t mtx;
 uint32_t* host      = NULL;
@@ -21,7 +21,7 @@ size_t host_p       = 0;
 void cache_init(void) {
     blocks = dynarray_init(sizeof(code_t));
     patches = dynarray_init(sizeof(uint8_t*));
-    reuse = dynarray_init(sizeof(int));
+    reuse = dynarray_init(sizeof(uint32_t));
     pthread_mutex_init(&mtx, NULL);
 }
 void cache_fini(void) {
@@ -66,8 +66,8 @@ void cache_emit(uint32_t data) {
     }
     host[host_p++] = data;
 }
-int cache_set_patch(uint8_t* guest) {
-    int id;
+uint32_t cache_set_patch(uint8_t* guest) {
+    uint32_t id;
     if (dynarray_size(reuse)) {
         id = reuse[dynarray_pop(reuse)];
     } else {
@@ -76,7 +76,7 @@ int cache_set_patch(uint8_t* guest) {
     patches[id] = guest;
     return ++id;
 }
-uint8_t* cache_get_patch(int id) {
+uint8_t* cache_get_patch(uint32_t id) {
     id--;
     size_t reuse_p = dynarray_push((void**)&reuse);
     reuse[reuse_p] = id;
