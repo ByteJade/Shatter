@@ -152,16 +152,12 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
 void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t dst = buf->dst.reg;
     uint8_t src = buf->src.reg;
-    uint32_t msf = MSF;
-    if (buf->type != COMISD && buf->type != UCOMISD)
-        msf *= (buf->prefix == REPN);
+    if (buf->type%2) buf->size = 64;
     if (buf->dst.type & MEM) {
-        emit_address(compiler, SC1R, &buf->dst, buf);
-        cache_emit(msf|LDR_N | (SC1R<<5) | 16);
+        emit_mem(compiler, LDN_GRP|16, &buf->dst, buf, 0);
         dst = 16;
     } else if (buf->src.type & MEM) {
-        emit_address(compiler, SC1R, &buf->src,  buf);
-        cache_emit(msf|LDR_N | (SC1R<<5) | 16);
+        emit_mem(compiler, LDN_GRP|16, &buf->src, buf, 0);
         src = 16;
     }
     if (buf->type >= UCOMISS)
@@ -169,7 +165,7 @@ void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     else if (buf->type >= CVTSS2SD)
         cache_emit(opcode | (dst) | (src<<5));
     else cache_emit(opcode | (dst) | (dst<<5) | (src<<16));
-    if (buf->dst.type & MEM) cache_emit(msf|STR_N | (SC1R<<5) | 16);
+    if (buf->dst.type & MEM) emit_mem(compiler, STN_GRP|16, &buf->dst, buf, 1);
 }
 void emit_patch(compiler_t* compiler, X86_64* buf) {
     size_t patch_p = dynarray_push((void**)&compiler->patches);
