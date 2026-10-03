@@ -182,7 +182,6 @@ void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t dst = buf->dst.reg;
     uint8_t src = buf->src.reg;
     if (buf->type%2) buf->size = 64;
-    else buf->size = 32;
     if (buf->dst.type & MEM) {
         emit_mem(compiler, LDN_GRP|16, &buf->dst, buf, 0);
         dst = 16;
@@ -374,8 +373,6 @@ void encode(compiler_t* compiler, X86_64* buf) {
             cache_emit(prefix | FCVTZS | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
         } break;
         case CVTSI2SD:
-            buf->size = 64;
-            [[fallthrough]];
         case CVTSI2SS:{
             uint32_t prefix = (ASF|NSF) * (buf->prefix == REPN);
             if (buf->src.type&MEM) {
