@@ -86,11 +86,15 @@ void print_r_m(uint32_t buf) {
     switch (buf&0xF1900000) {
         case W_GRP|U_GRP: case D_GRP|U_GRP:
             post = "r"; break;
-        case W_GRP|SX_GRP:
+        case H_GRP|SX_GRP:
             post = "ush"; break;
         case B_GRP|SX_GRP:
             post = "usb"; break;
-        case W_GRP:
+        case H_GRP|U_GRP:
+            post = "h"; break;
+        case B_GRP|U_GRP:
+            post = "b"; break;
+        case H_GRP:
             post = "uh"; break;
         case B_GRP:
             post = "ub"; break;
@@ -179,12 +183,12 @@ void decode_aarch64(uint32_t buf) {
         print_r_m(buf);
         return;
     }
-    if ((buf&MEM_M) == STP_POST) {
+    if ((buf&MEMP_M) == STP_POST) {
         printf("stp");
         print_r_r_m(buf);
         return;
     }
-    if ((buf&MEM_M) == LDP_POST) {
+    if ((buf&MEMP_M) == LDP_POST) {
         printf("ldp");
         print_r_r_m(buf);
         return;
