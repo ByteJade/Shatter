@@ -76,7 +76,7 @@ extern const uint8_t x86_regs[];
 #define LDN_GRP 0x0C400000
 #define D_GRP 0xF0000000
 #define W_GRP 0xB0000000
-#define SX_GRP 0x00900000
+#define SX_GRP 0x00800000
 #define H_GRP 0x70000000
 #define B_GRP 0x30000000
 #define U_GRP 0x01000000
