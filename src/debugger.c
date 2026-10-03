@@ -133,7 +133,6 @@ void debugger_help() {
     printf("regs - print cpu regs\n");
     printf("(b,h,w,d) [<reg>+<imm>] - print data in this location\n");
     printf("(b,h,w,d) [<reg>+<imm>] <data>- write data to this location\n");
-    printf("help - print this message\n");
     printf("level <log_level> - set log level (log, deb, warn, err)\n");
     printf("goto <imm> - set break point at [pc+imm]\n");
     printf("cache - print last compiled block\n");
