@@ -253,7 +253,7 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
         X86_64* n = next(compiler);
         if (n->type == PUSH && n->dst.type == REG) {
             uint8_t dst1 = x86_regs[n->dst.reg];
-            cache_emit(MSF|STP_PRE | ((-16&0x3FF)<<12) | dst | (TSP<<5) | (dst1<<10));
+            cache_emit(MSF|STP_PRE | ((-16&0x3FE)<<12) | dst | (TSP<<5) | (dst1<<10));
             return;
         }
     }
