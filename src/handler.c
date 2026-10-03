@@ -15,6 +15,7 @@ uint32_t* compile(size_t pc) {
     if (target == NULL) {
         compiler_t* compiler = compiler_init();
         target = compiler_step(compiler, (uint8_t*)pc);
+        compiler_fini(compiler);
     }
     cache_unlock();
     return target;
