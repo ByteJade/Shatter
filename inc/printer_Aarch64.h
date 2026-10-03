@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#define B_M 0xFF000000
-#define BC_M 0xFF000010
+#define B_M 0xFE000000
+#define BC_M 0xFE000010
 #define AR_M 0x0FE0FC00
 #define AI_M 0x1FC00000
 #define MOV_M 0x7FF00000

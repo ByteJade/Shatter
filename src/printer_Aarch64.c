@@ -103,8 +103,8 @@ void print_r_r_m(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
     printf(GREEN_COLOR" %c%i, %c%i, [X%i",
-        reg, get_reg(buf, 3),
         reg, get_reg(buf, 0),
+        reg, get_reg(buf, 3),
         get_reg(buf, 1)
     );
     int imm = get_imm10(buf);
