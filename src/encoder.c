@@ -97,7 +97,7 @@ void emit_mem(compiler_t* compiler, uint32_t grp, operand_t* op, X86_64* buf, in
     }
     if (op->type == (MEM|REG|IMM) &&
         op->imm >= -256 &&
-        op->imm <= 255) {
+        op->imm <= 255 && !(grp&U_GRP)) {
         cache_emit(grp | ((op->imm&0x1FF)<<12)|(x86_regs[op->reg]<<5));
         return;
     }
