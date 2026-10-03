@@ -341,14 +341,14 @@ void encode(compiler_t* compiler, X86_64* buf) {
                 uint8_t dst = x86_regs[buf->dst.reg];
                 emit_add_signed(dst, dst, buf->src.imm);
             } else {
-                emit_math(compiler, buf, ADD_R);
+                emit_math(compiler, buf, ADDS_R);
             } break;
         case SUB:
             if (buf->dst.type == REG && buf->src.type == IMM) {
                 uint8_t dst = x86_regs[buf->dst.reg];
                 emit_add_signed(dst, dst, -buf->src.imm);
             } else {
-                emit_math(compiler, buf, SUB_R);
+                emit_math(compiler, buf, SUBS_R);
             } break;
         case OR: case ADC: case SBB:
         case AND: case XOR: case CMP: {
