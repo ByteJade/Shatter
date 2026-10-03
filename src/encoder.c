@@ -108,7 +108,7 @@ void emit_mem(compiler_t* compiler, uint32_t grp, operand_t* op, X86_64* buf, in
         if (!fast) {
             full = emit_rip(compiler, op, SC1R);
         } else full = (uint64_t)(compiler->guest + op->imm) & 0xFFF;
-        full /= 4;
+        full /= buf->size/8;
         cache_emit(grp | (full << 10) | SC1R);
     } else {
         if (!fast) emit_address(compiler, SC1R, op, buf);
