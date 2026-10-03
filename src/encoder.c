@@ -62,12 +62,13 @@ uint16_t emit_rip(compiler_t* compiler, operand_t* op, uint8_t dst) {
 }
 void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf) {
     uint8_t t = op->type;
-    if (buf->prefix == FS) {
-        cache_emit(GET_FS | dst);
-        emit_add_signed(dst, dst, op->imm);
-    } else if (op->type == (MEM|IMM)) {
-        uint16_t full = emit_rip(compiler, op, dst);
-        if (full) cache_emit((ASF|ADD_I | (full << 10) | (dst << 5) | dst));
+    if (op->type == (MEM|IMM)) {
+        int full;
+        if (buf->prefix == FS) {
+            cache_emit(GET_FS | dst);
+            full = op->imm;
+        } else full = emit_rip(compiler, op, dst);
+        if (full) emit_add_signed(dst, dst, full);
     } else if (op->type&IDX) {
         if (op->scale != 0) {
             cache_emit(UBFM | ((-(op->scale) & 0x3F) << 16) |
@@ -104,10 +105,14 @@ void emit_mem(compiler_t* compiler, uint32_t grp, operand_t* op, X86_64* buf, in
     if (op->type == (MEM|REG)) {
         cache_emit(grp | (x86_regs[op->reg]<<5));
     }  else if (op->type == (MEM|IMM)) {
-        uint16_t full;
-        if (!fast) {
-            full = emit_rip(compiler, op, SC1R);
-        } else full = (uint64_t)(compiler->guest + op->imm) & 0xFFF;
+        int full;
+        if (buf->prefix == FS) {
+            if (!fast) cache_emit(GET_FS | SC1R);
+            full = op->imm;
+        } else {
+            if (!fast) full = emit_rip(compiler, op, SC1R);
+            else full = (uint64_t)(compiler->guest + op->imm) & 0xFFF;
+        }
         full /= buf->size/8;
         cache_emit(grp | (full << 10) | (SC1R<<5));
     } else {
