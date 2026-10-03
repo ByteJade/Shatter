@@ -340,6 +340,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
             if (buf->dst.type == REG && buf->src.type == IMM) {
                 uint8_t dst = x86_regs[buf->dst.reg];
                 emit_add_signed(dst, dst, buf->src.imm);
+                break;
             } [[fallthrough]];
         case OR ... CMP: {
             uint32_t opcode = math_group[buf->type - ADD];
