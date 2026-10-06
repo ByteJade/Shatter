@@ -53,6 +53,7 @@ WRAP_FUNC(fclose)
 WRAP_FUNC(open)
 WRAP_FUNC(close)
 WRAP_FUNC(mkdir)
+WRAP_FUNC(fileno)
 
 // string
 WRAP_FUNC(__strcpy_chk)
@@ -80,6 +81,7 @@ WRAP_FUNC(strdup)
 WRAP_FUNC(strtol)
 WRAP_FUNC(strerror)
 WRAP_FUNC(atoi)
+WRAP_FUNC(getopt_long)
 
 // memory
 WRAP_FUNC(__memset_chk)
@@ -116,6 +118,9 @@ WRAP_FUNC_VOID(__stack_chk_fail)
 
 WRAP_FUNC(wait)
 WRAP_FUNC(fork)
+WRAP_FUNC(rand)
+WRAP_FUNC(srand)
+WRAP_FUNC(isatty)
 
 void my_vprintf() {
     printf("TODO: my_vprintf\n");
