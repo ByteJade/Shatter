@@ -48,6 +48,16 @@ uint32_t csel_group[] = {
     UNK, UNK,
     CSELL, CSELGE,
 };
+uint32_t jcc_group[] = {
+    UNK, UNK,
+    BLO, BCS,
+    BEQ, BNE,
+    BLS, BHI,
+    BMI, BPL,
+    UNK, UNK,
+    BLT, BGE,
+    BLE, BGT,
+};
 
 void emit_imm(int64_t imm, uint8_t dst) {
     if (imm >= 0 && imm <= INT16_MAX) {
@@ -242,7 +252,7 @@ void emit_mov(compiler_t* compiler, X86_64* buf, int sx) {
     }
 }
 int emit_pre_push(compiler_t* compiler, X86_64* buf, int shift) {
-    int dst = SC1R + shift;
+    int dst = SC2R + shift;
     if (buf->dst.type == IMM) {
         emit_imm(buf->dst.imm, dst);
         return dst;
@@ -310,46 +320,10 @@ void emit_jump(uint32_t* dst, uint32_t* target) {
     int64_t delta = target - dst;
     uint32_t type = *dst;
     logger_log("patch %s", instr_types[type]);
-    int imm = ((delta & 0x7FFFF) << 5);
-    switch (type) {
-    case JE:
-        *dst = BEQ | imm;
-        break;
-    case JNE:
-        *dst = BNE | imm;
-        break;
-    case JAE:
-        *dst = BCS | imm;
-        break;
-    case JBE:
-        *dst = BLS | imm;
-        break;
-    case JB:
-        *dst = BLO | imm;
-        break;
-    case JGE:
-        *dst = BGE | imm;
-        break;
-    case JL:
-        *dst = BLT | imm;
-        break;
-    case JG:
-        *dst = BGT | imm;
-        break;
-    case JLE:
-        *dst = BLE | imm;
-        break;
-    case JA:
-        *dst = BHI | imm;
-        break;
-    case JS:
-        *dst = BMI | imm;
-        break;
-    case JMP:
+    if (type == JMP) {
         *dst = B | (delta & 0x3FFFFFF);
-        break;
-    default:
-        logger_err("Unknown jump type %i", type);
+    } else {
+        *dst = jcc_group[type - JO] | ((delta & 0x7FFFF) << 5);
     }
 }
 void emit_call(uint32_t* dst, uint32_t* target) {

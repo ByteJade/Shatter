@@ -91,6 +91,7 @@ extern const uint8_t x86_regs[];
 #define BCS 0x54000002
 #define BLO 0x54000003
 #define BMI 0x54000004
+#define BPL 0x54000005
 #define BHI 0x54000008
 #define BLS 0x54000009
 #define BGE 0x5400000A
