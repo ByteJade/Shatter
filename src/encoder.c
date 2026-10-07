@@ -421,11 +421,11 @@ void encode(compiler_t* compiler, X86_64* buf) {
             }
         } break;
         case IDIV: {
-            uint8_t dst = SC2R;
+            uint8_t src = SC2R;
             if (buf->src.type&MEM) {
                 emit_mem(compiler, LD_GRP|SC2R, &buf->src, buf, 0);
-            } else dst = x86_regs[buf->dst.reg];
-            uint8_t src = x86_regs[buf->src.reg];
+            } else src = x86_regs[buf->src.reg];
+            uint8_t dst = x86_regs[buf->dst.reg];
             uint32_t sf = ASF * (buf->size == 64);
             cache_emit(ADD_I | SC1R | (dst<<5));
             cache_emit(sf|0x1ac00c00 | (src<<16) | (SC1R<<5) | (dst)); // sdiv
