@@ -34,7 +34,7 @@ uint32_t neon_group[] = {
 };
 uint32_t cset_group[] = {
     CSETB, CSETAE,
-    CSETE, CSETNE,
+    CSETNE, CSETE,
     CSETBE, CSETA,
     CSETS, CSETNS,
     UNK, UNK,
