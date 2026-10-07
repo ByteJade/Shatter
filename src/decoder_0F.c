@@ -9,7 +9,7 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->type = SYSCALL;
             break;
         case 0x0B: // UD2
-            buf->type = HLT;
+            buf->type = NOP;
             break;
         case 0x1E:
             buf->type = EBR;
