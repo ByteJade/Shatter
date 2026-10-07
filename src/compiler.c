@@ -114,7 +114,9 @@ int emulate(compiler_t* compiler, X86_64* buf) {
                 push_jump(compiler, buf->dst.imm);
             } else if (buf->dst.type != REG) {
                 compiler->flags &= ~NEED_ENTRY;
-            } [[fallthrough]];
+            }
+            do_jump = 1;
+            break;
         case RET:
             compiler->flags |= NEED_STACK;
             do_jump = 1;
