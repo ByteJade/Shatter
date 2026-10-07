@@ -302,11 +302,9 @@ void emit_ret(struct compiler_t* compiler) {
     if (n->type == POP) {
         uint8_t dst1 = x86_regs[n->dst.reg];
         cache_emit(ASF|LDP_POST | (16<<12) | dst1 | (TSP<<5) | (30<<10));
-        return;
     } else if (n->type == LEAVE) {
         cache_emit(ASF|ADD_I | TSP | (29<<5));
         cache_emit(ASF|LDP_POST | (16<<12) | 29 | (TSP<<5) | (30<<10));
-        return;
     } else cache_emit(MSF|LDR_POST | (8<<12) | 30 | (TSP<<5));
     cache_emit(ASF|ADD_I | 31 | (TSP<<5));
     cache_emit(RET_R | (30 << 5));
