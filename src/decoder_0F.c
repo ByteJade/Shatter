@@ -8,6 +8,9 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
         case 0x05:
             buf->type = SYSCALL;
             break;
+        case 0x0B: // UD2
+            buf->type = HLT;
+            break;
         case 0x1E:
             buf->type = EBR;
             fetch8(compiler);
