@@ -10,12 +10,13 @@ int main() {
         r[i] = 2000;
     }
 
-    for (k = 2800; k > 0; k -= 14) {
+    for (k = 42; k > 0; k -= 14) {
         d = 0;
 
         i = k;
         for (;;) {
             d += r[i] * 10000;
+            printf("%i/", d);
             b = 2 * i - 1;
 
             r[i] = d % b;
@@ -23,6 +24,7 @@ int main() {
             i--;
             if (i == 0) break;
             d *= i;
+            printf("%i ", d);
         }
         printf("%i, %i, %.4d\n", c, d, c + d / 10000);
         c = d % 10000;
