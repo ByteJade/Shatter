@@ -1,11 +1,12 @@
 #include "../inc/decoder.h"
 #include "../inc/compiler.h"
 #include "../inc/logger.h"
+#include <unistd.h>
 
 void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
     switch (byte) {
         case 0x00 ... 0x3F:
-            if ((byte&7) > 4) goto error;
+            if ((byte&7) > 5) goto error;
             buf->type = ADD + ((byte >> 3) & 7);
             decode_GRP0(compiler, buf, byte);
             break;
@@ -181,6 +182,6 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
         } break;
         default: error:
             logger_err("Unknown instruction: %X", byte);
-            exit(EXIT_FAILURE);
+            _exit(EXIT_FAILURE);
     }
 }

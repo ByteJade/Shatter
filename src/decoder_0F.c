@@ -1,6 +1,7 @@
 #include "../inc/decoder.h"
 #include "../inc/compiler.h"
 #include "../inc/logger.h"
+#include <unistd.h>
 
 void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
     switch (byte) {
@@ -121,6 +122,6 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             break;
         default:
             logger_err("Unknown instruction: 0x0F 0x%X", byte);
-            exit(EXIT_FAILURE);
+            _exit(EXIT_FAILURE);
     }
 }
