@@ -290,36 +290,40 @@ void emit_jump(uint32_t* dst, uint32_t* target) {
     int64_t delta = target - dst;
     uint32_t type = *dst;
     logger_log("patch %s", instr_types[type]);
+    int imm = ((delta & 0x7FFFF) << 5);
     switch (type) {
     case JE:
-        *dst = BEQ | ((delta & 0x7FFFF) << 5);
+        *dst = BEQ | imm;
         break;
     case JNE:
-        *dst = BNE | ((delta & 0x7FFFF) << 5);
+        *dst = BNE | imm;
         break;
     case JAE:
-        *dst = BCS | ((delta & 0x7FFFF) << 5);
+        *dst = BCS | imm;
         break;
     case JBE:
-        *dst = BLS | ((delta & 0x7FFFF) << 5);
+        *dst = BLS | imm;
+        break;
+    case JB:
+        *dst = BLO | imm;
         break;
     case JGE:
-        *dst = BGE | ((delta & 0x7FFFF) << 5);
+        *dst = BGE | imm;
         break;
     case JL:
-        *dst = BLT | ((delta & 0x7FFFF) << 5);
+        *dst = BLT | imm;
         break;
     case JG:
-        *dst = BGT | ((delta & 0x7FFFF) << 5);
+        *dst = BGT | imm;
         break;
     case JLE:
-        *dst = BLE | ((delta & 0x7FFFF) << 5);
+        *dst = BLE | imm;
         break;
     case JA:
-        *dst = BHI | ((delta & 0x7FFFF) << 5);
+        *dst = BHI | imm;
         break;
     case JS:
-        *dst = BMI | ((delta & 0x7FFFF) << 5);
+        *dst = BMI | imm;
         break;
     case JMP:
         *dst = B | (delta & 0x3FFFFFF);

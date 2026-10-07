@@ -89,6 +89,7 @@ extern const uint8_t x86_regs[];
 #define BEQ 0x54000000
 #define BNE 0x54000001
 #define BCS 0x54000002
+#define BLO 0x54000003
 #define BMI 0x54000004
 #define BHI 0x54000008
 #define BLS 0x54000009
