@@ -18,9 +18,11 @@ int main() {
             d += r[i] * 10000;
             printf("%i/", d);
             b = 2 * i - 1;
+            printf("%i/", b);
 
             r[i] = d % b;
             d /= b;
+            printf("%i/", d);
             i--;
             if (i == 0) break;
             d *= i;
