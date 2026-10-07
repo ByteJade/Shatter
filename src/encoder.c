@@ -210,7 +210,6 @@ void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
         if (buf->type == CALL) {
             if (prev(compiler)->type != CALL) cache_emit(ASF|ADD_I | 31 | (TSP<<5));
             cache_emit(BRK | (cache_set_patch(compiler->guest + buf->dst.imm)<<5));
-            if (next(compiler)->type != CALL) cache_emit(ASF|ADD_I | TSP | (31<<5));
         } else emit_patch(compiler, buf);
     } else {
         uint8_t dst;
@@ -284,15 +283,16 @@ void emit_pop(compiler_t* compiler, X86_64* buf) {
     }
 }
 void emit_entry(struct compiler_t* compiler) {
-    if (!(compiler->flags&NEED_STACK)) return;
-    cache_emit(ASF|ADD_I | TSP | (31<<5));
-    if (!(compiler->flags&NEED_ENTRY)) return;
-    X86_64* n = next(compiler);
-    if (n->type == PUSH) {
-        skip(compiler);
-        uint8_t dst1 = emit_pre_push(compiler, n, 1);
-        cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | dst1 | (TSP<<5) | (30<<10));
-    }else cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
+    if (compiler->flags&NEED_STACK)
+        cache_emit(ASF|ADD_I | TSP | (31<<5));
+    if (compiler->flags&NEED_ENTRY) {
+        X86_64* n = next(compiler);
+        if (n->type == PUSH) {
+            skip(compiler);
+            uint8_t dst1 = emit_pre_push(compiler, n, 1);
+            cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | dst1 | (TSP<<5) | (30<<10));
+        }else cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
+    }
 }
 void emit_ret(struct compiler_t* compiler) {
     X86_64* n = prev(compiler);
