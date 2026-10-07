@@ -158,16 +158,15 @@ void decode_step(compiler_t* compiler) {
 void encode_step(compiler_t* compiler, block_t* block) {
     compiler->guest = block->start;
     if (block->start == compiler->entry) {
+        compiler->reader = block->buffer;
         compiler->entry = (uint8_t*)cache_get_host();
         emit_entry(compiler);
     }
     uint32_t end = block->buffer + block->size;
-    for (compiler->reader = block->buffer; compiler->reader < end; compiler->reader++) {
+    while (compiler->reader < end) {
         point_t* p = search_point(compiler, compiler->guest);
         if (p) p->host = cache_get_host();
-        compiler->guest += compiler->sizes[compiler->reader];
-        X86_64* buf = compiler->buffer + compiler->reader;
-        if (debugger_enabled()) print_x86_64(buf);
+        X86_64* buf = skip(compiler);
         encode(compiler, buf);
     }
     logger_deb("End compile");
@@ -212,16 +211,15 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
 }
 
 X86_64* prev(compiler_t* compiler) {
-    return compiler->buffer + compiler->reader - 1;
+    return compiler->buffer + compiler->reader - 2;
 }
 X86_64* next(compiler_t* compiler) {
-    return compiler->buffer + compiler->reader + 1;
+    return compiler->buffer + compiler->reader;
 }
-void skip(compiler_t* compiler) {
+X86_64* skip(compiler_t* compiler) {
+    X86_64* buf = compiler->buffer + compiler->reader;
+    if (debugger_enabled()) print_x86_64(buf);
     compiler->reader++;
     compiler->guest += compiler->sizes[compiler->reader];
-    if (debugger_enabled()) {
-        X86_64* buf = compiler->buffer + compiler->reader;
-        print_x86_64(buf);
-    }
+    return buf;
 }
