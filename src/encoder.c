@@ -254,7 +254,7 @@ void emit_push(compiler_t* compiler, X86_64* buf) {
         if (n->type == PUSH && n->dst.type == REG) {
             skip(compiler);
             uint8_t dst1 = x86_regs[n->dst.reg];
-            cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | dst | (TSP<<5) | (dst1<<10));
+            cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | dst1 | (TSP<<5) | (dst<<10));
             return;
         }
     }
