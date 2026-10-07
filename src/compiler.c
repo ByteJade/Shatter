@@ -164,9 +164,9 @@ void encode_step(compiler_t* compiler, block_t* block) {
     }
     uint32_t end = block->buffer + block->size;
     while (compiler->reader < end) {
+        X86_64* buf = skip(compiler);
         point_t* p = search_point(compiler, compiler->guest);
         if (p) p->host = cache_get_host();
-        X86_64* buf = skip(compiler);
         encode(compiler, buf);
     }
     logger_deb("End compile");
