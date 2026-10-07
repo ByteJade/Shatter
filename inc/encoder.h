@@ -99,16 +99,16 @@ extern const uint8_t x86_regs[];
 #define B 0x14000000
 #define BL 0x94000000
 
-#define CSETB 0x1a9f37e0
-#define CSETAE 0x1a9f27e0
-#define CSETE 0x1a9f07e0
-#define CSETNE 0x1a9f17e0
+#define CSETB 0x1a9f27e0
+#define CSETAE 0x1a9f37e0
+#define CSETE 0x1a9f17e0
+#define CSETNE 0x1a9f07e0 
 #define CSETBE 0x1a9f97e0
 #define CSETA 0x1a9f87e0
 #define CSETS 0x1a9f47e0
 #define CSETNS 0x1a9f57e0
-#define CSETL 0x1a9fb7e0
-#define CSETGE 0x1a9fa7e0
+#define CSETL 0xa9fa7e0
+#define CSETGE 0x1a9fb7e0
 
 #define CSELB 0x1A803000
 #define CSELAE 0x1A802000
