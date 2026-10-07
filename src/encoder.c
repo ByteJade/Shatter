@@ -173,6 +173,8 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
     if (buf->type == CMP || buf->type == TEST) {
         cache_emit(sf | opcode | XZR | (dst<<5) | (src<<16));
+    } else if (buf->type == NEG) {
+        cache_emit(sf | opcode | (dst) | XZR | (src<<16));
     } else {
         cache_emit(sf | opcode | dst | (dst<<5) | (src<<16));
         if (buf->dst.type&MEM) emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
@@ -448,6 +450,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
             cache_emit(MSF|LDR_POST | (8<<12) | 29 | (TSP<<5));
             break;
         case TEST: emit_math(compiler, buf, ANDS_R); break;
+        case NEG: emit_math(compiler, buf, SUBS_R); break;
         case ROR: emit_math(compiler, buf, ROR_R); break;
         case SHL:
         case SAL: emit_math(compiler, buf, LSL_R); break;
