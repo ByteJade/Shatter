@@ -157,16 +157,16 @@ void decode_step(compiler_t* compiler) {
 }
 void encode_step(compiler_t* compiler, block_t* block) {
     compiler->guest = block->start;
+    compiler->reader = block->buffer;
     if (block->start == compiler->entry) {
-        compiler->reader = block->buffer;
         compiler->entry = (uint8_t*)cache_get_host();
         emit_entry(compiler);
     }
     uint32_t end = block->buffer + block->size;
     while (compiler->reader < end) {
-        X86_64* buf = skip(compiler);
         point_t* p = search_point(compiler, compiler->guest);
         if (p) p->host = cache_get_host();
+        X86_64* buf = skip(compiler);
         encode(compiler, buf);
     }
     logger_deb("End compile");
