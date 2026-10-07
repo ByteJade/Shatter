@@ -242,25 +242,29 @@ void emit_mov(compiler_t* compiler, X86_64* buf, int sx) {
         emit_mem(compiler, ST_GRP|src, &buf->dst, buf, 0);
     }
 }
-void emit_push(compiler_t* compiler, X86_64* buf) {
-    uint8_t dst;
+int emit_pre_push(compiler_t* compiler, X86_64* buf, int shift) {
+    int dst = SC1R + shift;
     if (buf->dst.type == IMM) {
-        emit_imm(buf->dst.imm, SC3R);
-        dst = SC3R;
-    } else if (buf->dst.type&MEM) {
-        emit_mem(compiler, LD_GRP|SC1R, &buf->dst, buf, 0);
-        dst = SC1R;
-    } else {
-        dst = x86_regs[buf->dst.reg];
-        X86_64* n = next(compiler);
-        if (n->type == PUSH && n->dst.type == REG) {
-            skip(compiler);
-            uint8_t dst1 = x86_regs[n->dst.reg];
-            cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | dst1 | (TSP<<5) | (dst<<10));
-            return;
-        }
+        emit_imm(buf->dst.imm, dst);
+        return dst;
+    } if (buf->dst.type&MEM) {
+        emit_mem(compiler, LD_GRP|dst, &buf->dst, buf, 0);
+        return dst;
+    } if (buf->dst.reg == RSP) {
+        cache_emit(ADD_I | dst | (TSP<<5));
+        return dst;
     }
-    cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | dst | (TSP<<5));
+    return x86_regs[buf->dst.reg];
+}
+void emit_push(compiler_t* compiler, X86_64* buf) {
+    uint8_t dst = emit_pre_push(compiler, buf, 0);
+    X86_64* n = next(compiler);
+    if (n->type == PUSH) {
+        skip(compiler);
+        uint8_t dst1 = emit_pre_push(compiler, n, 1);
+        cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | dst1 | (TSP<<5) | (dst<<10));
+        return;
+    }else cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | dst | (TSP<<5));
 }
 void emit_pop(compiler_t* compiler, X86_64* buf) {
     if (buf->dst.type&MEM) {
