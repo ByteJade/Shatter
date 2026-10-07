@@ -274,9 +274,13 @@ void emit_pop(compiler_t* compiler, X86_64* buf) {
         X86_64* n = next(compiler);
         if (n->type == POP && n->dst.type == REG) {
             skip(compiler);
-            uint8_t dst1 = x86_regs[n->dst.reg];
-            cache_emit(ASF|LDP_POST | (16<<12) | dst | (TSP<<5) | (dst1<<10));
-        }else cache_emit(MSF|LDR_POST | (8<<12) | dst | (TSP<<5));
+            if (next(compiler)->type == RET)
+                cache_emit(MSF|LDR_POST | (8<<12) | dst | (TSP<<5));
+            else {
+                uint8_t dst1 = x86_regs[n->dst.reg];
+                cache_emit(ASF|LDP_POST | (16<<12) | dst | (TSP<<5) | (dst1<<10));
+            }
+        }else if (n->type != RET) cache_emit(MSF|LDR_POST | (8<<12) | dst | (TSP<<5));
     }
 }
 void emit_entry(struct compiler_t* compiler) {
@@ -296,12 +300,10 @@ void emit_entry(struct compiler_t* compiler) {
 void emit_ret(struct compiler_t* compiler) {
     X86_64* n = prev(compiler);
     if (n->type == POP) {
-        skip(compiler);
         uint8_t dst1 = x86_regs[n->dst.reg];
         cache_emit(ASF|LDP_POST | (16<<12) | dst1 | (TSP<<5) | (30<<10));
         return;
     } else if (n->type == LEAVE) {
-        skip(compiler);
         cache_emit(ASF|ADD_I | TSP | (29<<5));
         cache_emit(ASF|LDP_POST | (16<<12) | 29 | (TSP<<5) | (30<<10));
         return;
