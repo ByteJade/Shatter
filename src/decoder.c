@@ -37,9 +37,7 @@ void fetch_imm(compiler_t* compiler, X86_64* buf) {
     } else if (buf->prefix == OS) {
         buf->size = 16;
         buf->src.imm = fetch16_imm(compiler);
-    } else if (buf->size == 32) {
-        buf->src.imm = fetch32_imm(compiler);
-    } else buf->src.imm = fetch64(compiler);
+    } else buf->src.imm = fetch32_imm(compiler);
 }
 
 void decode_rm(compiler_t* compiler, operand_t* op, uint8_t modrm) {
