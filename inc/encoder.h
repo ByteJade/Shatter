@@ -42,7 +42,8 @@ extern const uint8_t x86_regs[];
 #define ASR_R 0x1AC02800
 #define ROR_R 0x1AC02C00
 
-#define SXTW_R 0x93407C00
+#define SXTW 0x93407C00
+#define SBFM 0x93400000
 
 #define MSF 0x40000000
 

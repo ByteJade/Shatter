@@ -70,7 +70,7 @@ void emit_imm(int64_t imm, uint8_t dst) {
         cache_emit(ASF|MOVZ_I | (a << 5) | dst);
         if (b) cache_emit(ASF|MOVK_I | (1 << 21) | (b << 5) | dst);
         if (imm >= INT32_MIN && imm <= INT32_MAX) {
-            if (imm < 0) cache_emit(SXTW_R | (dst << 5) | dst);
+            if (imm < 0) cache_emit(SXTW | (dst << 5) | dst);
             return;
         }
         uint16_t c = (imm>>32) & 0xFFFF;
@@ -238,6 +238,8 @@ void emit_mov(compiler_t* compiler, X86_64* buf, int sx) {
             emit_imm(buf->src.imm, dst);
         } else if (buf->src.type&MEM) {
             emit_mem(compiler, LD_GRP|(SX_GRP*sx)|dst, &buf->src, buf, 0);
+        } else if (sx) {
+            cache_emit(SBFM | dst | (x86_regs[buf->src.reg]<<5) | ((buf->size-1) << 10));
         } else {
             cache_emit(ASF|ADD_I | dst | (x86_regs[buf->src.reg]<<5));
         }
@@ -452,7 +454,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case RET: emit_ret(compiler); break;
         case JO ... JG: emit_patch(compiler, buf); break;
         case CLTQ: case CLTD:
-            cache_emit(SXTW_R | (x86_regs[RAX] << 5) | x86_regs[RAX]);
+            cache_emit(SXTW | (x86_regs[RAX] << 5) | x86_regs[RAX]);
             if (buf->type == CLTD) cache_emit(0x937ffc00 | (x86_regs[RAX] << 5) | x86_regs[RDX]); // asr x2, x8, #63
             break;
         default:
