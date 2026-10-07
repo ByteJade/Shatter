@@ -176,6 +176,7 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     }
     if (buf->dst.type&MEM) {
         emit_mem(compiler, LD_GRP|SC2R, &buf->dst, buf, 0);
+        if (buf->type == XADD) cache_emit(ADD_I | x86_regs[buf->dst.reg] | SC2R);
         dst = SC2R;
     } else dst = x86_regs[buf->dst.reg];
     
@@ -341,6 +342,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case PUSH: emit_push(compiler, buf); break;
         case POP: emit_pop(compiler, buf); break;
         case LEA: emit_address(compiler, x86_regs[buf->dst.reg], &buf->src, buf); break;
+        case XADD: emit_math(compiler, buf, ADDS_R); break;
         case ADD:
             if (buf->dst.type == REG && buf->src.type == IMM) {
                 uint8_t dst = x86_regs[buf->dst.reg];

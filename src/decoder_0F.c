@@ -120,6 +120,10 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->type = MOVSX16;
             decode_r_rm(compiler, buf);
             break;
+        case 0xC1:
+            buf->type = XADD;
+            decode_rm_r(compiler, buf);
+            break;
         default:
             logger_err("Unknown instruction: 0x0F 0x%X", byte);
             _exit(EXIT_FAILURE);

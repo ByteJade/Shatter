@@ -47,6 +47,8 @@ const char* instr_types[] = {
     "sete", "setne", "setbe", "seta",
     "sets", "setns", "setp", "setpo",
     "setl", "setge", "setle", "setg",
+
+    "xadd",
 };
 const char* regs64[] = {
     "rax", "rcx", "rdx", "rbx",
@@ -122,6 +124,7 @@ void print_op(X86_64* buf, operand_t* op) {
 }
 
 void print_x86_64(X86_64* buf) {
+    if (buf->prefix == LOCK) printf("lock ");
     printf(BLUE_COLOR"%s "GREEN_COLOR, instr_types[buf->type]);
     if (buf->dst.type) {
         print_op(buf, &buf->dst);

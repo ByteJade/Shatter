@@ -57,13 +57,15 @@ enum Types {
     SETE, SETNE, SETBE, SETA,
     SETS, SETNS, SETP, SETPO,
     SETL, SETGE, SETLE, SETG,
+
+    XADD,
 };
 
 enum prefixes {
     FS = 0x64,
     GS = 0x65,
     OS = 0x66,
-    //LOCK = 0xF0,
+    LOCK = 0xF0,
     REPN = 0xF2,
     REPE = 0xF3,
 };

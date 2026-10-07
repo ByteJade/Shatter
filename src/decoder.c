@@ -138,7 +138,7 @@ void decode(compiler_t* compiler, X86_64* buf) {
     uint8_t rex = 0;
     uint8_t byte = fetch8(compiler);
     if ((byte >= FS && byte <= OS) ||
-    (byte >= REPN && byte <= REPE)) {
+    (byte >= LOCK && byte <= REPE)) {
         buf->prefix = byte;
         byte = fetch8(compiler);
     }
