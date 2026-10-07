@@ -219,7 +219,7 @@ X86_64* next(compiler_t* compiler) {
 X86_64* skip(compiler_t* compiler) {
     X86_64* buf = compiler->buffer + compiler->reader;
     if (debugger_enabled()) print_x86_64(buf);
-    compiler->reader++;
     compiler->guest += compiler->sizes[compiler->reader];
+    compiler->reader++;
     return buf;
 }
