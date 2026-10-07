@@ -287,7 +287,7 @@ void emit_entry(struct compiler_t* compiler) {
             if (n->type == PUSH) {
                 skip(compiler);
                 uint8_t dst1 = emit_pre_push(compiler, n, 1);
-                cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | dst1 | (TSP<<5) | 30);
+                cache_emit(ASF|STP_PRE | ((-16&0x3FE)<<12) | dst1 | (TSP<<5) | (30<<10));
                 return;
             }else cache_emit(MSF|STR_PRE | ((-8&0x1FF)<<12) | (TSP<<5) | 30);
         }
@@ -298,9 +298,14 @@ void emit_ret(struct compiler_t* compiler) {
     if (n->type == POP) {
         skip(compiler);
         uint8_t dst1 = x86_regs[n->dst.reg];
-        cache_emit(ASF|LDP_POST | (16<<12) | dst1 | (TSP<<5) | 30);
+        cache_emit(ASF|LDP_POST | (16<<12) | dst1 | (TSP<<5) | (30<<10));
         return;
-    }else cache_emit(MSF|LDR_POST | (8<<12) | 30 | (TSP<<5));
+    } else if (n->type == LEAVE) {
+        skip(compiler);
+        cache_emit(ASF|ADD_I | TSP | (29<<5));
+        cache_emit(ASF|LDP_POST | (16<<12) | 29 | (TSP<<5) | (30<<10));
+        return;
+    } else cache_emit(MSF|LDR_POST | (8<<12) | 30 | (TSP<<5));
     cache_emit(ASF|ADD_I | 31 | (TSP<<5));
     cache_emit(RET_R | (30 << 5));
 }
@@ -461,10 +466,6 @@ void encode(compiler_t* compiler, X86_64* buf) {
                 cache_emit(SMUL_R | (SC1R<<16) | (src<<5) | dst);
             }
         } break;
-        case LEAVE:
-            cache_emit(ASF|ADD_I | TSP | (29<<5));
-            cache_emit(MSF|LDR_POST | (8<<12) | 29 | (TSP<<5));
-            break;
         case TEST: emit_math(compiler, buf, ANDS_R); break;
         case NEG: emit_math(compiler, buf, SUBS_R); break;
         case ROR: emit_math(compiler, buf, ROR_R); break;
@@ -472,7 +473,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case SAL: emit_math(compiler, buf, LSL_R); break;
         case SHR: emit_math(compiler, buf, LSR_R); break;
         case SAR: emit_math(compiler, buf, ASR_R); break;
-        case EBR: case NOP: case HLT: break;
+        case EBR: case NOP: case HLT: case LEAVE: break;
         case JMP: emit_branch(compiler, buf, BR); break;
         case CALL: emit_branch(compiler, buf, BLR); break;
         case RET: emit_ret(compiler); break;
