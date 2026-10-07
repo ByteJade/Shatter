@@ -100,7 +100,10 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->type = MOV;
             buf->dst.type = REG;
             buf->dst.reg = byte&7;
-            fetch_imm(compiler, buf);
+            if (buf->size == 64) {
+                buf->src.type = IMM;
+                buf->src.imm = fetch64(compiler);
+            } else fetch_imm(compiler, buf);
             break;
         case 0xC0: case 0xC1:
         case 0xD0: case 0xD1:
