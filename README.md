@@ -5,4 +5,4 @@ git clone https://github.com/ByteJade/Shatter
 cd Shatter && make  
 ### Use example
 cd build  
-./shatter ../tests/glxgears  
+./shatter ../tests/hello  
