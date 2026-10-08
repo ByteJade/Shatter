@@ -191,6 +191,16 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
         if (buf->dst.type&MEM) emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
     }
 }
+void emit_shift(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
+    uint8_t src;
+    uint8_t dst = x86_regs[buf->dst.reg];
+    if (buf->src.type == IMM) {
+        emit_imm(buf->src.imm, SC3R);
+        src = SC3R;
+    } else src = x86_regs[buf->src.reg];
+    uint32_t sf = (buf->size == 64) * ASF;
+    cache_emit(sf | opcode | dst | (dst<<5) | (src<<16));
+}
 void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t dst = buf->dst.reg;
     uint8_t src = buf->src.reg;
@@ -375,7 +385,9 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case CMOVB ... CMOVGE: {
             uint32_t opcode = csel_group[buf->type - CMOVB];
             uint8_t dst = x86_regs[buf->dst.reg];
-            cache_emit(opcode | dst | (x86_regs[buf->src.reg] << 5) | (dst << 16));
+            uint8_t src = x86_regs[buf->src.reg];
+            uint32_t sf = ASF * (buf->size == 64);
+            cache_emit(sf | opcode | dst | (src << 5) | (dst << 16));
         } break;
         case CVTSS2SI: 
         case CVTSD2SI: {
@@ -423,9 +435,9 @@ void encode(compiler_t* compiler, X86_64* buf) {
             } else src = x86_regs[buf->src.reg];
             uint8_t dst = x86_regs[buf->dst.reg];
             uint32_t sf = ASF * (buf->size == 64);
-            cache_emit(ADD_I | SC1R | (dst<<5));
-            cache_emit(sf|0x1ac00c00 | (src<<16) | (SC1R<<5) | (dst)); // sdiv
-            cache_emit(sf|0x1b008000 | (src<<16) | (SC1R<<10) | (dst << 5) | 2); // msub
+            cache_emit(sf|ADD_I | SC1R | (dst<<5));
+            cache_emit(sf|SDIV_R | (src<<16) | (SC1R<<5) | (dst));
+            cache_emit(sf|MSUB_R | (src<<16) | (SC1R<<10) | (dst << 5) | 2);
         } break;
         case IMUL: {
             uint8_t src = SC2R;
@@ -443,11 +455,11 @@ void encode(compiler_t* compiler, X86_64* buf) {
         } break;
         case TEST: emit_math(compiler, buf, ANDS_R); break;
         case NEG: emit_math(compiler, buf, SUBS_R); break;
-        case ROR: emit_math(compiler, buf, ROR_R); break;
+        case ROR: emit_shift(compiler, buf, ROR_R); break;
         case SHL:
-        case SAL: emit_math(compiler, buf, LSL_R); break;
-        case SHR: emit_math(compiler, buf, LSR_R); break;
-        case SAR: emit_math(compiler, buf, ASR_R); break;
+        case SHR: emit_shift(compiler, buf, LSR_R); break;
+        case SAL: emit_shift(compiler, buf, LSL_R); break;
+        case SAR: emit_shift(compiler, buf, ASR_R); break;
         case EBR: case NOP: case HLT: case LEAVE: break;
         case JMP: emit_branch(compiler, buf, BR); break;
         case CALL: emit_branch(compiler, buf, BLR); break;
