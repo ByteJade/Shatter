@@ -12,11 +12,11 @@
 compiler_t* compiler_init(void) {
     compiler_t* compiler = (compiler_t*)malloc(sizeof(compiler_t));
 
-    compiler->sizes = dynarray_init(sizeof(uint8_t));
-    compiler->buffer = dynarray_init(sizeof(X86_64));
-    compiler->blocks = dynarray_init(sizeof(block_t));
-    compiler->points = dynarray_init(sizeof(point_t));
-    compiler->patches = dynarray_init(sizeof(patch_t));
+    compiler->sizes = dynarray_init(sizeof(uint8_t), 64);
+    compiler->buffer = dynarray_init(sizeof(X86_64), 64);
+    compiler->blocks = dynarray_init(sizeof(block_t), 16);
+    compiler->points = dynarray_init(sizeof(point_t), 32);
+    compiler->patches = dynarray_init(sizeof(patch_t), 16);
     compiler->reader = 0;
     compiler->entry = NULL;
     compiler->flags = 0;

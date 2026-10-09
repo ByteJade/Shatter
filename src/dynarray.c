@@ -9,14 +9,12 @@ typedef struct {
     size_t data_size;
 } dynarray_t;
 
-#define BASE_SIZE 128
-
-void* dynarray_init(size_t data_size) {
+void* dynarray_init(size_t data_size, size_t array_size) {
     dynarray_t* array = (dynarray_t*)malloc(
-        sizeof(dynarray_t) + data_size*BASE_SIZE
+        sizeof(dynarray_t) + data_size*array_size
     );
     array->size = 0;
-    array->capacity = BASE_SIZE;
+    array->capacity = array_size;
     array->data_size = data_size;
     return array+1;
 }

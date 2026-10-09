@@ -23,7 +23,7 @@ static const char* error = NULL;
 static library_t* libraries;
 
 void elf_manager_init(void) {
-    libraries = (library_t*)dynarray_init(sizeof(library_t));
+    libraries = (library_t*)dynarray_init(sizeof(library_t), 8);
 }
 void elf_manager_fini(void) {
     dynarray_fini(libraries);

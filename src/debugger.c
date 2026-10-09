@@ -25,7 +25,7 @@ break_t* breaks = NULL;
 
 void debugger_init(void) {
     enabled = 1;
-    breaks = dynarray_init(sizeof(break_t));
+    breaks = dynarray_init(sizeof(break_t), 8);
 }
 void debugger_fini(void) {
     enabled = 0;
