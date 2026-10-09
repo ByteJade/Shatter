@@ -19,6 +19,7 @@ compiler_t* compiler_init(void) {
     compiler->patches = dynarray_init(sizeof(patch_t), 16);
     compiler->reader = 0;
     compiler->entry = NULL;
+    compiler->start = NULL;
     compiler->flags = 0;
 
     return compiler;
@@ -111,8 +112,13 @@ int emulate(compiler_t* compiler, X86_64* buf) {
             break;
         case JMP:
             if (buf->dst.type == IMM) {
-                push_jump(compiler, buf->dst.imm);
-            } else if (buf->dst.type != REG) {
+                int imm = buf->dst.imm;
+                push_jump(compiler, imm);
+                // tail-optimize
+                if (compiler->guest + imm < compiler->start) {
+                    compiler->flags |= NEED_TAIL;
+                }
+            } else if (buf->dst.type != REG && !(compiler->flags&NEED_TAIL)) {
                 compiler->flags &= ~NEED_ENTRY;
             }
             do_jump = 1;
@@ -160,8 +166,8 @@ void decode_step(compiler_t* compiler) {
 void encode_step(compiler_t* compiler, block_t* block) {
     compiler->guest = block->start;
     compiler->reader = block->buffer;
-    if (block->start == compiler->entry) {
-        compiler->entry = (uint8_t*)cache_get_host();
+    if (block->start == compiler->start) {
+        compiler->entry = cache_get_host();
         emit_entry(compiler);
     }
     uint32_t end = block->buffer + block->size;
@@ -190,7 +196,7 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     if (debugger_enabled()) 
         clock_gettime(CLOCK_MONOTONIC, &start);
     compiler->guest = guest;
-    compiler->entry = guest;
+    compiler->start = guest;
     compiler->flags = NEED_ENTRY;
     decode_step(compiler);
     cache_start_block(guest);
@@ -200,16 +206,15 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
         encode_step(compiler, block);
     }
     patch_step(compiler);
-    uint32_t* ret = (uint32_t*)compiler->entry;
     if (debugger_enabled()) {
-        debugger_brk(ret);
+        debugger_brk(compiler->entry);
         clock_gettime(CLOCK_MONOTONIC, &end);
         uint64_t nseconds = (uint64_t)(end.tv_sec - start.tv_sec) * 1000000000ULL + 
                     (end.tv_nsec - start.tv_nsec);
         logger_deb("Compile finish, time: %li nseconds\n", nseconds);
     }
     cache_end_block();
-    return ret;
+    return compiler->entry;
 }
 
 X86_64* prev(compiler_t* compiler) {

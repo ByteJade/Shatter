@@ -21,6 +21,7 @@ typedef struct {
 enum CompileFlags {
     NEED_ENTRY = 1<<0,
     NEED_STACK = 1<<1,
+    NEED_TAIL = 1<<2,
 };
 
 typedef struct compiler_t {
@@ -33,8 +34,9 @@ typedef struct compiler_t {
     patch_t* patches;
 
     uint32_t reader;
-    uint8_t* entry;
     int flags;
+    uint32_t* entry;
+    uint8_t* start;
 } compiler_t;
 
 compiler_t* compiler_init(void);
