@@ -19,9 +19,9 @@ size_t prev_host_p  = 0;
 size_t host_p       = 0;
 
 void cache_init(void) {
-    blocks = dynarray_init(sizeof(code_t));
-    patches = dynarray_init(sizeof(uint8_t*));
-    reuse = dynarray_init(sizeof(uint32_t));
+    blocks = dynarray_init(sizeof(code_t), 256);
+    patches = dynarray_init(sizeof(uint8_t*), 256);
+    reuse = dynarray_init(sizeof(uint32_t), 256);
     pthread_mutex_init(&mtx, NULL);
 }
 void cache_fini(void) {
