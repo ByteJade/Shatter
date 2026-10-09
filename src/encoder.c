@@ -460,8 +460,8 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case TEST: emit_math(compiler, buf, ANDS_R); break;
         case NEG: emit_math(compiler, buf, SUBS_R); break;
         case ROR: emit_shift(compiler, buf, ROR_R); break;
-        case SHL:
         case SHR: emit_shift(compiler, buf, LSR_R); break;
+        case SHL:
         case SAL: emit_shift(compiler, buf, LSL_R); break;
         case SAR: emit_shift(compiler, buf, ASR_R); break;
         case EBR: case NOP: case HLT: case LEAVE: break;
