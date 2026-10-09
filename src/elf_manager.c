@@ -26,6 +26,10 @@ void elf_manager_init(void) {
     libraries = (library_t*)dynarray_init(sizeof(library_t), 8);
 }
 void elf_manager_fini(void) {
+    for (size_t i = 0; i < dynarray_size(libraries); i++) {
+        library_t* lib = libraries + i;
+        if (lib->name) free((void*)lib->name);
+    }
     dynarray_fini(libraries);
 }
 
