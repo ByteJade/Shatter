@@ -238,7 +238,7 @@ void emit_branch(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
             emit_mem(compiler, LD_GRP|SC1R, &buf->dst, buf, 0);
             dst = SC1R;
         } else dst = x86_regs[buf->dst.reg];
-        if (buf->type == JMP) {
+        if (buf->type == JMP && (compiler->flags&NEED_TAIL)) {
             cache_emit(MSF|LDR_POST | (8<<12) | 30 | (TSP<<5));
             cache_emit(ASF|ADD_I | 31 | (TSP<<5));
         }
