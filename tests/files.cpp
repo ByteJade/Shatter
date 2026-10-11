@@ -21,11 +21,14 @@ int main() {
     auto&& __range = fs::directory_iterator(".", ec);
     auto __begin = begin(__range);
     auto __end   = end(__range);
+    dump(__begin, "__begin");
+    dump(__end, "__end");
     for (; __begin != __end; ++__begin) {
-        dump(__begin, "__begin");
-        const auto& entry = *__begin;
+        dump(__begin, "it");
+        auto& entry = *__begin;
         std::cout << entry.path() << "\n";
     }
     dump(__begin, "__begin");
+    dump(__end, "__end");
     return 0;
 }
