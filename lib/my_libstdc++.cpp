@@ -93,8 +93,8 @@ extern "C" {
     WRAP_VOID_FUNC(_ZNSt6thread6_StateD2Ev)
     WRAP_VOID_FUNC(_ZSt20throw_length_errorPKc)
     WRAP_VOID_FUNC(_ZNSt6thread15_M_start_threadESt10unique_ptrINS_6_StateESt14default_deleteIS1_EEPFvvE)
-    WRAP_VOID_FUNC(_ZNSt7cxx1112basic_stringIcSt11char_traitsIcESaIcEE10_M_disposeEv)
-    WRAP_OBJ_FUNC(_ZNKSt7cxx1115basic_stringbufIcSt11char_traitsIcESaIcEE3strEv)
+    WRAP_VOID_FUNC(_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE10_M_disposeEv)
+    WRAP_OBJ_FUNC(_ZNKSt7__cxx1115basic_stringbufIcSt11char_traitsIcESaIcEE3strEv)
     WRAP_VOID_FUNC(_ZNSt6thread4joinEv)
 
     WRAP_VOID_FUNC(_Unwind_Resume)
