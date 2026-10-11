@@ -161,19 +161,18 @@ void emit_mem(compiler_t* compiler, uint32_t grp, operand_t* op, X86_64* buf, in
     }
 }
 void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
+    uint8_t src;
     uint8_t dst;
-    uint8_t src1;
-    uint8_t src2;
     if (buf->src.type == IMM) {
         if (buf->src.imm) {
             emit_imm(buf->src.imm, SC3R);
-            src2 = SC3R;
-        } else src2 = XZR;
+            src = SC3R;
+        } else src = XZR;
     } else if (buf->src.type == REG) {
-        src2 = x86_regs[buf->src.reg];
+        src = x86_regs[buf->src.reg];
     } else {
         emit_mem(compiler, LD_GRP|SC2R, &buf->src, buf, 0);
-        src2 = SC2R;
+        src = SC2R;
     }
     if (buf->dst.type&MEM) {
         emit_mem(compiler, LD_GRP|SC2R, &buf->dst, buf, 0);
@@ -182,24 +181,16 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     
     uint32_t sf = (buf->size == 64) * ASF;
     if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
+    if (buf->type == XADD) cache_emit(ADD_I | SC4R | dst);
     if (buf->type == CMP || buf->type == TEST) {
-        src1 = dst;
-        dst = XZR;
+        cache_emit(sf | opcode | XZR | (dst<<5) | (src<<16));
     } else if (buf->type == NEG) {
-        src1 = XZR;
-    } else if (buf->type == XADD) {
-        src1 = dst;
-        dst = SC4R;
+        cache_emit(sf | opcode | (dst) | (XZR<<5) | (src<<16));
     } else {
-        src1 = dst;
+        cache_emit(sf | opcode | dst | (dst<<5) | (src<<16));
+        if (buf->dst.type&MEM) emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
     }
-    if (buf->dst.type&MEM) {
-        cache_emit(sf | opcode | dst | (src1<<5) | (src2<<16));
-        emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
-    } else {
-        cache_emit(sf | opcode | dst | (src1<<5) | (src2<<16));
-    }
-    if (buf->type == XADD) cache_emit(ADD_I | src2 | src1);
+    if (buf->type == XADD) cache_emit(ADD_I | src | SC4R);
 }
 void emit_shift(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t src;
