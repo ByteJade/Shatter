@@ -9,6 +9,7 @@
 #define SC1R 10
 #define SC2R 11
 #define SC3R 12
+#define SC4R 13
 #define XZR 31
 #define TSP 28
 
@@ -160,7 +161,6 @@ void emit_mem(compiler_t* compiler, uint32_t grp, operand_t* op, X86_64* buf, in
     }
 }
 void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
-    // ADD, SUB, OR, XOR, AND
     uint8_t src;
     uint8_t dst;
     if (buf->src.type == IMM) {
@@ -176,20 +176,21 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     }
     if (buf->dst.type&MEM) {
         emit_mem(compiler, LD_GRP|SC2R, &buf->dst, buf, 0);
-        if (buf->type == XADD) cache_emit(ADD_I | x86_regs[buf->dst.reg] | SC2R);
         dst = SC2R;
     } else dst = x86_regs[buf->dst.reg];
     
     uint32_t sf = (buf->size == 64) * ASF;
     if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
+    if (buf->type == XADD) cache_emit(ADD_I | SC4R | dst);
     if (buf->type == CMP || buf->type == TEST) {
         cache_emit(sf | opcode | XZR | (dst<<5) | (src<<16));
     } else if (buf->type == NEG) {
-        cache_emit(sf | opcode | (dst) | XZR | (src<<16));
+        cache_emit(sf | opcode | (dst) | (XZR<<5) | (src<<16));
     } else {
         cache_emit(sf | opcode | dst | (dst<<5) | (src<<16));
         if (buf->dst.type&MEM) emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
     }
+    if (buf->type == XADD) cache_emit(ADD_I | src | SC4R);
 }
 void emit_shift(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t src;
@@ -204,7 +205,7 @@ void emit_shift(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
 void emit_neon(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t dst = buf->dst.reg;
     uint8_t src = buf->src.reg;
-    if (buf->type%2) buf->size = 64;
+    if (!buf->type%2) buf->size = 64;
     if (buf->dst.type & MEM) {
         emit_mem(compiler, LDN_GRP|16, &buf->dst, buf, 0);
         dst = 16;
@@ -458,6 +459,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
             }
         } break;
         case TEST: emit_math(compiler, buf, ANDS_R); break;
+        case XCHG: emit_math(compiler, buf, ANDS_R); break;
         case NEG: emit_math(compiler, buf, SUBS_R); break;
         case ROR: emit_shift(compiler, buf, ROR_R); break;
         case SHR: emit_shift(compiler, buf, LSR_R); break;
