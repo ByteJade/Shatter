@@ -9,7 +9,6 @@
 #define SC1R 10
 #define SC2R 11
 #define SC3R 12
-#define SC4R 13
 #define XZR 31
 #define TSP 28
 
@@ -181,16 +180,21 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     
     uint32_t sf = (buf->size == 64) * ASF;
     if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
-    if (buf->type == XADD) cache_emit(ADD_I | SC4R | (dst<<5));
+    if (buf->type >= XADD) cache_emit(ADD_I | SC3R | (dst<<5));
     if (buf->type == CMP || buf->type == TEST) {
         cache_emit(sf | opcode | XZR | (dst<<5) | (src<<16));
     } else if (buf->type == NEG) {
         cache_emit(sf | opcode | (dst) | (XZR<<5) | (src<<16));
-    } else {
+    } else if (buf->type == XCHG) {
+        cache_emit(sf | opcode | (SC3R) | (dst<<5));
+        cache_emit(sf | opcode | (dst) | (src<<5));
+        cache_emit(sf | opcode | (src) | (SC3R<<5));
+        if (buf->dst.type&MEM) emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
+    }else {
         cache_emit(sf | opcode | dst | (dst<<5) | (src<<16));
         if (buf->dst.type&MEM) emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
     }
-    if (buf->type == XADD) cache_emit(ADD_I | src | (SC4R<<5));
+    if (buf->type >= XADD) cache_emit(ADD_I | src | (SC3R<<5));
 }
 void emit_shift(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t src;
@@ -459,7 +463,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
             }
         } break;
         case TEST: emit_math(compiler, buf, ANDS_R); break;
-        case XCHG: emit_math(compiler, buf, ANDS_R); break;
+        case XCHG: emit_math(compiler, buf, ADD_I); break;
         case NEG: emit_math(compiler, buf, SUBS_R); break;
         case ROR: emit_shift(compiler, buf, ROR_R); break;
         case SHR: emit_shift(compiler, buf, LSR_R); break;
