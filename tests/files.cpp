@@ -1,36 +1,31 @@
 #include <filesystem>
 #include <iostream>
-#include <memory>
-#include <string>
 
 namespace fs = std::filesystem;
 
-struct fake_dir_iter {
-    std::shared_ptr<void> _M_dir;
-    char                  padding[16];
-    fs::path              _M_path;
-};
-
 void dump(const fs::directory_iterator& it, const char* name) {
-    auto* p = reinterpret_cast<const fake_dir_iter*>(&it);
-    
-    void* dir_ptr = p->_M_dir.get();
-    std::string path_str = p->_M_path.string();
+    void* dir_ptr = *reinterpret_cast<void* const*>(&it);
 
-    std::cout << name
-              << ": _M_dir=" << dir_ptr
-              << " path=\"" << path_str << "\"\n";
+    std::cout << name << ": _M_dir=" << dir_ptr;
+
+    if (it != fs::directory_iterator{}) {
+        std::cout << " path=\"" << it->path().string() << "\"";
+    } else {
+        std::cout << " (end)";
+    }
+    std::cout << "\n";
 }
 
 int main() {
     std::error_code ec;
-    fs::directory_iterator it(".", ec);
-    fs::directory_iterator end;
-
-    while (it != end) {
-        dump(it, "cur");
-        it++; 
+    auto&& __range = fs::directory_iterator(".", ec);
+    auto __begin = begin(__range);
+    auto __end   = end(__range);
+    for (; __begin != __end; ++__begin) {
+        dump(__begin, "__begin");
+        const auto& entry = *__begin;
+        std::cout << entry.path() << "\n";
     }
-    dump(it, "end");
+    dump(__begin, "__begin");
     return 0;
 }
