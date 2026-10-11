@@ -111,8 +111,8 @@ void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf)
         if (full) emit_add_signed(dst, dst, full);
     } else if (op->type&IDX) {
         if (op->scale != 0) {
-            cache_emit(UBFM | ((-(op->scale) & 0x3F) << 16) |
-            (((63 - op->scale) & 0x3F) << 10) | (x86_regs[op->idx] << 5) | dst);
+            cache_emit(UBFM | (((-op->scale) & 0x3F) << 16) |
+            ((63 - op->scale) << 10) | (x86_regs[op->idx] << 5) | dst);
         } else cache_emit(ASF|ADD_I | (dst) | (x86_regs[op->idx]<<5));
         if (t&REG) {
             cache_emit(ASF|ADD_R | (dst) | (dst<<5) | (x86_regs[op->reg]<<16));
@@ -179,22 +179,25 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     } else dst = x86_regs[buf->dst.reg];
     
     uint32_t sf = (buf->size == 64) * ASF;
-    if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
-    if (buf->type >= XADD) cache_emit(ADD_I | SC3R | (dst<<5));
+    opcode |= sf;
+    if (buf->type >= XADD) cache_emit(sf | ADD_I | SC3R | (dst<<5));
     if (buf->type == CMP || buf->type == TEST) {
-        cache_emit(sf | opcode | XZR | (dst<<5) | (src<<16));
+        cache_emit(opcode | XZR | (dst<<5) | (src<<16));
     } else if (buf->type == NEG) {
-        cache_emit(sf | opcode | (dst) | (XZR<<5) | (src<<16));
+        cache_emit(opcode | (dst) | (XZR<<5) | (src<<16));
     } else if (buf->type == XCHG) {
-        cache_emit(sf | opcode | (SC3R) | (dst<<5));
-        cache_emit(sf | opcode | (dst) | (src<<5));
-        cache_emit(sf | opcode | (src) | (SC3R<<5));
+        cache_emit(opcode | (SC3R) | (dst<<5));
+        cache_emit(opcode | (dst) | (src<<5));
+        cache_emit(opcode | (src) | (SC3R<<5));
         if (buf->dst.type&MEM) emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
     }else {
-        cache_emit(sf | opcode | dst | (dst<<5) | (src<<16));
+        cache_emit(opcode | dst | (dst<<5) | (src<<16));
         if (buf->dst.type&MEM) emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
+        else if (buf->size < 32) {
+            cache_emit(0x12000c00 | dst | (dst<<5) | ((buf->size/4-1)<<12));
+        }
     }
-    if (buf->type >= XADD) cache_emit(ADD_I | src | (SC3R<<5));
+    if (buf->type >= XADD) cache_emit(sf | ADD_I | src | (SC3R<<5));
 }
 void emit_shift(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t src;
