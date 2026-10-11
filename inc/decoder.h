@@ -32,7 +32,7 @@ enum Types {
 
     LEAVE, NOP, CLTQ, CLTD,
 
-    XCHG, SYSCALL, EBR, HLT,
+    SYSCALL, EBR, HLT,
 
     MOVSS, MOVSD,
     MOVAPD, MOVQ,
@@ -58,7 +58,7 @@ enum Types {
     SETS, SETNS, SETP, SETPO,
     SETL, SETGE, SETLE, SETG,
 
-    XADD,
+    XADD, XCHG, 
 };
 
 enum prefixes {
