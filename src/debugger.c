@@ -69,6 +69,22 @@ void emulate_jump(struct sigcontext* sc) {
         if (sc_get_flag(sc, "C"))
             imm = get_imm19(instr);
         break;
+    case BLO:
+        if (!sc_get_flag(sc, "C"))
+            imm = get_imm19(instr);
+        break;
+    case BMI:
+        if (sc_get_flag(sc, "N"))
+            imm = get_imm19(instr);
+        break;
+    case BPL:
+        if (!sc_get_flag(sc, "N"))
+            imm = get_imm19(instr);
+        break;
+    case BHI:
+        if (sc_get_flag(sc, "C") && !sc_get_flag(sc, "Z"))
+            imm = get_imm19(instr);
+        break;
     case BLS:
         if (!sc_get_flag(sc, "C") || sc_get_flag(sc, "Z"))
             imm = get_imm19(instr);
@@ -87,14 +103,6 @@ void emulate_jump(struct sigcontext* sc) {
         break;
     case BLE:
         if (sc_get_flag(sc, "Z") || sc_get_flag(sc, "N") != sc_get_flag(sc, "V"))
-            imm = get_imm19(instr);
-        break;
-    case BHI:
-        if (sc_get_flag(sc, "Z") == 0 && sc_get_flag(sc, "C"))
-            imm = get_imm19(instr);
-        break;
-    case BMI:
-        if (sc_get_flag(sc, "N"))
             imm = get_imm19(instr);
         break;
     }
@@ -127,12 +135,12 @@ void print_memory(struct sigcontext* sc, char argv[3][64], int argc) {
 void debugger_help() {
     printf("debugger commands:\n");
     printf("step - single step\n");
-    printf("exit - continue execution\n");
+    printf("quit - continue execution\n");
     printf("abort - exit from programm\n");
     printf("flags - print cpu flags\n");
     printf("regs - print cpu regs\n");
     printf("(b,h,w,d) [<reg>+<imm>] - print data in this location\n");
-    printf("(b,h,w,d) [<reg>+<imm>] <data>- write data to this location\n");
+    printf("(b,h,w,d) [<reg>+<imm>] <data> - write data to this location\n");
     printf("level <log_level> - set log level (log, deb, warn, err)\n");
     printf("goto <imm> - set break point at [pc+imm]\n");
     printf("cache - print last compiled block\n");
@@ -158,7 +166,7 @@ void debugger_step(struct sigcontext* sc) {
             case 'e':
                 run = 0;
                 break;
-            case 'a':
+            case 'q':
                 _exit(EXIT_SUCCESS);
                 break;
             case 'f':
