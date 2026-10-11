@@ -18,7 +18,7 @@ void my___libc_start_main(
 void my_exit(int stat) {
     _exit(stat);
 }
-WRAP_FUNC_VOID(_exit)
+WRAP_VOID_FUNC(_exit)
 // IO
 WRAP_FUNC(puts)
 WRAP_FUNC(putchar)
@@ -99,7 +99,7 @@ WRAP_FUNC(memchr)
 WRAP_FUNC(malloc)
 WRAP_FUNC(calloc)
 WRAP_FUNC(realloc)
-WRAP_FUNC_VOID(free)
+WRAP_VOID_FUNC(free)
 
 // time
 WRAP_FUNC(time)
@@ -119,8 +119,8 @@ WRAP_FUNC(getrusage)
 WRAP_FUNC(sysconf)
 
 // CXA
-WRAP_FUNC_VOID(__cxa_finalize)
-WRAP_FUNC_VOID(__stack_chk_fail)
+WRAP_VOID_FUNC(__cxa_finalize)
+WRAP_VOID_FUNC(__stack_chk_fail)
 
 WRAP_FUNC(wait)
 WRAP_FUNC(fork)
