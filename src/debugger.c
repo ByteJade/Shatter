@@ -112,7 +112,7 @@ void emulate_jump(struct sigcontext* sc) {
 }
 void print_memory(struct sigcontext* sc, char argv[3][64], int argc) {
     if (argc < 2) return;
-    size_t reg = sc_get_reg_host(sc, argv[1]+1);
+    size_t reg = sc_get_reg_host(sc, argv[1]);
     if (!reg) {
         logger_err("%s = (NULL)", argv[1]);
         return;
