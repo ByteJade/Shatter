@@ -20,11 +20,11 @@ extern "C" {
     WRAP_VOID_FUNC(_ZNSt12__shared_ptrINSt10filesystem7__cxx114_DirELN9__gnu_cxx12_Lock_policyE2EEC1Ev)
     WRAP_VOID_FUNC(_ZNSt10filesystem7__cxx1118directory_iteratorC1ERKNS0_4pathENS_17directory_optionsEPSt10error_code)
     WRAP_FUNC(_ZNKSt10filesystem7__cxx114path7compareERKS1_)
-    WRAP_FUNC(_ZNSt10filesystem7__cxx114path14_M_split_cmptsEv)
+    WRAP_VOID_FUNC(_ZNSt10filesystem7__cxx114path14_M_split_cmptsEv)
     WRAP_FUNC(_ZNKSt10filesystem7__cxx114path17_M_find_extensionEv)
     WRAP_FUNC(_ZNSt10filesystem7__cxx1118directory_iteratorppEv)
     WRAP_VOID_FUNC(_ZNSt10filesystem7__cxx114path5_ListC1Ev)
-    WRAP_FUNC(_ZNKSt10filesystem7__cxx114path5_List13_Impl_deleterclEPNS2_5_ImplE)
+    WRAP_VOID_FUNC(_ZNKSt10filesystem7__cxx114path5_List13_Impl_deleterclEPNS2_5_ImplE)
     WRAP_FUNC(_ZNSi4readEPcl)
     WRAP_FUNC(_ZNSo5writeEPKcl)
 
@@ -74,6 +74,7 @@ extern "C" {
     WRAP_FUNC(_ZStlsIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_St13_Setprecision)
     WRAP_FUNC(_ZStlsIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_St8_SetfillIS3_E)
     WRAP_FUNC(_ZStlsIcSt11char_traitsIcESaIcEERSt13basic_ostreamIT_T0_ES7_RKNSt7__cxx1112basic_stringIS4_S5_T1_EE)
+    WRAP_FUNC(_ZSt16ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l)
     WRAP_VOID_FUNC(_ZNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEE3strERKNS_12basic_stringIcS2_S3_EE)
     WRAP_OBJ_FUNC(_ZNKSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEE3strEv)
     WRAP_FUNC(_ZNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEED1Ev)
@@ -85,6 +86,16 @@ extern "C" {
     WRAP_VOID_FUNC(_ZNSo5flushEv)
 
     WRAP_FUNC(_ZNSt6chrono3_V212steady_clock3nowEv)
+
+    WRAP_VOID_FUNC(_ZNSt8ios_base4InitD1Ev)
+    WRAP_VOID_FUNC(_ZNSt8ios_base4InitC1Ev)
+    WRAP_VOID_FUNC(_ZSt9terminatev)
+    WRAP_VOID_FUNC(_ZNSt6thread6_StateD2Ev)
+    WRAP_VOID_FUNC(_ZSt20throw_length_errorPKc)
+    WRAP_VOID_FUNC(_ZNSt6thread15_M_start_threadESt10unique_ptrINS_6_StateESt14default_deleteIS1_EEPFvvE)
+    WRAP_VOID_FUNC(_ZNSt7cxx1112basic_stringIcSt11char_traitsIcESaIcEE10_M_disposeEv)
+    WRAP_OBJ_FUNC(_ZNKSt7cxx1115basic_stringbufIcSt11char_traitsIcESaIcEE3strEv)
+    WRAP_VOID_FUNC(_ZNSt6thread4joinEv)
 
     WRAP_VOID_FUNC(_Unwind_Resume)
     WRAP_VOID_FUNC(__cxa_end_catch)
