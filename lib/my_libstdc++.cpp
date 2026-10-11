@@ -74,7 +74,7 @@ extern "C" {
     WRAP_FUNC(_ZStlsIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_St13_Setprecision)
     WRAP_FUNC(_ZStlsIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_St8_SetfillIS3_E)
     WRAP_FUNC(_ZStlsIcSt11char_traitsIcESaIcEERSt13basic_ostreamIT_T0_ES7_RKNSt7__cxx1112basic_stringIS4_S5_T1_EE)
-    WRAP_FUNC(_ZSt16ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l)
+    WRAP_FUNC(_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l)
     WRAP_VOID_FUNC(_ZNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEE3strERKNS_12basic_stringIcS2_S3_EE)
     WRAP_OBJ_FUNC(_ZNKSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEE3strEv)
     WRAP_FUNC(_ZNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEED1Ev)
