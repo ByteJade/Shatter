@@ -12,6 +12,16 @@
             "mov x8, x0\n" \
         ); \
     }
+#define WRAP_OBJ_FUNC(func) \
+    void my_##func() { \
+        asm volatile( \
+            "stp x30, x29, [sp, #-16]!\n" \
+            "mov x8, x0\n" \
+            "mov x0, x1\n" \
+            "bl " #func "\n" \
+            "ldp x30, x29, [sp], #16\n" \
+        ); \
+    }
 #define WRAP_MED_FUNC(func) \
     void my_##func() { \
         asm volatile( \
@@ -43,6 +53,7 @@
 
 #define WRAP_FUNC_VOID(func) JUMP(func)
 #define WRAP_FUNC(func)      JUMP(func)
+#define WRAP_OBJ_FUNC(func)      JUMP(func)
 #define WRAP_MED_FUNC(func)  JUMP(func)
 #define WRAP_BIG_FUNC(func)  JUMP(func)
 #endif
