@@ -6,9 +6,12 @@
 #define WRAP_OBJ_FUNC(func) \
     void my_##func() { \
         asm volatile( \
+            "stp x30, x29, [sp, #-16]!\n" \
             "mov x8, x0\n" \
             "mov x0, x1\n" \
-            "b " #func "\n" \
+            "bl " #func "\n" \
+            "ldp x30, x29, [sp], #16\n" \
+            "mov x0, x8\n" \
         ); \
     }
 #define WRAP_FUNC(func) \
