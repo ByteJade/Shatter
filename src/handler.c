@@ -112,8 +112,8 @@ size_t sc_get_reg_host(struct sigcontext* sc, const char* reg) {
         sscanf(reg+1, "%i", &num);
         return sc->regs[num];
     }
-    if (strcmp(reg, "sp") == 0) return sc->sp;
-    if (strcmp(reg, "pc") == 0) return sc->pc;
+    if (reg[0] == 's' && reg[1] == 'p') return sc->sp;
+    if (reg[0] == 'p' && reg[1] == 'c') return sc->pc;
     #endif
     return 0;
 }
