@@ -23,7 +23,7 @@ const char* instr_types[] = {
 
     "leave", "nop", "cltq", "cltd",
 
-    "syscall", "ebr", "hlt",
+    "xchg", "syscall", "ebr", "hlt",
     "movss", "movsd",
     "movapd", "movq",
     "cvtsi2ss", "cvtsi2sd",

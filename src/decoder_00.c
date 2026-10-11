@@ -69,6 +69,13 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->type = TEST;
             decode_rm_r(compiler, buf);
             break;
+        case 0x86:
+            buf->size = 8;
+            [[fallthrough]];
+        case 0x87:
+            buf->type = XCHG;
+            decode_rm_r(compiler, buf);
+            break;
         case 0x88 ... 0x8B:
             buf->type = MOV;
             decode_GRP0(compiler, buf, byte);

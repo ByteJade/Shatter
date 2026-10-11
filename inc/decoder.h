@@ -32,7 +32,7 @@ enum Types {
 
     LEAVE, NOP, CLTQ, CLTD,
 
-    SYSCALL, EBR, HLT,
+    XCHG, SYSCALL, EBR, HLT,
 
     MOVSS, MOVSD,
     MOVAPD, MOVQ,
