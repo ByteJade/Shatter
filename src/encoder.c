@@ -181,7 +181,7 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     
     uint32_t sf = (buf->size == 64) * ASF;
     if (buf->size < 32) logger_err("TODO: 8, 16 bit instructions");
-    if (buf->type == XADD) cache_emit(ADD_I | SC4R | dst);
+    if (buf->type == XADD) cache_emit(ADD_I | SC4R | (dst<<5));
     if (buf->type == CMP || buf->type == TEST) {
         cache_emit(sf | opcode | XZR | (dst<<5) | (src<<16));
     } else if (buf->type == NEG) {
@@ -190,7 +190,7 @@ void emit_math(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
         cache_emit(sf | opcode | dst | (dst<<5) | (src<<16));
         if (buf->dst.type&MEM) emit_mem(compiler, ST_GRP|dst, &buf->dst, buf, 1);
     }
-    if (buf->type == XADD) cache_emit(ADD_I | src | SC4R);
+    if (buf->type == XADD) cache_emit(ADD_I | src | (SC4R<<5));
 }
 void emit_shift(compiler_t* compiler, X86_64* buf, uint32_t opcode) {
     uint8_t src;
