@@ -23,7 +23,7 @@ const char* instr_types[] = {
 
     "leave", "nop", "cltq", "cltd",
 
-    "xchg", "syscall", "ebr", "hlt",
+    "syscall", "ebr", "hlt",
     "movss", "movsd",
     "movapd", "movq",
     "cvtsi2ss", "cvtsi2sd",
@@ -48,7 +48,7 @@ const char* instr_types[] = {
     "sets", "setns", "setp", "setpo",
     "setl", "setge", "setle", "setg",
 
-    "xadd",
+    "xadd", "xchg", 
 };
 const char* regs64[] = {
     "rax", "rcx", "rdx", "rbx",
