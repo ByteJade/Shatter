@@ -79,14 +79,14 @@ void emit_imm(int64_t imm, uint8_t dst) {
         if (d) cache_emit(ASF|MOVK_I | (3 << 21) | (d << 5) | dst);
     }
 }
-void emit_add_signed(uint8_t dst, uint8_t src, int64_t imm) {
+void emit_add_signed(uint8_t dst, uint8_t src, int64_t imm, uint32_t size) {
     if (imm > 4095 || imm < -4096) {
         emit_imm(imm, SC2R);
-        cache_emit(ASF|ADD_R | (dst) | (src<<5) | (SC2R<<16));
+        cache_emit(size|ADD_R | (dst) | (src<<5) | (SC2R<<16));
     } else {
         if (imm > 0)
-            cache_emit(ASF|ADD_I | (dst) | (src<<5) | (imm<<10));
-        else cache_emit(ASF|SUB_I | (dst) | (src<<5) | (-imm<<10));
+            cache_emit(size|ADD_I | (dst) | (src<<5) | (imm<<10));
+        else cache_emit(size|SUB_I | (dst) | (src<<5) | (-imm<<10));
     }
 }
 uint16_t emit_rip(compiler_t* compiler, operand_t* op, uint8_t dst) {
@@ -108,7 +108,7 @@ void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf)
             cache_emit(GET_FS | dst);
             full = op->imm;
         } else full = emit_rip(compiler, op, dst);
-        if (full) emit_add_signed(dst, dst, full);
+        if (full) emit_add_signed(dst, dst, full, ASF);
     } else if (op->type&IDX) {
         if (op->scale != 0) {
             cache_emit(UBFM | (((-op->scale) & 0x3F) << 16) |
@@ -118,11 +118,11 @@ void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf)
             cache_emit(ASF|ADD_R | (dst) | (dst<<5) | (x86_regs[op->reg]<<16));
         }
         if ((t&IMM) && op->imm != 0) {
-            emit_add_signed(dst, dst, op->imm);
+            emit_add_signed(dst, dst, op->imm, ASF);
         }
     }else {
         if (t&IMM) {
-            emit_add_signed(dst, x86_regs[op->reg], op->imm);
+            emit_add_signed(dst, x86_regs[op->reg], op->imm, ASF);
         } else {
             cache_emit(ASF|ADD_I | (dst) | (x86_regs[op->reg]<<5));
         }
@@ -370,14 +370,14 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case ADD:
             if (buf->dst.type == REG && buf->src.type == IMM) {
                 uint8_t dst = x86_regs[buf->dst.reg];
-                emit_add_signed(dst, dst, buf->src.imm);
+                emit_add_signed(dst, dst, buf->src.imm, ASF*(buf->size==64));
             } else {
                 emit_math(compiler, buf, ADDS_R);
             } break;
         case SUB:
             if (buf->dst.type == REG && buf->src.type == IMM) {
                 uint8_t dst = x86_regs[buf->dst.reg];
-                emit_add_signed(dst, dst, -buf->src.imm);
+                emit_add_signed(dst, dst, -buf->src.imm, ASF*(buf->size==64));
             } else {
                 emit_math(compiler, buf, SUBS_R);
             } break;
