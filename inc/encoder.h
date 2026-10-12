@@ -11,6 +11,7 @@ extern const uint8_t x86_regs[];
 #define ADRP 0x90000000
 
 #define ASF 0x80000000
+#define SIGN 0x20000000
 
 #define MOVN_I 0x12800000
 #define MOVZ_I 0x52800000
