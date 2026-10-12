@@ -219,7 +219,7 @@ void decode_aarch64(uint32_t buf) {
         return;
     }
     if ((buf&FS_M) == GET_FS) {
-        printf("mrs "GREEN_COLOR"X%i", get_reg(buf, 0));
+        printf("mrs "GREEN_COLOR"X%i, fs", get_reg(buf, 0));
         return;
     }
     if ((buf&BFM_M) == SBFM) {
@@ -232,7 +232,7 @@ void decode_aarch64(uint32_t buf) {
     if ((buf&BFM_M) == UBFM) {
         printf("ubfm "GREEN_COLOR"X%i, X%i, %i, %i",
             get_reg(buf, 0), get_reg(buf, 1),
-            buf>>10&0x3F, buf>>16&0x3F
+            buf>>16&0x3F, buf>>10&0x3F
         );
         return;
     }
