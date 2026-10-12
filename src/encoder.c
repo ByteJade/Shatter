@@ -368,15 +368,18 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case LEA: emit_address(compiler, x86_regs[buf->dst.reg], &buf->src, buf); break;
         case XADD: emit_math(compiler, buf, ADDS_R); break;
         case SUB:
-            if (buf->src.type == IMM) buf->src.imm = -buf->src.imm;
-            [[fallthrough]];
+            if (buf->dst.type == REG && buf->src.type == IMM) {
+                uint8_t dst = x86_regs[buf->dst.reg];
+                emit_add_signed(dst, dst, -buf->src.imm, SIGN|(ASF*(buf->size==64)));
+                break;
+            } else emit_math(compiler, buf, SUBS_R);
+            break;
         case ADD:
             if (buf->dst.type == REG && buf->src.type == IMM) {
                 uint8_t dst = x86_regs[buf->dst.reg];
                 emit_add_signed(dst, dst, buf->src.imm, SIGN|(ASF*(buf->size==64)));
-            } else {
-                emit_math(compiler, buf, math_group[buf->type - ADD]);
-            } break;
+            } else emit_math(compiler, buf, ADDS_R);
+            break;
         case OR: case ADC: case SBB:
         case AND: case XOR: case CMP: {
             uint32_t opcode = math_group[buf->type - ADD];
