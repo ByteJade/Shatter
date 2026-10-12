@@ -70,7 +70,7 @@ void emit_imm(int64_t imm, uint8_t dst) {
         cache_emit(ASF|MOVZ_I | (a << 5) | dst);
         if (b) cache_emit(ASF|MOVK_I | (1 << 21) | (b << 5) | dst);
         if (imm >= INT32_MIN && imm <= INT32_MAX) {
-            if (imm < 0) cache_emit(SXTW | (dst << 5) | dst);
+            if (imm < 0) cache_emit(SBFM | (31 << 10) | (dst << 5) | dst);
             return;
         }
         uint16_t c = (imm>>32) & 0xFFFF;
@@ -479,7 +479,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case RET: emit_ret(compiler); break;
         case JO ... JG: emit_patch(compiler, buf); break;
         case CLTQ: case CLTD:
-            cache_emit(SXTW | (x86_regs[RAX] << 5) | x86_regs[RAX]);
+            cache_emit(SBFM | (31 << 10) | (x86_regs[RAX] << 5) | x86_regs[RAX]);
             if (buf->type == CLTD) cache_emit(0x937ffc00 | (x86_regs[RAX] << 5) | x86_regs[RDX]); // asr x2, x8, #63
             break;
         default:

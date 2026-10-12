@@ -13,6 +13,8 @@
 #define ADRP_M 0x9F000000
 #define BR_M 0xFFFF0000
 #define AS_M 0x7FE0E000
+#define FS_M 0xFFFFFFF0
+#define BFM_M 0xFFC00000
 
 int32_t get_imm12(uint32_t buf);
 int32_t get_imm16(uint32_t buf);

@@ -9,7 +9,6 @@ extern const uint8_t x86_regs[];
 
 #define GET_FS 0xD53BD040
 #define ADRP 0x90000000
-#define UBFM 0xD3400000
 
 #define ASF 0x80000000
 
@@ -44,8 +43,8 @@ extern const uint8_t x86_regs[];
 #define ASR_R 0x1AC02800
 #define ROR_R 0x1AC02C00
 
-#define SXTW 0x93407C00
 #define SBFM 0x93400000
+#define UBFM 0xD3400000
 
 #define MSF 0x40000000
 
