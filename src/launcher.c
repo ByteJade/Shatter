@@ -1,19 +1,23 @@
 #include "../inc/launcher.h"
 
-void execute(void* start) {
-    #ifdef __aarch64__ 
+void* execute(void* start) {
+    void* ret = 0;
+    #ifdef __aarch64__
     asm volatile (
-        "blr %0\n"
-        : : "r" (start)
-        : "memory", "x24", "x25", "x26", "x27", "x28", "x29", "x30"
+        "blr %1\n"
+        : "=r"(ret)
+        : "r"(start)
+        : "memory", "x24", "x25", "x26", "x28"
     );
     #else
     asm volatile (
         "call *%0\n"
-        : : "r" (start)
+        : "=r"(ret)
+        : "r" (start)
         : "memory"
     );
     #endif
+    return ret;
 }
 void launch(void* start, stack_t* stack) {
     #ifdef __aarch64__ 

@@ -60,14 +60,17 @@ void reloc_rela(elf_t* elf, Elf64_Rela* rela, int relasz) {
         switch(type) {
             case R_X86_64_NONE: break;
             case R_X86_64_64:
-                *patch = (Elf64_Addr)(sym->st_value + rel->r_addend);
+                *patch = sym->st_value + rel->r_addend;
                 break;
             case R_X86_64_RELATIVE:
-                *patch = (Elf64_Addr)(elf->base + rel->r_addend);
+                *patch = elf->base + rel->r_addend;
+                break;
+            case R_X86_64_IRELATIVE:
+                *patch = (Elf64_Addr)execute((void*)(elf->base + rel->r_addend));
                 break;
             case R_X86_64_JUMP_SLOT:
             case R_X86_64_GLOB_DAT: {
-                void *sym_addr = my_dlsym(RTLD_DEFAULT, symname);
+                void* sym_addr = my_dlsym(RTLD_DEFAULT, symname);
                 if (sym_addr) {
                     *patch = (Elf64_Addr)sym_addr;
                 } else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK) {
@@ -78,7 +81,7 @@ void reloc_rela(elf_t* elf, Elf64_Rela* rela, int relasz) {
                 }
             } break;
             case R_X86_64_COPY: {
-                void *sym_addr = my_dlsym(RTLD_DEFAULT, symname);
+                void* sym_addr = my_dlsym(RTLD_DEFAULT, symname);
                 size_t size = sym->st_size;
                 if (sym_addr && size) {
                     memmove(patch, sym_addr, size);
