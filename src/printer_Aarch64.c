@@ -75,7 +75,7 @@ void print_r_r_r_r(uint32_t buf) {
 void print_r_r_i(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
-    printf(GREEN_COLOR" %c%i, %c%i, %i",
+    printf(GREEN_COLOR" %c%i, %c%i, %x",
         reg, get_reg(buf,0),
         reg, get_reg(buf,1),
         get_imm12(buf)
@@ -84,7 +84,7 @@ void print_r_r_i(uint32_t buf) {
 void print_r_i(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
-    printf(GREEN_COLOR" %c%i, %i",
+    printf(GREEN_COLOR" %c%i, %x",
         reg, get_reg(buf,0),
         get_imm16(buf)
     );
