@@ -37,6 +37,7 @@ WRAP_BIG_FUNC(__vsnprintf_chk)
 // file
 WRAP_FUNC(fflush)
 WRAP_FUNC(fflush_unlocked)
+WRAP_FUNC(fgetc)
 WRAP_FUNC(fputs)
 WRAP_FUNC(fputs_unlocked)
 WRAP_BIG_FUNC(fprintf)
@@ -54,6 +55,7 @@ WRAP_FUNC(open)
 WRAP_FUNC(close)
 WRAP_FUNC(mkdir)
 WRAP_FUNC(fileno)
+WRAP_VOID_FUNC(rewind)
 
 // string
 WRAP_FUNC(__strcpy_chk)

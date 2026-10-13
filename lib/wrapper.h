@@ -53,7 +53,7 @@
     }
 
 #define WRAP_VOID_FUNC(func) JUMP(func)
-#define WRAP_OBJ_FUNC(func)      JUMP(func)
+#define WRAP_OBJ_FUNC(func)  JUMP(func)
 #define WRAP_FUNC(func)      JUMP(func)
 #define WRAP_MED_FUNC(func)  JUMP(func)
 #define WRAP_BIG_FUNC(func)  JUMP(func)
