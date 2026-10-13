@@ -9,7 +9,7 @@ void my___libc_start_main(
     void (*rtld_fini) (void), void* stack_end)
 {
     // if (init) init();
-    int stat = main(argc, argv, __environ);
+    int stat = main(argc, argv, NULL);
     // if (fini) fini();
     //if (rtld_fini) rtld_fini();
     fflush(stdout);
