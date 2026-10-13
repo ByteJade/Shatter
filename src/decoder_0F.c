@@ -106,8 +106,24 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->type = IMUL;
             decode_r_rm(compiler, buf);
             break;
-        case 0xB6 ... 0xBF:
-            buf->type = MOVZX8 + (byte - 0xB6);
+        case 0xB6:
+            buf->size = 8;
+            buf->type = MOVZX;
+            decode_r_rm(compiler, buf);
+            break;
+        case 0xB7:
+            buf->size = 16;
+            buf->type = MOVZX;
+            decode_r_rm(compiler, buf);
+            break;
+        case 0xBE:
+            buf->size = 8;
+            buf->type = MOVSX;
+            decode_r_rm(compiler, buf);
+            break;
+        case 0xBF:
+            buf->size = 16;
+            buf->type = MOVSX;
             decode_r_rm(compiler, buf);
             break;
         case 0xC1:

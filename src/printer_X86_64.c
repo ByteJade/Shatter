@@ -19,7 +19,7 @@ const char* instr_types[] = {
     "js", "jns", "jp", "jpo",
     "jl", "jge", "jle", "jg",
 
-    "mov", "lea", "ret", "movsx",
+    "mov", "lea", "ret", "xchg", 
 
     "leave", "nop", "cltq", "cltd",
 
@@ -36,8 +36,7 @@ const char* instr_types[] = {
     "ucomiss", "ucomisd",
     "comiss", "comisd",
     
-    "movzx8", "movzx16", "movsx8", "movsx16",
-
+    "movzx",  "movsx",
     "cmovo", "cmovno", "cmovb", "cmovae",
     "cmove", "cmovne", "cmovbe", "cmova",
     "cmovs", "cmovns", "cmovp", "cmovpo",
@@ -48,7 +47,7 @@ const char* instr_types[] = {
     "sets", "setns", "setp", "setpo",
     "setl", "setge", "setle", "setg",
 
-    "xadd", "xchg", 
+    "xadd",
 };
 const char* regs64[] = {
     "rax", "rcx", "rdx", "rbx",

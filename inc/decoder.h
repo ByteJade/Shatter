@@ -28,7 +28,7 @@ enum Types {
     JS, JNS, JP, JPO,
     JL, JGE, JLE, JG,
 
-    MOV, LEA, RET, MOVSX,
+    MOV, LEA, RET, XCHG,
 
     LEAVE, NOP, CLTQ, CLTD,
 
@@ -46,7 +46,7 @@ enum Types {
     UCOMISS, UCOMISD,
     COMISS, COMISD,
 
-    MOVZX8, MOVZX16, MOVSX8, MOVSX16,
+    MOVZX, MOVSX,
     
     CMOVO, CMOVNO, CMOVB, CMOVAE,
     CMOVE, CMOVNE, CMOVBE, CMOVA,
@@ -58,7 +58,7 @@ enum Types {
     SETS, SETNS, SETP, SETPO,
     SETL, SETGE, SETLE, SETG,
 
-    XADD, XCHG, 
+    XADD,
 };
 
 enum prefixes {

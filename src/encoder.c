@@ -354,10 +354,8 @@ void emit_call(uint32_t* dst, uint32_t* target) {
 }
 void encode(compiler_t* compiler, X86_64* buf) {
     switch (buf->type) {
-        case MOVZX8: buf->size = 8; emit_mov(compiler, buf, 0); break;
-        case MOVZX16: buf->size = 16; emit_mov(compiler, buf, 0); break;
-        case MOVSX8: buf->size = 8; emit_mov(compiler, buf, 1); break;
-        case MOVSX16: buf->size = 16; emit_mov(compiler, buf, 1); break;
+        case MOVZX: emit_mov(compiler, buf, 0); break;
+        case MOVSX: emit_mov(compiler, buf, 1); break;
         case MOV: emit_mov(compiler, buf, 0); break;
         case PUSH: emit_push(compiler, buf); break;
         case POP: emit_pop(compiler, buf); break;
@@ -411,9 +409,6 @@ void encode(compiler_t* compiler, X86_64* buf) {
                 cache_emit(prefix|SCVTF_N | (buf->dst.reg) | (x86_regs[buf->src.reg]<<5));
             }
         } break;
-        case MOVSX:
-            cache_emit(0x93407c00 | (x86_regs[buf->src.reg]<<5) | (x86_regs[buf->dst.reg]));
-            break;
         case MOVQ:
             if (buf->src.type&XMM) cache_emit(FMOV_N | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
             else cache_emit(FMOVR_N | (buf->dst.reg) | (x86_regs[buf->src.reg] << 5));
