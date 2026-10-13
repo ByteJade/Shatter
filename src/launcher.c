@@ -7,7 +7,7 @@ void* execute(void* start) {
         "blr %1\n"
         : "=r"(ret)
         : "r"(start)
-        : "memory", "x24", "x25", "x26", "x28"
+        : "memory", "x24", "x25", "x26", "x28", "x30"
     );
     #else
     asm volatile (
