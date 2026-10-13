@@ -236,7 +236,7 @@ void decode_aarch64(uint32_t buf) {
     if ((buf&BFM_M) == SBFM) {
         printf("sbfm "GREEN_COLOR"X%i, X%i, %i, %i",
             get_reg(buf, 0), get_reg(buf, 1),
-            buf>>10&0x3F, buf>>16&0x3F
+            buf>>16&0x3F, buf>>10&0x3F
         );
         return;
     }
