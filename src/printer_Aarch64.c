@@ -244,7 +244,7 @@ void decode_aarch64(uint32_t buf) {
         );
         return;
     }
-    if ((buf&MOV_M) == SMUL_R) {
+    if ((buf&MUL_M) == SMUL_R) {
         printf("smaddl");
         print_r_r_r_r(buf);
         return;
