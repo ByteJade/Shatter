@@ -25,7 +25,7 @@ const char* instr_types[] = {
 
     "syscall", "ebr", "hlt",
     "movss", "movsd",
-    "movapd", "movq",
+    "movapd", "movd",
     "cvtsi2ss", "cvtsi2sd",
     "cvtss2si", "cvtsd2si",
 
@@ -36,7 +36,7 @@ const char* instr_types[] = {
     "ucomiss", "ucomisd",
     "comiss", "comisd",
     
-    "movzx",  "movsx",
+    "movzx",  "movsx", "movq",
     "cmovo", "cmovno", "cmovb", "cmovae",
     "cmove", "cmovne", "cmovbe", "cmova",
     "cmovs", "cmovns", "cmovp", "cmovpo",

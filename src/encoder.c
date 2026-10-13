@@ -410,17 +410,20 @@ void encode(compiler_t* compiler, X86_64* buf) {
                 cache_emit(prefix|SCVTF_N | (buf->dst.reg) | (x86_regs[buf->src.reg]<<5));
             }
         } break;
-        case MOVQ:
+        case MOVD:
             if (buf->src.type&XMM) cache_emit(FMOV_N | (x86_regs[buf->dst.reg]) | (buf->src.reg << 5));
             else cache_emit(FMOVR_N | (buf->dst.reg) | (x86_regs[buf->src.reg] << 5));
             break;
         case MOVSD: 
+        case MOVQ:
             buf->size = 64;
             [[fallthrough]];
         case MOVSS:{
             if (buf->dst.type & MEM)
                 emit_mem(compiler, STN_GRP|buf->src.reg, &buf->dst, buf, 0);
-            else emit_mem(compiler, LDN_GRP|buf->dst.reg, &buf->src, buf, 0);
+            else if (buf->src.type & MEM)
+                emit_mem(compiler, LDN_GRP|buf->dst.reg, &buf->src, buf, 0);
+            else cache_emit(MOV_N | (buf->dst.reg) | (buf->src.reg << 5) | (buf->src.reg << 16));
         } break;
         case MOVAPD: {
             buf->size = 64;

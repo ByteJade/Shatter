@@ -82,16 +82,24 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             decode_r_rm_XMM(compiler, buf,1);
             break;
         case 0x6E:
-            buf->type = MOVQ;
+            buf->type = MOVD;
             decode_r_rm_XMM(compiler, buf,0);
             break;
         case 0x7E: {
-            buf->type = MOVQ;
+            buf->type = MOVD;
             uint8_t modrm = fetch8(compiler);
             decode_rm(compiler, &buf->dst, modrm);
             buf->src.type = REG|XMM;
             buf->src.reg = (modrm>>3)&7;
         } break;
+        case 0x6F:
+            buf->type = MOVQ;
+            decode_r_rm_XMM(compiler, buf,1);
+            break;
+        case 0x7F:
+            buf->type = MOVQ;
+            decode_rm_r_XMM(compiler, buf,1);
+            break;
         case 0x80 ... 0x8F:
             buf->type = JO + (byte&0xF);
             buf->dst.type = IMM;
