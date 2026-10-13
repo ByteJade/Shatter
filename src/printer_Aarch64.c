@@ -144,6 +144,7 @@ void decode_aarch64(uint32_t buf) {
     if ((buf&AR_M) == ADD_R) {
         printf("%s", math[(buf>>29)&3]);
         print_r_r_r(buf);
+        if ((buf>>10)&3) printf(", lsl %i", (buf>>10)&3);
         return;
     }
     if ((buf&AI_M) == ADD_I) {
