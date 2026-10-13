@@ -6,7 +6,6 @@
 #include "../inc/encoder.h"
 #include <stdint.h>
 #include <signal.h>
-#include <unistd.h>
 #include <string.h>
 
 uint32_t* compile(size_t pc) {
@@ -94,16 +93,12 @@ void sc_set_pc(struct sigcontext* sc, size_t pc) {
     sc->pc = pc;
     #endif
 }
-int sc_get_flag(struct sigcontext* sc, const char* flag) {
+int sc_get_flags(struct sigcontext* sc) {
     #ifdef __aarch64__
-    switch (*flag) {
-        case 'N': return (sc->pstate >> 31) & 1;
-        case 'Z': return (sc->pstate >> 30) & 1;
-        case 'C': return (sc->pstate >> 29) & 1;
-        case 'V': return (sc->pstate >> 28) & 1;
-    }
-    #endif
+    return sc->pstate;
+    #else
     return 0;
+    #endif
 }
 size_t sc_get_reg_host(struct sigcontext* sc, const char* reg) {
     #ifdef __aarch64__
@@ -118,11 +113,12 @@ size_t sc_get_reg_host(struct sigcontext* sc, const char* reg) {
     return 0;
 }
 void sc_print_flags(struct sigcontext* sc) {
+    int pstate = sc_get_flags(sc);
     printf("Flags: N%i Z%i C%i V%i\n",
-        sc_get_flag(sc, "N"),
-        sc_get_flag(sc, "Z"),
-        sc_get_flag(sc, "C"),
-        sc_get_flag(sc, "V")
+        NF(pstate),
+        ZF(pstate),
+        CF(pstate),
+        VF(pstate)
     );
 }
 void sc_print_regs_host(struct sigcontext* sc) {

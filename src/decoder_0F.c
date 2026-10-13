@@ -1,7 +1,6 @@
 #include "../inc/decoder.h"
 #include "../inc/compiler.h"
 #include "../inc/logger.h"
-#include <unistd.h>
 
 void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
     switch (byte) {
@@ -107,20 +106,8 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->type = IMUL;
             decode_r_rm(compiler, buf);
             break;
-        case 0xB6:
-            buf->type = MOVZX8;
-            decode_r_rm(compiler, buf);
-            break;
-        case 0xB7:
-            buf->type = MOVZX16;
-            decode_r_rm(compiler, buf);
-            break;
-        case 0xBE:
-            buf->type = MOVSX8;
-            decode_r_rm(compiler, buf);
-            break;
-        case 0xBF:
-            buf->type = MOVSX16;
+        case 0xB6 ... 0xBF:
+            buf->type = MOVZX8 + (byte - 0xB6);
             decode_r_rm(compiler, buf);
             break;
         case 0xC1:

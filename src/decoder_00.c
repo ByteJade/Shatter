@@ -1,7 +1,6 @@
 #include "../inc/decoder.h"
 #include "../inc/compiler.h"
 #include "../inc/logger.h"
-#include <unistd.h>
 
 void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
     switch (byte) {

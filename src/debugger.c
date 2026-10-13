@@ -6,7 +6,6 @@
 #include "../inc/cache.h"
 #include "../inc/printer_Aarch64.h"
 #include <pthread.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -56,53 +55,54 @@ void emulate_jump(struct sigcontext* sc) {
     print_aarch64(instr);
     if (instr == (RET_R | (30<<5))) return;
     int imm = 1;
+    int pstate = sc_get_flags(sc);
     switch (instr&BCC_M) {
     case BEQ:
-        if (sc_get_flag(sc, "Z"))
+        if (ZF(pstate))
             imm = get_imm19(instr);
         break;
     case BNE:
-        if (!sc_get_flag(sc, "Z"))
+        if (!ZF(pstate))
             imm = get_imm19(instr);
         break;
     case BCS:
-        if (sc_get_flag(sc, "C"))
+        if (CF(pstate))
             imm = get_imm19(instr);
         break;
     case BLO:
-        if (!sc_get_flag(sc, "C"))
+        if (!CF(pstate))
             imm = get_imm19(instr);
         break;
     case BMI:
-        if (sc_get_flag(sc, "N"))
+        if (NF(pstate))
             imm = get_imm19(instr);
         break;
     case BPL:
-        if (!sc_get_flag(sc, "N"))
+        if (!NF(pstate))
             imm = get_imm19(instr);
         break;
     case BHI:
-        if (sc_get_flag(sc, "C") && !sc_get_flag(sc, "Z"))
+        if (CF(pstate) && !ZF(pstate))
             imm = get_imm19(instr);
         break;
     case BLS:
-        if (!sc_get_flag(sc, "C") || sc_get_flag(sc, "Z"))
+        if (!CF(pstate) || ZF(pstate))
             imm = get_imm19(instr);
         break;
     case BGE:
-        if (sc_get_flag(sc, "N") == sc_get_flag(sc, "V"))
+        if (NF(pstate) == VF(pstate))
             imm = get_imm19(instr);
         break;
     case BLT:
-        if (sc_get_flag(sc, "N") != sc_get_flag(sc, "V"))
+        if (NF(pstate) != VF(pstate))
             imm = get_imm19(instr);
         break;
     case BGT:
-        if (!sc_get_flag(sc, "Z") && sc_get_flag(sc, "N") == sc_get_flag(sc, "V"))
+        if (!ZF(pstate) && NF(pstate) == VF(pstate))
             imm = get_imm19(instr);
         break;
     case BLE:
-        if (sc_get_flag(sc, "Z") || sc_get_flag(sc, "N") != sc_get_flag(sc, "V"))
+        if (ZF(pstate) || NF(pstate) != VF(pstate))
             imm = get_imm19(instr);
         break;
     }
@@ -111,7 +111,6 @@ void emulate_jump(struct sigcontext* sc) {
     debugger_brk(pc + imm);
 }
 void print_memory(struct sigcontext* sc, char argv[3][64], int argc) {
-    if (argc < 2) return;
     size_t reg = sc_get_reg_host(sc, argv[1]+1);
     if (!reg) {
         logger_err("%s = (NULL)", argv[1]);
@@ -181,6 +180,7 @@ void debugger_step(struct sigcontext* sc) {
                 break;
             case 'b': case 'h':
             case 'w': case 'd':
+                if (argc < 2) break;
                 print_memory(sc, argv, argc);
                 break;
             case 'l':
