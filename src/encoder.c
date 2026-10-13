@@ -335,6 +335,7 @@ void emit_ret(struct compiler_t* compiler) {
         cache_emit(ASF|LDP_POST | (16<<12) | 29 | (TSP<<5) | (30<<10));
     } else cache_emit(MSF|LDR_POST | (8<<12) | 30 | (TSP<<5));
     cache_emit(ASF|ADD_I | 31 | (TSP<<5));
+    cache_emit(ASF|ADD_I | 0 | (8<<5));
     cache_emit(RET_R | (30 << 5));
 }
 void emit_jump(uint32_t* dst, uint32_t* target) {
