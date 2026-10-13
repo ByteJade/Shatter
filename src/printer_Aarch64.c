@@ -162,8 +162,9 @@ void decode_aarch64(uint32_t buf) {
         return;
     }
     if ((buf&MOV_M) == MOVK_I) {
-        printf("movk (%i),", (buf >> 21)&3);
+        printf("movk");
         print_r_i(buf);
+        printf(", lsl %i", ((buf >> 21)&3) * 8);
         return;
     }
     if ((buf&B_M) == B) {
