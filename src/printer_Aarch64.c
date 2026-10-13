@@ -62,6 +62,14 @@ void print_r_r_r(uint32_t buf) {
         reg, get_reg(buf,2)
     );
 }
+void print_r_r_r_r(uint32_t buf) {
+    printf(GREEN_COLOR" X%i, W%i, W%i, W%i",
+        get_reg(buf,0),
+        get_reg(buf,1),
+        get_reg(buf,2),
+        get_reg(buf,3)
+    );
+}
 void print_r_r_i(uint32_t buf) {
     char reg = 'W';
     if (buf&ASF) reg = 'X';
@@ -234,6 +242,11 @@ void decode_aarch64(uint32_t buf) {
             get_reg(buf, 0), get_reg(buf, 1),
             buf>>16&0x3F, buf>>10&0x3F
         );
+        return;
+    }
+    if ((buf&MOV_M) == SMUL_R) {
+        printf("smaddl");
+        print_r_r_r_r(buf);
         return;
     }
     printf("unk");

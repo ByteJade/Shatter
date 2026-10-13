@@ -457,11 +457,11 @@ void encode(compiler_t* compiler, X86_64* buf) {
                 emit_mem(compiler, LD_GRP|SC2R, &buf->src, buf, 0);
             } else src = x86_regs[buf->src.reg];
             if (buf->dst.type == REG) {
-                cache_emit(SMUL_R | (src<<16) | (dst<<5) | (dst));
+                cache_emit(SMUL_R | (src<<16) | (XZR << 10)  | (dst<<5) | dst);
                 cache_emit(0x9360FC00 | 2 | (8 << 5));
             } else {
                 emit_imm(buf->dst.imm, SC1R);
-                cache_emit(SMUL_R | (SC1R<<16) | (src<<5) | dst);
+                cache_emit(SMUL_R | (SC1R<<16) | (XZR << 10) | (src<<5) | dst);
             }
         } break;
         case TEST: emit_math(compiler, buf, ANDS_R); break;
