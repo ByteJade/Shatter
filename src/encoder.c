@@ -110,10 +110,9 @@ void emit_address(compiler_t* compiler, uint8_t dst, operand_t* op, X86_64* buf)
         } else full = emit_rip(compiler, op, dst);
         if (full) emit_add_signed(dst, dst, full, ASF);
     } else if (op->type&IDX) {
-        cache_emit(ASF|ADD_R | (dst) | (dst<<5) | (op->scale<<10) | (x86_regs[op->idx]<< 16));
         if (t&REG) {
-            cache_emit(ASF|ADD_R | (dst) | (dst<<5) | (x86_regs[op->reg]<<16));
-        }
+            cache_emit(ASF|ADD_R | (dst) | (x86_regs[op->reg]<<5) | (op->scale<<10) | (x86_regs[op->idx]<<16));
+        } else cache_emit(ASF|ADD_R | (dst) | (XZR<<5) | (op->scale<<10) | (x86_regs[op->idx]<< 16));
         if ((t&IMM) && op->imm != 0) {
             emit_add_signed(dst, dst, op->imm, ASF);
         }
