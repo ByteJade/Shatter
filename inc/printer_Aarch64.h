@@ -5,7 +5,7 @@
 
 #define B_M 0xFC000000
 #define BC_M 0xFC000010
-#define AR_M 0x0FE0FC00
+#define AR_M 0x0FE00C00
 #define AI_M 0x1FC00000
 #define MOV_M 0x7FC00000
 #define MEM_M 0x0EC00000
