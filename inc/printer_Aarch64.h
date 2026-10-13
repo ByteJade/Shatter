@@ -16,6 +16,8 @@
 #define FS_M 0xFFFFFFF0
 #define BFM_M 0xFFC00000
 #define MUL_M 0xFFF00000
+#define MSUB_M 0xFFC08000
+#define SDIV_M 0xFFC00C00
 
 int32_t get_imm12(uint32_t buf);
 int32_t get_imm16(uint32_t buf);
