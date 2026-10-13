@@ -4,6 +4,6 @@
 #include "stack.h"
 
 void* execute(void* start);
-void launch(void* start, stack_t* stack);
+void launch(void* start, Stack* stack);
 
 #endif

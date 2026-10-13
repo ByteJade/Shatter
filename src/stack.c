@@ -3,19 +3,19 @@
 #include <string.h>
 #include <sys/mman.h>
 
-void push_str(stack_t* stack, const char* str) {
+void push_str(Stack* stack, const char* str) {
     push_arg(stack, (size_t)stack->down);
     size_t len = strlen(str) + 1;
     memcpy(stack->down, str, len);
     stack->down += len;
 }
-void push_arg(stack_t* stack, size_t arg) {
+void push_arg(Stack* stack, size_t arg) {
     stack->top--;
     *stack->top = arg;
 }
 
-stack_t* stack_init(void) {
-    stack_t* stack = (stack_t*)malloc(sizeof(stack_t));
+Stack* stack_init(void) {
+    Stack* stack = (Stack*)malloc(sizeof(Stack));
     stack->base = mmap(
         NULL, STACK_SIZE,
         PROT_READ | PROT_WRITE,
@@ -26,7 +26,7 @@ stack_t* stack_init(void) {
     stack->top = (size_t*)(stack->down + STACK_SIZE);
     return stack;
 }
-void stack_setup(stack_t* stack, int argc, char** argv, char** envp) {
+void stack_setup(Stack* stack, int argc, char** argv, char** envp) {
     int envpc = 0;
     while (envp[envpc]) {envpc++;}
     if ((envpc + argc)%2 == 0) push_arg(stack, 0);
@@ -41,7 +41,7 @@ void stack_setup(stack_t* stack, int argc, char** argv, char** envp) {
         logger_err("Stack unalligned!");
     else logger_deb("Stack setup finish");
 }
-void stack_fini(stack_t* stack) {
+void stack_fini(Stack* stack) {
     if (stack) {
         munmap(stack->base, STACK_SIZE);
         free(stack);

@@ -9,13 +9,13 @@ typedef struct {
     void* base;
     size_t* top;
     char* down;
-} stack_t;
+} Stack;
 
-void push_str(stack_t* stack, const char* str);
-void push_arg(stack_t* stack, size_t arg);
+void push_str(Stack* stack, const char* str);
+void push_arg(Stack* stack, size_t arg);
 
-stack_t* stack_init(void);
-void stack_setup(stack_t* stack, int argc, char** argv, char** envp);
-void stack_fini(stack_t* stack);
+Stack* stack_init(void);
+void stack_setup(Stack* stack, int argc, char** argv, char** envp);
+void stack_fini(Stack* stack);
 
 #endif

@@ -19,7 +19,7 @@ void* execute(void* start) {
     #endif
     return ret;
 }
-void launch(void* start, stack_t* stack) {
+void launch(void* start, Stack* stack) {
     #ifdef __aarch64__ 
     asm volatile (
         "mov sp, %0\n"
