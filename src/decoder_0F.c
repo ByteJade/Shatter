@@ -88,7 +88,7 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
         case 0x7E: {
             buf->type = MOVD;
             uint8_t modrm = fetch8(compiler);
-            decode_rm(compiler, &buf->dst, modrm);
+            decode_rm(compiler, &buf->dst, modrm, buf->rex);
             buf->src.type = REG|XMM;
             buf->src.reg = (modrm>>3)&7;
         } break;
@@ -108,7 +108,7 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
         case 0x90 ... 0x9F:
             buf->size = 8;
             buf->type = SETO + (byte&0xF);
-            decode_rm(compiler, &buf->dst, fetch8(compiler));
+            decode_rm(compiler, &buf->dst, fetch8(compiler), buf->rex);
             break;
         case 0xAF:
             buf->type = IMUL;

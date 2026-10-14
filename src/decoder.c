@@ -1,5 +1,6 @@
 #include "../inc/decoder.h"
 #include "../inc/compiler.h"
+#include <stdint.h>
 
 uint8_t fetch8(compiler_t* compiler) {
     return *(uint8_t*)compiler->guest++;
@@ -40,7 +41,7 @@ void fetch_imm(compiler_t* compiler, X86_64* buf) {
     } else buf->src.imm = fetch32_imm(compiler);
 }
 
-void decode_rm(compiler_t* compiler, operand_t* op, uint8_t modrm) {
+void decode_rm(compiler_t* compiler, operand_t* op, uint8_t modrm, uint8_t rex) {
     uint8_t mod = modrm >> 6;
     uint8_t rm = modrm & 7;
     if (mod == 3) {
@@ -54,7 +55,7 @@ void decode_rm(compiler_t* compiler, operand_t* op, uint8_t modrm) {
         op->reg = sib&7;
         op->idx = (sib>>3)&7;
         op->scale = sib>>6;
-        if (op->idx != 4) op->type |= IDX;
+        if (op->idx != 4 || rex&2) op->type |= IDX;
         if (op->reg == 5 && mod == 0) {
             op->type |= IMM;
             op->imm = fetch32_imm(compiler);
@@ -77,15 +78,16 @@ void decode_rm_r(compiler_t* compiler, X86_64* buf) {
     buf->reverse = 1;
     buf->src.type = REG;
     buf->src.reg = (modrm >> 3) & 7;
-    decode_rm(compiler, &buf->dst, modrm);
+    decode_rm(compiler, &buf->dst, modrm, buf->rex);
 }
 void decode_r_rm(compiler_t* compiler, X86_64* buf) {
     uint8_t modrm = fetch8(compiler);
     buf->dst.type = REG;
     buf->dst.reg = (modrm >> 3) & 7;
-    decode_rm(compiler, &buf->src, modrm);
+    decode_rm(compiler, &buf->src, modrm, buf->rex);
 }
-void decode_rex(X86_64* buf, uint8_t rex) {
+void decode_rex(X86_64* buf) {
+    uint8_t rex = buf->rex;
     if (buf->reverse) {
         if (rex&4) buf->src.reg += 8;
         if (rex&2) buf->dst.idx += 8;
@@ -117,7 +119,7 @@ void decode_rm_r_XMM(compiler_t* compiler, X86_64* buf, int xmm) {
     buf->src.type = REG;
     if (xmm) buf->src.type |= XMM;
     buf->src.reg = (modrm >> 3) & 7;
-    decode_rm(compiler, &buf->dst, modrm);
+    decode_rm(compiler, &buf->dst, modrm, buf->rex);
     if (buf->dst.type == REG) buf->dst.type |= XMM;
     if (buf->prefix == REPN) buf->type++;
 }
@@ -125,7 +127,7 @@ void decode_r_rm_XMM(compiler_t* compiler, X86_64* buf, int xmm) {
     uint8_t modrm = fetch8(compiler);
     buf->dst.type = REG|XMM;
     buf->dst.reg = (modrm >> 3) & 7;
-    decode_rm(compiler, &buf->src, modrm);
+    decode_rm(compiler, &buf->src, modrm, buf->rex);
     if (xmm && (buf->src.type == REG)) buf->src.type |= XMM;
     if (buf->prefix == REPN) buf->type++;
 }
@@ -135,7 +137,6 @@ void decode(compiler_t* compiler, X86_64* buf) {
     buf->reverse = 0;
     buf->dst.type = NONE;
     buf->src.type = NONE;
-    uint8_t rex = 0;
     uint8_t byte = fetch8(compiler);
     if ((byte >= FS && byte <= OS) ||
     (byte >= LOCK && byte <= REPE)) {
@@ -143,12 +144,12 @@ void decode(compiler_t* compiler, X86_64* buf) {
         byte = fetch8(compiler);
     }
     if ((byte&0xF0) == 0x40) {
-        rex = byte & 0xF;
+        buf->rex = byte & 0xF;
         byte = fetch8(compiler);
-    }
-    if (rex&8) buf->size = 64;
+    } else buf->rex = 0;
+    if (buf->rex&8) buf->size = 64;
     else buf->size = 32;
     if (byte != 0x0F) decode_00(compiler, buf, byte);
     else decode_0F(compiler, buf, fetch8(compiler));
-    if (rex) decode_rex(buf, rex);
+    if (buf->rex) decode_rex(buf);
 }

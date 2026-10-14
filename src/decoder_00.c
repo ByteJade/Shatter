@@ -55,7 +55,7 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             uint8_t modrm = fetch8(compiler);
             buf->reverse = 1;
             buf->type = ADD + ((modrm >> 3) & 7);
-            decode_rm(compiler, &buf->dst, modrm);
+            decode_rm(compiler, &buf->dst, modrm, buf->rex);
             buf->src.type = IMM;
             if (byte != 0x81) {
                 buf->src.imm = fetch8_imm(compiler);
@@ -87,7 +87,7 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->size = 64;
             buf->reverse = 1;
             buf->type = POP;
-            decode_rm(compiler, &buf->dst, fetch8(compiler));
+            decode_rm(compiler, &buf->dst, fetch8(compiler), buf->rex);
             break;
         case 0x90: 
             buf->type = NOP;
@@ -118,7 +118,7 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             uint8_t modrm = fetch8(compiler);
             buf->reverse = 1;
             buf->type = ROL + ((modrm >> 3) & 7);
-            decode_rm(compiler, &buf->dst, modrm);
+            decode_rm(compiler, &buf->dst, modrm, buf->rex);
             if (byte < 0xD2) {
                 buf->src.type = IMM;
                 if (byte > 0xC1) buf->src.imm = 1;
@@ -135,14 +135,14 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->size = 8;
             buf->reverse = 1;
             buf->type = MOV;
-            decode_rm(compiler, &buf->dst, fetch8(compiler));
+            decode_rm(compiler, &buf->dst, fetch8(compiler), buf->rex);
             buf->src.type = IMM;
             buf->src.imm = fetch8_imm(compiler);
             break;
         case 0xC7:
             buf->reverse = 1;
             buf->type = MOV;
-            decode_rm(compiler, &buf->dst, fetch8(compiler));
+            decode_rm(compiler, &buf->dst, fetch8(compiler), buf->rex);
             buf->src.type = IMM;
             fetch_imm(compiler, buf);
             break;
@@ -173,7 +173,7 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->type = TEST + code;
             buf->dst.type = REG;
             buf->dst.reg = RAX;
-            decode_rm(compiler, &buf->src, modrm);
+            decode_rm(compiler, &buf->src, modrm, buf->rex);
         } break;
         case 0xFE:
             buf->size = 8;
@@ -183,7 +183,7 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             if (byte != 0xFE) buf->size = 64;
             uint8_t modrm = fetch8(compiler);
             uint8_t code = (modrm >> 3) & 7;
-            decode_rm(compiler, &buf->dst, modrm);
+            decode_rm(compiler, &buf->dst, modrm, buf->rex);
             buf->type = INC + code;
         } break;
         default: error:

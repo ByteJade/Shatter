@@ -90,6 +90,8 @@ typedef struct {
     uint8_t size;
     uint8_t prefix;
     uint8_t reverse;
+    uint8_t rex;
+    uint8_t flags;
 
     operand_t dst;
     operand_t src;
@@ -108,10 +110,10 @@ int64_t fetch32_imm(struct compiler_t* compiler);
 
 void fetch_imm(struct compiler_t* compiler, X86_64* buf);
 
-void decode_rm(struct compiler_t* compiler, operand_t* op, uint8_t modrm);
+void decode_rm(struct compiler_t* compiler, operand_t* op, uint8_t modrm, uint8_t rex);
 void decode_rm_r(struct compiler_t* compiler, X86_64* buf);
 void decode_r_rm(struct compiler_t* compiler, X86_64* buf);
-void decode_rex(X86_64* buf, uint8_t rex);
+void decode_rex(X86_64* buf);
 
 void decode_GRP0(struct compiler_t* compiler, X86_64* buf, uint8_t byte);
 void decode_rm_r_XMM(struct compiler_t* compiler, X86_64* buf, int xmm);
