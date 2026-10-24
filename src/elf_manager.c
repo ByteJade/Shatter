@@ -21,9 +21,11 @@ typedef struct {
 
 static const char* error = NULL;
 static library_t* libraries;
+const char* main_filename = NULL;
 
-void elf_manager_init(void) {
+void elf_manager_init(char* filename) {
     libraries = (library_t*)dynarray_init(sizeof(library_t), 8);
+    main_filename = filename;
 }
 void elf_manager_fini(void) {
     for (size_t i = 0; i < dynarray_size(libraries); i++) {
@@ -130,17 +132,26 @@ void* dlopen_native(const char* filename, int flags) {
     return lib;
 }
 void* my_dlopen(const char* filename, int flags) {
+    const char *name = strrchr(filename, '/');
+    if (!name) name = filename;
+    else name++;
     for (size_t i = 0; i < dynarray_size(libraries); i++) {
         library_t* lib = libraries + i;
-        if (strcmp(lib->name, filename) == 0) {
+        if (strcmp(lib->name, name) == 0) {
             lib->refs++;
             return lib;
         }
     }
-    void* lib = dlopen_wrapper(filename);
+    void* lib = dlopen_wrapper(name);
     if (!lib) lib = dlopen_native(filename, flags);
     if (!lib) error = "No such file or directory";
     return lib;
+}
+char* my_realpath(const char *name, char *resolved) {
+    if (name && strcmp(name, "/proc/self/exe") == 0) {
+        name = main_filename;
+    }
+    return realpath(name, resolved);
 }
 void* dlsym_override(const char* symname) {
     if (strcmp(symname, "dlopen") == 0)
@@ -151,6 +162,8 @@ void* dlsym_override(const char* symname) {
         return (void*)my_dlerror;
     else if (strcmp(symname, "dlclose") == 0)
         return (void*)my_dlclose;
+    else if (strcmp(symname, "realpath") == 0)
+        return (void*)my_realpath;
     return NULL;
 }
 void* dlsym_wrapped(const char* symname) {
@@ -167,6 +180,10 @@ void* dlsym_wrapped(const char* symname) {
 }
 void* my_dlsym(void* handle, const char* symname) {
     // TODO: RTLD_*
+    if (handle) {
+        library_t* lib = (library_t*)handle;
+        return dlsym(lib->data, symname);
+    }
     (void)handle;
     void* sym = dlsym_wrapped(symname);
     if (!sym) sym = dlsym_override(symname);

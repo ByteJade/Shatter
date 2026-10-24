@@ -3,7 +3,7 @@
 
 #include <dlfcn.h>
 
-void elf_manager_init(void);
+void elf_manager_init(char* filename);
 void elf_manager_fini(void);
 
 void override_got(const char* symname, void* patch);

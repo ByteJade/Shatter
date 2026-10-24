@@ -11,7 +11,7 @@ void* execute(void* start) {
     );
     #else
     asm volatile (
-        "call *%0\n"
+        "call *%1\n"
         : "=r"(ret)
         : "r" (start)
         : "memory"
