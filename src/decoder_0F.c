@@ -96,6 +96,7 @@ void decode_0F(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->type = MOVQ;
             decode_r_rm_XMM(compiler, buf,1);
             break;
+        case 0xD6:
         case 0x7F:
             buf->type = MOVQ;
             decode_rm_r_XMM(compiler, buf,1);
