@@ -21,7 +21,7 @@ extern "C" {
     WRAP_VOID_FUNC(_ZNSt10filesystem7__cxx1118directory_iteratorC1ERKNS0_4pathENS_17directory_optionsEPSt10error_code)
     WRAP_FUNC(_ZNKSt10filesystem7__cxx114path7compareERKS1_)
     WRAP_VOID_FUNC(_ZNSt10filesystem7__cxx114path14_M_split_cmptsEv)
-    WRAP_FUNC(_ZNKSt10filesystem7__cxx114path17_M_find_extensionEv)
+    WRAP_PAIR_FUNC(_ZNKSt10filesystem7__cxx114path17_M_find_extensionEv)
     WRAP_FUNC(_ZNSt10filesystem7__cxx1118directory_iteratorppEv)
     WRAP_VOID_FUNC(_ZNSt10filesystem7__cxx114path5_ListC1Ev)
     WRAP_VOID_FUNC(_ZNKSt10filesystem7__cxx114path5_List13_Impl_deleterclEPNS2_5_ImplE)
