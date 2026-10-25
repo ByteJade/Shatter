@@ -426,10 +426,11 @@ void encode(compiler_t* compiler, X86_64* buf) {
             else cache_emit(MOV_N | (buf->dst.reg) | (buf->src.reg << 5) | (buf->src.reg << 16));
         } break;
         case MOVAPD: {
-            buf->size = 64;
+            buf->size = 128;
             uint8_t src = buf->src.reg;
+            if (buf->src.type & MEM) logger_err("TODO: movapd r, m");
             if (buf->dst.type & MEM) {
-                emit_mem(compiler, STN_GRP|src, &buf->dst, buf, 0);
+                emit_mem(compiler, ST1_N|src, &buf->dst, buf, 0);
             }else {
                 cache_emit(MOV_N | (buf->dst.reg) | (src << 5) | (src << 16));
             }

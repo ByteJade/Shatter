@@ -146,6 +146,7 @@ extern const uint8_t x86_regs[];
 #define FCVTNS 0x1E200000
 #define FCVTZS 0x1E780000
 #define SCVTF_N 0x1E220000
+#define ST1_N 0x4C007000
 
 struct compiler_t;
 
