@@ -192,7 +192,10 @@ void* my_dlsym(void* handle, const char* symname) {
         if (sym) logger_warn("Using native symbol: %s", symname);
     }
     error = NULL;
-    if (!sym) error = "Undefined symbol";
+    if (!sym) {
+        error = "Undefined symbol";
+        logger_err("%s: %s", error, symname);
+    }
     return sym;
 }
 const char* my_dlerror(void) {
