@@ -430,7 +430,9 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint8_t src = buf->src.reg;
             if (buf->src.type & MEM) logger_err("TODO: movapd r, m");
             if (buf->dst.type & MEM) {
-                emit_mem(compiler, ST1_N|src, &buf->dst, buf, 0);
+                //emit_mem(compiler, ST1_N|src, &buf->dst, buf, 0);
+                emit_address(compiler, SC1R, &buf->dst, buf);
+                cache_emit(ST1_N | (src) | (SC1R << 5));
             }else {
                 cache_emit(MOV_N | (buf->dst.reg) | (src << 5) | (src << 16));
             }
