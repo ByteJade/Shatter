@@ -39,6 +39,7 @@ uint32_t cset_group[] = {
     CSETS, CSETNS,
     UNK, UNK,
     CSETL, CSETGE,
+    CSETLE, CSETG
 };
 uint32_t csel_group[] = {
     CSELB, CSELAE,
@@ -384,7 +385,7 @@ void encode(compiler_t* compiler, X86_64* buf) {
             uint32_t opcode = neon_group[buf->type - PXOR];
             emit_neon(compiler, buf, opcode);
         } break;
-        case SETB ... SETGE: {
+        case SETB ... SETG: {
             uint32_t opcode = cset_group[buf->type - SETB];
             cache_emit(opcode | x86_regs[buf->dst.reg]);
         } break;
