@@ -184,23 +184,22 @@ void* dlsym_wrapped(const char* symname) {
 }
 void* my_dlsym(void* handle, const char* symname) {
     // TODO: RTLD_*
+    (void)handle;
     void* sym;
-    if (handle) {
+    /*if (handle) {
         library_t* lib = (library_t*)handle;
         sym = dlsym(lib->data, symname);
-    } else {
-
-        sym = dlsym_wrapped(symname);
-        if (!sym) sym = dlsym_override(symname);
-        if (!sym) {
-            sym = dlsym(RTLD_DEFAULT, symname);
-            if (sym) logger_warn("Using native symbol: %s", symname);
-        }
-        error = NULL;
-        if (!sym) {
-            error = "Undefined symbol";
-            logger_err("%s: %s", error, symname);
-        }
+    }*/
+    sym = dlsym_wrapped(symname);
+    if (!sym) sym = dlsym_override(symname);
+    if (!sym) {
+        sym = dlsym(RTLD_DEFAULT, symname);
+        if (sym) logger_warn("Using native symbol: %s", symname);
+    }
+    error = NULL;
+    if (!sym) {
+        error = "Undefined symbol";
+        logger_err("%s: %s", error, symname);
     }
     WRAPPED_RET(sym);
     return sym;
