@@ -1,4 +1,10 @@
 #ifdef __aarch64__
+#define WRAPPED_RET(ret) \
+    asm volatile ( \
+        "mov x8, %0\n" \
+        : : "r"(ret) \
+        : "memory" \
+    )
 #define WRAP_VOID_FUNC(func) \
     void my_##func() { \
         asm volatile("b " #func); \
@@ -56,6 +62,7 @@
         ); \
     }
 #else
+#define WRAPPED_RET(ret) asm volatile("nop\n")
 #define JUMP(func) \
     __attribute__((naked)) \
     void my_##func() { \

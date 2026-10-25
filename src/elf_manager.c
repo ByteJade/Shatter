@@ -2,6 +2,7 @@
 #include "../inc/elf_manager.h"
 #include "../inc/logger.h"
 #include "../inc/dynarray.h"
+#include "../lib/wrapper.h"
 #include <link.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -145,13 +146,16 @@ void* my_dlopen(const char* filename, int flags) {
     void* lib = dlopen_wrapper(name);
     if (!lib) lib = dlopen_native(filename, flags);
     if (!lib) error = "No such file or directory";
+    WRAPPED_RET(lib);
     return lib;
 }
 char* my_realpath(const char *name, char *resolved) {
     if (name && strcmp(name, "/proc/self/exe") == 0) {
         name = main_filename;
     }
-    return realpath(name, resolved);
+    char* ret = realpath(name, resolved);
+    WRAPPED_RET(ret);
+    return ret;
 }
 void* dlsym_override(const char* symname) {
     if (strcmp(symname, "dlopen") == 0)
@@ -180,31 +184,35 @@ void* dlsym_wrapped(const char* symname) {
 }
 void* my_dlsym(void* handle, const char* symname) {
     // TODO: RTLD_*
+    void* sym;
     if (handle) {
         library_t* lib = (library_t*)handle;
-        return dlsym(lib->data, symname);
+        sym = dlsym(lib->data, symname);
+    } else {
+
+        sym = dlsym_wrapped(symname);
+        if (!sym) sym = dlsym_override(symname);
+        if (!sym) {
+            sym = dlsym(RTLD_DEFAULT, symname);
+            if (sym) logger_warn("Using native symbol: %s", symname);
+        }
+        error = NULL;
+        if (!sym) {
+            error = "Undefined symbol";
+            logger_err("%s: %s", error, symname);
+        }
     }
-    (void)handle;
-    void* sym = dlsym_wrapped(symname);
-    if (!sym) sym = dlsym_override(symname);
-    if (!sym) {
-        sym = dlsym(RTLD_DEFAULT, symname);
-        if (sym) logger_warn("Using native symbol: %s", symname);
-    }
-    error = NULL;
-    if (!sym) {
-        error = "Undefined symbol";
-        logger_err("%s: %s", error, symname);
-    }
+    WRAPPED_RET(sym);
     return sym;
 }
 const char* my_dlerror(void) {
+    const char* ret;
     if (error) {
-        const char* ret = error;
+        ret = error;
         error = NULL;
-        return ret;
-    }
-    return dlerror();
+    } else ret = dlerror();
+    WRAPPED_RET(ret);
+    return ret;
 }
 void my_dlclose(void* handler) {
     for (uint32_t i = 0; i < dynarray_size(libraries); i++) {
@@ -214,6 +222,5 @@ void my_dlclose(void* handler) {
             dlclose(lib->data);
             libraries[i] = libraries[dynarray_pop(libraries)];
         }
-        return;
     }
 }
