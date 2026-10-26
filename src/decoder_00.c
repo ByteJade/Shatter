@@ -43,6 +43,12 @@ void decode_00(compiler_t* compiler, X86_64* buf, uint8_t byte) {
             buf->dst.type = IMM;
             buf->dst.imm = fetch8_imm(compiler);
             break;
+        case 0x6B:
+            buf->type = IMUL;
+            decode_r_rm(compiler, buf);
+            buf->dst.type |= IMM;
+            buf->dst.imm = fetch8_imm(compiler);
+            break;
         case 0x70 ... 0x7F:
             buf->type = JO + byte - 0x70;
             buf->dst.type = IMM;
