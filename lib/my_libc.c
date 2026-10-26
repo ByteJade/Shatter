@@ -173,27 +173,30 @@ int construct_format(const char* src, char* dst) {
     dst[pos] = '\0';
     return pos-1;
 }
-void my_vprintf(const char *format, void* vlist) {
+void my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist) {
     char c;
-    while (1) {
-        char c = *format++;
+    size_t cur = 0;
+    do {
+        c = *format++;
         if (c == '%') {
             char nformat[10];
             int pos = construct_format(format, nformat);
             if (nformat[pos] == 'f' || nformat[pos] == 'g') {
-                printf(nformat, my_va_arg_x(vlist));
+                cur += snprintf(buffer + cur, bufsz - cur, nformat, my_va_arg_x(vlist));
             }else {
-                printf(nformat, my_va_arg_r(vlist));
+                cur += snprintf(buffer + cur, bufsz - cur, nformat, my_va_arg_r(vlist));
             }
             format += pos;
-        } else if (c == '\0') {
-            break;
-        } else putchar(c);
-    }
+        } else {
+            buffer[cur++] = c;
+        }
+    } while (cur < bufsz && c != '\0');
+    WRAPPED_RET(cur);
 }
-void my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist) {
-    printf("TODO: my_vsnprintf\n");
-    snprintf(buffer, bufsz, format, 0, 0, 0, 0);
+void my_vprintf(const char *format, void* vlist) {
+    char buffer[256];
+    my_vsnprintf(buffer, sizeof(buffer), format, vlist);
+    printf("%s", buffer);
 }
 void my_backtrace() {
     printf("TODO: my_backtrace\n");
