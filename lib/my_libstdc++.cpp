@@ -44,6 +44,7 @@ extern "C" {
     WRAP_FUNC(_ZNSolsEj)
     WRAP_FUNC(_ZNSolsEt)
     WRAP_FUNC(_ZNSolsEm)
+    WRAP_FUNC(_ZNSolsEb)
     WRAP_FUNC(_ZNSolsEPKv)
     WRAP_FUNC(_ZNSolsEPFRSt8ios_baseS0_E)
     WRAP_FUNC(_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
