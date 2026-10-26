@@ -129,11 +129,67 @@ WRAP_FUNC(rand)
 WRAP_FUNC(srand)
 WRAP_FUNC(isatty)
 
-void my_vprintf(const char *format, va_list vlist) {
-    printf("TODO: my_vprintf\n");
-    printf(format, 0, 0, 0, 0);
+typedef struct {
+    unsigned int gp_offset;
+    unsigned int fp_offset;
+    char *overflow_arg_area;
+    char *reg_save_area;
+} my_va_list;
+
+size_t my_va_arg_r(void* vlist) {
+    my_va_list *ap = (my_va_list *)vlist;
+    size_t value;
+    if (ap->gp_offset < 48) {
+        char *reg_ptr = ap->reg_save_area + ap->gp_offset;
+        value = *(size_t *)reg_ptr;
+        ap->gp_offset += 8;
+    } else {
+        value = *(size_t *)ap->overflow_arg_area;
+        ap->overflow_arg_area += 8;
+    }
+    return value;
 }
-void my_vsnprintf(char *buffer, size_t bufsz, const char *format, va_list vlist) {
+double my_va_arg_x(void* vlist) {
+    double value;
+    my_va_list *ap = (my_va_list *)vlist;
+    if (ap->fp_offset < 176) {
+        char *reg_ptr = ap->reg_save_area + ap->fp_offset;
+        value = *(double *)reg_ptr;
+        ap->fp_offset += 16;
+    } else {
+        value = *(double *)ap->overflow_arg_area;
+        ap->overflow_arg_area += 8;
+    }
+    return value;
+}
+int construct_format(const char* src, char* dst) {
+    int pos = 0;
+    dst[pos++] = '%';
+    char c = *src++;
+    dst[pos++] = c;
+    if (c == 'l') {
+        dst[pos++] = *src++;
+    }
+    dst[pos] = '\0';
+    return pos-1;
+}
+void my_vprintf(const char *format, void* vlist) {
+    char c;
+    do {
+        char c = *format++;
+        if (c == '%') {
+            char nformat[10];
+            int pos = construct_format(format, nformat);
+            if (nformat[pos] == 'f') {
+                printf(nformat, my_va_arg_x(vlist));
+            } else {
+                printf(nformat, my_va_arg_r(vlist));
+            }
+            format += pos;
+        } else putchar(c);
+    } while (c);
+}
+void my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist) {
     printf("TODO: my_vsnprintf\n");
     snprintf(buffer, bufsz, format, 0, 0, 0, 0);
 }
