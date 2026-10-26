@@ -176,6 +176,7 @@ int construct_format(const char* src, char* dst) {
 size_t my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist) {
     char c;
     size_t cur = 0;
+    if (!buffer) goto err;
     do {
         c = *format++;
         if (c == '%') {
@@ -191,6 +192,7 @@ size_t my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist)
             buffer[cur++] = c;
         }
     } while (cur < bufsz && c != '\0');
+err:
     WRAPPED_RET(cur);
     return cur;
 }
