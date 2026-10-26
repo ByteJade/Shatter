@@ -6,12 +6,14 @@
 #include "../inc/launcher.h"
 #include "../inc/handler.h"
 #include "../inc/cache.h"
+#include <dlfcn.h>
 #include <stdlib.h>
 
 [[noreturn]] void usage(void) {
     printf("usage: shatter <argv> \"filename\" <argv\n>");
     printf("\t-d : enable debug mode\n");
-    printf("\t-l <level> : set logger_log level\n");
+    printf("\t-p <library>: preload wrapper\n");
+    printf("\t-l <level> : set logger level\n");
     printf("\t-h : print this message\n");
     exit(EXIT_SUCCESS);
 }
@@ -21,6 +23,9 @@ int parce_argv(int argc, char** argv) {
         char* arg = argv[argp];
         if (*arg != '-') return argp;
         switch (*++arg) {
+            case 'p':
+                my_dlopen(argv[++argp], RTLD_GLOBAL|RTLD_NOW);
+                break;
             case 'd':
                 debugger_init();
                 break;
