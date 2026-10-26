@@ -176,23 +176,24 @@ int construct_format(const char* src, char* dst) {
 size_t my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist) {
     char c;
     size_t cur = 0;
-    if (!buffer) goto err;
+    char* top = buffer;
     do {
         c = *format++;
+        if (buffer) top = buffer + cur;
         if (c == '%') {
             char nformat[10];
             int pos = construct_format(format, nformat);
             if (nformat[pos] == 'f' || nformat[pos] == 'g') {
-                cur += snprintf(buffer + cur, bufsz - cur, nformat, my_va_arg_x(vlist));
+                cur += snprintf(top, bufsz - cur, nformat, my_va_arg_x(vlist));
             }else {
-                cur += snprintf(buffer + cur, bufsz - cur, nformat, my_va_arg_r(vlist));
+                cur += snprintf(top, bufsz - cur, nformat, my_va_arg_r(vlist));
             }
             format += pos;
         } else {
-            buffer[cur++] = c;
+            if (buffer && cur < bufsz) buffer[cur] = c;
+            cur++;
         }
-    } while (cur < bufsz && c != '\0');
-err:
+    } while (c != '\0');
     WRAPPED_RET(cur);
     return cur;
 }
