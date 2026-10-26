@@ -129,8 +129,13 @@ WRAP_FUNC(rand)
 WRAP_FUNC(srand)
 WRAP_FUNC(isatty)
 
-void my_vprintf() {
+void my_vprintf(const char *format, va_list vlist) {
     printf("TODO: my_vprintf\n");
+    printf(format, 0, 0, 0, 0);
+}
+void my_vsnprintf(char *buffer, size_t bufsz, const char *format, va_list vlist) {
+    printf("TODO: my_vsnprintf\n");
+    snprintf(buffer, bufsz, format, 0, 0, 0, 0);
 }
 void my_backtrace() {
     printf("TODO: my_backtrace\n");
