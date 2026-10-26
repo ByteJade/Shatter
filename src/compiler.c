@@ -203,7 +203,7 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     }
     patch_step(compiler);
     if (debugger_enabled()) {
-        debugger_brk(compiler->entry);
+        if (debugger_patch() < 0) debugger_brk(compiler->entry);
         clock_gettime(CLOCK_MONOTONIC, &end);
         uint64_t nseconds = (uint64_t)(end.tv_sec - start.tv_sec) * 1000000000ULL + 
                     (end.tv_nsec - start.tv_nsec);

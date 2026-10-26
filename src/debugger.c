@@ -19,6 +19,7 @@ typedef struct {
 } break_t;
 
 int enabled = 0;
+int patch = -1;
 pthread_mutex_t mut;
 break_t* breaks = NULL;
 
@@ -146,6 +147,7 @@ void debugger_help() {
     printf("(b,h,w,d) [<reg>+<imm>] <data> - write data to this location\n");
     printf("level <log_level> - set log level (log, deb, warn, err)\n");
     printf("goto <imm> - set break point at [pc+imm]\n");
+    printf("patch <imm> - stop at this patch\n");
     printf("cache - print last compiled block\n");
     printf("usage - print memory usage\n");
 }
@@ -178,6 +180,10 @@ void debugger_step(struct sigcontext* sc) {
             case 'r':
                 sc_print_regs_host(sc);
                 break;
+            case 'p':
+                if (argc < 2) break;
+                patch = atoi(argv[1]);
+                break;
             case 'b': case 'h':
             case 'w': case 'd':
                 if (argc < 2) break;
@@ -206,4 +212,7 @@ void debugger_step(struct sigcontext* sc) {
 }
 int debugger_enabled(void) {
     return enabled;
+}
+int debugger_patch(void) {
+    return patch;
 }

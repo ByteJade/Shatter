@@ -27,7 +27,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
     uint32_t instruction = *pc;
-    uint16_t ret = (instruction >> 5) & 0xFFFF;
+    int ret = (instruction >> 5) & 0xFFFF;
     if (ret == 0) {
         debugger_step(sc);
         return;
@@ -36,6 +36,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     uint32_t* target = compile((size_t)patch);
     emit_call(pc, target);
     logger_deb("found patch: %i", ret);
+    if (ret == debugger_patch()) debugger_brk(target);
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;

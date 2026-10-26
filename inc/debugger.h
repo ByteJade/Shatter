@@ -11,5 +11,6 @@ void debugger_brk(uint32_t* host);
 void debugger_ret(uint32_t* host);
 void debugger_step(struct sigcontext* sc);
 int debugger_enabled(void);
+int debugger_patch(void);
 
 #endif
