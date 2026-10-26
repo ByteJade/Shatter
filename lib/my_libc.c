@@ -173,7 +173,7 @@ int construct_format(const char* src, char* dst) {
     dst[pos] = '\0';
     return pos-1;
 }
-void my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist) {
+size_t my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist) {
     char c;
     size_t cur = 0;
     do {
@@ -192,11 +192,13 @@ void my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist) {
         }
     } while (cur < bufsz && c != '\0');
     WRAPPED_RET(cur);
+    return cur;
 }
 void my_vprintf(const char *format, void* vlist) {
     char buffer[256];
-    my_vsnprintf(buffer, sizeof(buffer), format, vlist);
+    size_t cur = my_vsnprintf(buffer, sizeof(buffer), format, vlist);
     printf("%s", buffer);
+    WRAPPED_RET(cur);
 }
 void my_backtrace() {
     printf("TODO: my_backtrace\n");
