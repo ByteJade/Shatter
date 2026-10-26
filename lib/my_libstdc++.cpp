@@ -66,7 +66,7 @@ extern "C" {
     WRAP_FUNC(_ZNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEC1Ev)
     WRAP_OBJ_FUNC(_ZNKRSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEE3strEv)
     WRAP_FUNC(_ZNSt3_V215system_categoryEv)
-    WRAP_FUNC(_ZNSt14basic_ifstreamIcSt11char_traitsIcEEC1EPKcSt13_Ios_Openmode)
+    WRAP_VOID_FUNC(_ZNSt14basic_ifstreamIcSt11char_traitsIcEEC1EPKcSt13_Ios_Openmode)
     WRAP_VOID_FUNC(_ZNSt14basic_ifstreamIcSt11char_traitsIcEED1Ev)
     WRAP_FUNC(_ZNKSi6gcountEv)
     WRAP_FUNC(_ZNSi5seekgElSt12_Ios_Seekdir)
