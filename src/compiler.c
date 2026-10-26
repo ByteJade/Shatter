@@ -91,8 +91,8 @@ int jump(compiler_t* compiler) {
     prev->size = buffer_size - prev->buffer;
     prev->end = compiler->guest;
     point_t* points = compiler->points;
-    for (; compiler->reader < dynarray_size(points); compiler->reader++) {
-        uint8_t* p = points[compiler->reader].point;
+    for (int id = 0; id < dynarray_size(points); id++) {
+        uint8_t* p = points[id].point;
         if (!has_block(compiler, p)) {
             compiler->guest = p;
             block_start(compiler);
