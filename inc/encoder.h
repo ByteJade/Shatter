@@ -114,8 +114,8 @@ extern const uint8_t x86_regs[];
 #define CSETNS 0x1a9f57e0
 #define CSETL  0x1a9fa7e0
 #define CSETGE 0x1a9fb7e0
-#define CSETLE 0x1a9fd7e0
-#define CSETG  0x1a9fc7e0
+#define CSETLE 0x1a9fc7e0
+#define CSETG  0x1a9fd7e0
 
 #define CSELB 0x1A803000
 #define CSELAE 0x1A802000
