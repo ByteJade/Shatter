@@ -15,7 +15,7 @@ split_fuzzy(const string& src, char delim, vector<string>& elementVec)
     string::size_type startPos(0);
     string str(src);
 
-    printf("find_first_of\n");
+    printf("find_first_of %s %s\n", delimiter.c_str(), str.c_str());
     string::size_type endPos = str.find_first_of(delimiter);
 
     while (endPos != string::npos)
