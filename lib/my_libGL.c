@@ -117,22 +117,20 @@ Function GLX_functions[] = {
     "glXMakeContextCurrent", my_glXMakeContextCurrent,
     "glXQueryContext", my_glXQueryContext,
     "glXSelectEvent", my_glXSelectEvent,
-    "my_glXGetProcAddressARB", my_glXGetProcAddressARB,
-    "my_glXGetProcAddress", my_glXGetProcAddress,
-    NULL, NULL
+    "glXGetProcAddressARB", my_glXGetProcAddressARB,
+    "glXGetProcAddress", my_glXGetProcAddress,
 };
 
 void* my_glXGetProcAddressARB(const char* name) {
     void* ret = NULL;
-    size_t addr = 0;
-    Function func;
-    do {
-        func = GLX_functions[addr];
+    const size_t end = sizeof(GLX_functions) / sizeof(Function);
+    for (size_t addr = 0; addr < end; addr++) {
+        Function func = GLX_functions[addr];
         if (strcmp(name, func.name) == 0) {
             ret = func.adderss;
             break;
-        } else addr++;
-    } while(func.adderss);
+        }
+    }
     if (!ret) printf("No such function: %s\n", name);
     WRAPPED_RET(ret);
     return ret;
