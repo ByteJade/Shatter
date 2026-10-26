@@ -23,15 +23,9 @@ int parce_argv(int argc, char** argv) {
         char* arg = argv[argp];
         if (*arg != '-') return argp;
         switch (*++arg) {
-            case 'p': {
-                char fullpath[512];
-                snprintf(
-                    fullpath, sizeof(fullpath),
-                    LIB_DIR"my_%s", argv[++argp]
-                );
-                void* data = dlopen(fullpath, RTLD_NOW|RTLD_GLOBAL);
-                if (!data) logger_err("Cannot preload: %s", dlerror());
-            } break;
+            case 'p':
+                my_dlopen(argv[++argp], RTLD_NOW|RTLD_GLOBAL);
+                break;
             case 'd':
                 debugger_init();
                 break;
@@ -45,6 +39,7 @@ int parce_argv(int argc, char** argv) {
 }
 
 int main(int argc, char** argv, char** envp) {
+    elf_manager_init();
     int user_argc = parce_argv(argc, argv);
     if (!user_argc) {
         logger_err("Wait: filename");
@@ -52,14 +47,7 @@ int main(int argc, char** argv, char** envp) {
     }
     cache_init();
     handler_init();
-    elf_manager_init(argv[user_argc]);
-    elf_t* elf = elf_init(argv[user_argc]);
-    if (!elf) {
-        logger_err("Cannot open file");
-        return EXIT_FAILURE;
-    }
-    elf_read_dynamic(elf);
-    elf_start(elf);
+    elf_t* elf = elf_manager_set_executable(argv[user_argc]);
     Stack* stack = stack_init();
     stack_setup(stack, argc - user_argc, argv + user_argc, envp);
     launch((void*)(elf->base + elf->head.e_entry), stack);

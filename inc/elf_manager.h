@@ -2,11 +2,13 @@
 #define ELF_MANAGER_H
 
 #include <dlfcn.h>
+#include "elf_loader.h"
 
 #define LIB_DIR "./lib/"
 
-void elf_manager_init(char* filename);
+void elf_manager_init(void);
 void elf_manager_fini(void);
+elf_t* elf_manager_set_executable(const char* name);
 
 void override_got(const char* symname, void* patch);
 void* my_dlopen(const char* filename, int flags);

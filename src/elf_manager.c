@@ -22,9 +22,8 @@ static const char* error = NULL;
 static library_t* libraries;
 const char* main_filename = NULL;
 
-void elf_manager_init(char* filename) {
+void elf_manager_init(void) {
     libraries = (library_t*)dynarray_init(sizeof(library_t), 8);
-    main_filename = filename;
 }
 void elf_manager_fini(void) {
     for (size_t i = 0; i < dynarray_size(libraries); i++) {
@@ -32,6 +31,17 @@ void elf_manager_fini(void) {
         if (lib->name) free((void*)lib->name);
     }
     dynarray_fini(libraries);
+}
+elf_t* elf_manager_set_executable(const char* name) {
+    main_filename = name;
+    elf_t* elf = elf_init(name);
+    if (!elf) {
+        logger_err("Cannot open file");
+        return EXIT_FAILURE;
+    }
+    elf_read_dynamic(elf);
+    elf_start(elf);
+    return elf;
 }
 
 void* elf_get_ptr(Elf64_Addr base, Elf64_Addr link) {
@@ -178,7 +188,7 @@ void* dlsym_wrapped(const char* symname) {
         void* sym = dlsym(libraries[i].data, my_symbol);
         if (sym) return sym;
     }
-    return dlsym(RTLD_DEFAULT, my_symbol);
+    return NULL;
 }
 void* my_dlsym(void* handle, const char* symname) {
     // TODO: RTLD_*
