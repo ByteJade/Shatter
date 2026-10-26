@@ -131,7 +131,7 @@ void* my_glXGetProcAddressARB(const char* name) {
         if (strcmp(name, func.name) == 0) {
             ret = func.adderss;
             break;
-        }
+        } else addr++;
     } while(func.adderss);
     if (!ret) printf("No such function: %s\n", name);
     WRAPPED_RET(ret);
