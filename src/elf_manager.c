@@ -35,12 +35,10 @@ void elf_manager_fini(void) {
 elf_t* elf_manager_set_executable(const char* name) {
     main_filename = name;
     elf_t* elf = elf_init(name);
-    if (!elf) {
-        logger_err("Cannot open file");
-        return EXIT_FAILURE;
+    if (elf) {
+        elf_read_dynamic(elf);
+        elf_start(elf);
     }
-    elf_read_dynamic(elf);
-    elf_start(elf);
     return elf;
 }
 

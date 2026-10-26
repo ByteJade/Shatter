@@ -48,6 +48,10 @@ int main(int argc, char** argv, char** envp) {
     cache_init();
     handler_init();
     elf_t* elf = elf_manager_set_executable(argv[user_argc]);
+    if (elf) {
+        logger_err("Cannot open file");
+        return EXIT_FAILURE;
+    }
     Stack* stack = stack_init();
     stack_setup(stack, argc - user_argc, argv + user_argc, envp);
     launch((void*)(elf->base + elf->head.e_entry), stack);
