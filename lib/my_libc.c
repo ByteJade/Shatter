@@ -175,19 +175,21 @@ int construct_format(const char* src, char* dst) {
 }
 void my_vprintf(const char *format, void* vlist) {
     char c;
-    do {
+    while (1) {
         char c = *format++;
         if (c == '%') {
             char nformat[10];
             int pos = construct_format(format, nformat);
-            if (nformat[pos] == 'f') {
+            if (nformat[pos] == 'f' || nformat[pos] == 'g') {
                 printf(nformat, my_va_arg_x(vlist));
-            } else {
+            }else {
                 printf(nformat, my_va_arg_r(vlist));
             }
             format += pos;
+        } else if (c == '\0') {
+            break;
         } else putchar(c);
-    } while (c);
+    }
 }
 void my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist) {
     printf("TODO: my_vsnprintf\n");
