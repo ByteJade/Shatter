@@ -48,7 +48,7 @@ int main(int argc, char** argv, char** envp) {
     cache_init();
     handler_init();
     elf_t* elf = elf_manager_set_executable(argv[user_argc]);
-    if (elf) {
+    if (!elf) {
         logger_err("Cannot open file");
         return EXIT_FAILURE;
     }
