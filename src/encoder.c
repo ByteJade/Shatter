@@ -363,6 +363,11 @@ void encode(compiler_t* compiler, X86_64* buf) {
         case POP: emit_pop(compiler, buf); break;
         case LEA: emit_address(compiler, x86_regs[buf->dst.reg], &buf->src, buf); break;
         case XADD: emit_math(compiler, buf, ADDS_R); break;
+        case NOT: {
+            uint32_t sf = (buf->size == 64) * ASF;
+            uint8_t reg = x86_regs[buf->dst.reg];
+            cache_emit(sf | MOVN_R | reg | (reg<<16));
+        } break;
         case SUB:
             if (buf->dst.type == REG && buf->src.type == IMM) {
                 uint8_t dst = x86_regs[buf->dst.reg];

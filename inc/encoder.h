@@ -43,6 +43,7 @@ extern const uint8_t x86_regs[];
 #define LSR_R 0x1AC02400
 #define ASR_R 0x1AC02800
 #define ROR_R 0x1AC02C00
+#define MOVN_R 0x2A2003E0
 
 #define SBFM 0x93400000
 #define UBFM 0xD3400000
