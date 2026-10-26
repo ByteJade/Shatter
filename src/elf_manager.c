@@ -7,8 +7,6 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#define LIB_DIR "./lib/"
-
 typedef struct {
     const char* name;
     int refs;

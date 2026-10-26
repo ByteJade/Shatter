@@ -3,6 +3,8 @@
 
 #include <dlfcn.h>
 
+#define LIB_DIR "./lib/"
+
 void elf_manager_init(char* filename);
 void elf_manager_fini(void);
 

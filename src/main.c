@@ -23,9 +23,15 @@ int parce_argv(int argc, char** argv) {
         char* arg = argv[argp];
         if (*arg != '-') return argp;
         switch (*++arg) {
-            case 'p':
-                my_dlopen(argv[++argp], RTLD_GLOBAL|RTLD_NOW);
-                break;
+            case 'p': {
+                char fullpath[512];
+                snprintf(
+                    fullpath, sizeof(fullpath),
+                    LIB_DIR"my_%s", argv[++argp]
+                );
+                void* data = dlopen(fullpath, RTLD_NOW|RTLD_GLOBAL);
+                logger_err("Cannot preload: %s", dlerror());
+            } break;
             case 'd':
                 debugger_init();
                 break;
