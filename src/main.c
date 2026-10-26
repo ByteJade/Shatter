@@ -30,7 +30,7 @@ int parce_argv(int argc, char** argv) {
                     LIB_DIR"my_%s", argv[++argp]
                 );
                 void* data = dlopen(fullpath, RTLD_NOW|RTLD_GLOBAL);
-                logger_err("Cannot preload: %s", dlerror());
+                if (!data) logger_err("Cannot preload: %s", dlerror());
             } break;
             case 'd':
                 debugger_init();
