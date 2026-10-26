@@ -178,7 +178,7 @@ void* dlsym_wrapped(const char* symname) {
         void* sym = dlsym(libraries[i].data, my_symbol);
         if (sym) return sym;
     }
-    return NULL;
+    return dlsym(RTLD_DEFAULT, my_symbol);
 }
 void* my_dlsym(void* handle, const char* symname) {
     // TODO: RTLD_*
