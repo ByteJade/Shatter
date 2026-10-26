@@ -131,6 +131,7 @@ WRAP_FUNC(glIsFramebufferEXT)
 WRAP_FUNC(glIsRenderbufferEXT)
 WRAP_VOID_FUNC(glRenderbufferStorageEXT)
 
+WRAP_FUNC(glMapBuffer)
 WRAP_FUNC(glXMakeCurrent)
 WRAP_VOID_FUNC(glXDestroyContext)
 WRAP_FUNC(glXCreateContext)
