@@ -1,13 +1,14 @@
 #include "../inc/dynarray.h"
-#include "../inc/logger.h"
-#include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 typedef struct {
     size_t size;
     size_t capacity;
     size_t data_size;
 } dynarray_t;
+
+#define dynarray_data(dynarray) (((dynarray_t*)dynarray)-1)
 
 void* dynarray_init(size_t data_size, size_t array_size) {
     dynarray_t* array = (dynarray_t*)malloc(
@@ -20,22 +21,20 @@ void* dynarray_init(size_t data_size, size_t array_size) {
 }
 
 void dynarray_fini(void* dynarray) {
-    if (dynarray) {
-        dynarray_t* array = ((dynarray_t*)dynarray)-1;
-        free(array);
-    }
+    if (dynarray) free(dynarray_data(dynarray));
 }
 void dynarray_clear(void* dynarray) {
-    dynarray_t* array = ((dynarray_t*)dynarray)-1;
-    array->size = 0;
+    dynarray_data(dynarray)->size = 0;
 }
 size_t dynarray_pop(void* dynarray) {
-    dynarray_t* array = ((dynarray_t*)dynarray)-1;
-    if (array->size) return --array->size;
-    return 0;
+    size_t ret;
+    dynarray_t* array = dynarray_data(dynarray);
+    if (array->size) ret = --array->size;
+    else ret = 0;
+    return ret;
 }
 size_t dynarray_push(void** dynarray) {
-    dynarray_t* array = ((dynarray_t*)*dynarray)-1;
+    dynarray_t* array = dynarray_data(*dynarray);
     if (array->size >= array->capacity) {
         array->capacity *= 2;
         array = realloc(
@@ -44,7 +43,7 @@ size_t dynarray_push(void** dynarray) {
             array->data_size*array->capacity
         );
         if (!array) {
-            logger_err("Out of memory? Abort");
+            printf("Out of memory? Abort");
             exit(EXIT_FAILURE);
         }
         *dynarray = array+1;
@@ -52,6 +51,5 @@ size_t dynarray_push(void** dynarray) {
     return array->size++;
 }
 size_t dynarray_size(void* dynarray) {
-    dynarray_t* array = ((dynarray_t*)dynarray)-1;
-    return array->size;
+    return dynarray_data(dynarray)->size;
 }
