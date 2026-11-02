@@ -1,7 +1,7 @@
 #include "wrapper.h"
 #include <stdio.h>
 #include <unistd.h>
-#include <pthread.h>
+#include <setjmp.h>
 
 void my___libc_start_main(
     int (*main) (int, char**, char**),
