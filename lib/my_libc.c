@@ -1,6 +1,7 @@
 #include "wrapper.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <pthread.h>
 
 void my___libc_start_main(
     int (*main) (int, char**, char**),
@@ -130,6 +131,51 @@ WRAP_FUNC(srand)
 WRAP_FUNC(isatty)
 
 typedef struct {
+    long long int __jmp_buf[22];
+    int __mask_was_saved;
+} __jmp_buf_tag_arm;
+typedef struct {
+    long long int __jmp_buf[8];
+    int __mask_was_saved;
+} __jmp_buf_tag_x86;
+
+void arm2x86(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
+    arm->__jmp_buf[0]  = x86->__jmp_buf[0];
+    arm->__jmp_buf[10] = x86->__jmp_buf[1];
+    arm->__jmp_buf[1]  = x86->__jmp_buf[2];
+    arm->__jmp_buf[2]  = x86->__jmp_buf[3];
+    arm->__jmp_buf[3]  = x86->__jmp_buf[4];
+    arm->__jmp_buf[4]  = x86->__jmp_buf[5];
+    arm->__jmp_buf[11] = x86->__jmp_buf[6];
+    arm->__jmp_buf[12] = x86->__jmp_buf[7];
+    arm->__mask_was_saved = x86->__mask_was_saved;
+}
+
+int my___sigsetjmp(__jmp_buf_tag_x86* x86, int savemask) {
+    int ret;
+    void* address = __builtin_return_address(0);
+    #ifdef __aarch64__
+    __jmp_buf_tag_arm arm;
+    x86->__jmp_buf[7] = (long long int)address;
+    ret = __sigsetjmp((struct __jmp_buf_tag *)&arm, savemask);
+    x86->__jmp_buf[0] = arm.__jmp_buf[0];
+    x86->__jmp_buf[1] = arm.__jmp_buf[10];
+    x86->__jmp_buf[2] = arm.__jmp_buf[1];
+    x86->__jmp_buf[3] = arm.__jmp_buf[2];
+    x86->__jmp_buf[4] = arm.__jmp_buf[3];
+    x86->__jmp_buf[5] = arm.__jmp_buf[4];
+    x86->__jmp_buf[6] = arm.__jmp_buf[11];
+    x86->__mask_was_saved = arm.__mask_was_saved;
+    WRAPPED_RET(ret);
+    #else
+    ret = __sigsetjmp((struct __jmp_buf_tag *)&x86, savemask);
+    x86->__jmp_buf[7] = (long long int)address;
+    #endif
+    WRAPPED_RET(ret);
+    return ret;
+}
+
+typedef struct {
     unsigned int gp_offset;
     unsigned int fp_offset;
     char *overflow_arg_area;
@@ -204,11 +250,12 @@ size_t my_vsnprintf(char *buffer, size_t bufsz, const char *format, void* vlist)
     WRAPPED_RET(cur);
     return cur;
 }
-void my_vprintf(const char *format, void* vlist) {
+size_t my_vprintf(const char *format, void* vlist) {
     char buffer[256];
     size_t cur = my_vsnprintf(buffer, sizeof(buffer), format, vlist);
     printf("%s", buffer);
     WRAPPED_RET(cur);
+    return cur;
 }
 void my_backtrace() {
     printf("TODO: my_backtrace\n");

@@ -120,6 +120,8 @@ elf_t* elf_init(const char* filename) {
                     phdr->p_memsz - phdr->p_filesz
                 );
             }
+        } else if (phdr->p_type == PT_TLS) {
+            logger_err("TLS header used");
         }
     }
     fclose(fp);

@@ -26,7 +26,8 @@ void elf_manager_init(void) {
     libraries = (library_t*)dynarray_init(sizeof(library_t), 8);
 }
 void elf_manager_fini(void) {
-    for (size_t i = 0; i < dynarray_size(libraries); i++) {
+    size_t end = dynarray_size(libraries);
+    for (size_t i = 0; i < end; i++) {
         library_t* lib = libraries + i;
         if (lib->name) free((void*)lib->name);
     }
@@ -103,39 +104,39 @@ void override_got(const char* symname, void* patch) {
     Search_data data = {symname, (Elf64_Addr)patch};
     dl_iterate_phdr(patch_library, &data);
 }
+library_t* dlopen_base(const char* filename, int flags) {
+    void* data = dlopen(filename, flags);
+    library_t* lib = NULL;
+    if (data) {
+        size_t lib_p = dynarray_push((void**)&libraries);
+        lib = libraries + lib_p;
+        lib->data = data;
+        lib->name = strdup(filename);
+        lib->refs = 1;
+        lib->native = 0;
+    } else {
+        logger_err("Cannot open: %s\n: %s", filename, dlerror());
+    }
+    return lib;
+}
 void* dlopen_wrapper(const char* filename) {
     char fullpath[512];
     snprintf(
         fullpath, sizeof(fullpath),
         LIB_DIR"my_%s", filename
     );
-    void* data = dlopen(fullpath, RTLD_NOW|RTLD_GLOBAL);
-    if (!data) {
-        logger_err("Cannot open wrapper: %s\n: %s", fullpath, dlerror());
-        return NULL;
+    library_t* lib = dlopen_base(fullpath, RTLD_NOW|RTLD_GLOBAL);
+    if (lib) {
+        logger_deb("Success wrap: %s", fullpath);
     }
-    size_t lib_p = dynarray_push((void**)&libraries);
-    library_t* lib = libraries + lib_p;
-    lib->name = strdup(filename);
-    lib->refs = 1;
-    lib->native = 0;
-    lib->data = data;
-    logger_deb("Success wrap: %s", fullpath);
     return lib;
 }
 void* dlopen_native(const char* filename, int flags) {
-    void* data = dlopen(filename, flags);
-    if (!data) {
-        logger_err("Cannot open native library: %s\n: %s", filename, dlerror());
-        return NULL;
+    library_t* lib = dlopen_base(filename, flags);
+    if (lib) {
+        lib->native = 1;
+        logger_warn("Using native library: %s", filename);
     }
-    size_t lib_p = dynarray_push((void**)&libraries);
-    library_t* lib = libraries + lib_p;
-    lib->data = data;
-    lib->name = strdup(filename);
-    lib->refs = 1;
-    lib->native = 1;
-    logger_warn("Using native library: %s", filename);
     return lib;
 }
 void* my_dlopen(const char* filename, int flags) {
@@ -164,17 +165,18 @@ char* my_realpath(const char *name, char *resolved) {
     return ret;
 }
 void* dlsym_override(const char* symname) {
+    void* ret = NULL;
     if (strcmp(symname, "dlopen") == 0)
-        return (void*)my_dlopen;
+        ret = my_dlopen;
     else if (strcmp(symname, "dlsym") == 0)
-        return (void*)my_dlsym;
+        ret = my_dlsym;
     else if (strcmp(symname, "dlerror") == 0)
-        return (void*)my_dlerror;
+        ret = my_dlerror;
     else if (strcmp(symname, "dlclose") == 0)
-        return (void*)my_dlclose;
+        ret = my_dlclose;
     else if (strcmp(symname, "realpath") == 0)
-        return (void*)my_realpath;
-    return NULL;
+        ret = my_realpath;
+    return ret;
 }
 void* dlsym_wrapped(const char* symname) {
     char my_symbol[512];
@@ -182,7 +184,8 @@ void* dlsym_wrapped(const char* symname) {
         my_symbol, sizeof(my_symbol),
         "my_%s", symname
     );
-    for (size_t i = 0; i < dynarray_size(libraries); i++) {
+    size_t end = dynarray_size(libraries);
+    for (size_t i = 0; i < end; i++) {
         void* sym = dlsym(libraries[i].data, my_symbol);
         if (sym) return sym;
     }
@@ -205,7 +208,7 @@ void* my_dlsym(void* handle, const char* symname) {
     error = NULL;
     if (!sym) {
         error = "Undefined symbol";
-        logger_err("%s: %s", error, symname);
+        logger_warn("%s: %s", error, symname);
     }
     WRAPPED_RET(sym);
     return sym;
@@ -220,7 +223,8 @@ const char* my_dlerror(void) {
     return ret;
 }
 void my_dlclose(void* handler) {
-    for (uint32_t i = 0; i < dynarray_size(libraries); i++) {
+    size_t end = dynarray_size(libraries);
+    for (uint32_t i = 0; i < end; i++) {
         library_t* lib = libraries + i;
         if (lib != handler) continue;
         if (--lib->refs <= 0) {

@@ -102,7 +102,8 @@ uint32_t* cache_get_host() {
     return host + host_p;
 }
 uint32_t* cache_search(uint8_t* guest) {
-    for (size_t i = 0; i < dynarray_size(blocks); i++) {
+    size_t end = dynarray_size(blocks);
+    for (size_t i = 0; i < end; i++) {
         code_t* block = blocks + i;
         if (block->guest == guest) {
             return block->host;

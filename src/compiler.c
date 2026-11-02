@@ -68,7 +68,8 @@ point_t* search_point(compiler_t* compiler, uint8_t* guest) {
     return NULL;
 }
 int has_block(compiler_t* compiler, uint8_t* p) {
-    for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {
+    size_t end = dynarray_size(compiler->blocks);
+    for (size_t i = 0; i < end; i++) {
         block_t* block = compiler->blocks + i;
         if (p >= block->start && p < block->end) {
             return 1;
@@ -91,7 +92,8 @@ int jump(compiler_t* compiler) {
     prev->size = buffer_size - prev->buffer;
     prev->end = compiler->guest;
     point_t* points = compiler->points;
-    for (size_t id = 0; id < dynarray_size(points); id++) {
+    size_t end = dynarray_size(points);
+    for (size_t id = 0; id < end; id++) {
         uint8_t* p = points[id].point;
         if (!has_block(compiler, p)) {
             compiler->guest = p;
@@ -188,15 +190,16 @@ void patch_step(compiler_t* compiler) {
     }
 }
 uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
-    struct timespec start, end;
+    struct timespec t_start, t_end;
     logger_deb("Start compile: %p", guest);
     if (debugger_enabled()) 
-        clock_gettime(CLOCK_MONOTONIC, &start);
+        clock_gettime(CLOCK_MONOTONIC, &t_start);
     compiler->guest = guest;
     compiler->start = guest;
     decode_step(compiler);
     cache_start_block(guest);
-    for (size_t i = 0; i < dynarray_size(compiler->blocks); i++) {
+    size_t end = dynarray_size(compiler->blocks);
+    for (size_t i = 0; i < end; i++) {
         logger_log("start block %i", i);
         block_t* block = compiler->blocks + i;
         encode_step(compiler, block);
@@ -204,9 +207,9 @@ uint32_t* compiler_step(compiler_t* compiler, uint8_t* guest) {
     patch_step(compiler);
     if (debugger_enabled()) {
         if (debugger_patch() < 0) debugger_brk(compiler->entry);
-        clock_gettime(CLOCK_MONOTONIC, &end);
-        uint64_t nseconds = (uint64_t)(end.tv_sec - start.tv_sec) * 1000000000ULL + 
-                    (end.tv_nsec - start.tv_nsec);
+        clock_gettime(CLOCK_MONOTONIC, &t_end);
+        uint64_t nseconds = (uint64_t)(t_end.tv_sec - t_start.tv_sec) * 1000000000ULL + 
+                    (t_end.tv_nsec - t_start.tv_nsec);
         logger_deb("Compile finish, time: %li nseconds\n", nseconds);
     }
     cache_end_block();

@@ -170,9 +170,6 @@ WRAP_FUNC(glXGetVisualFromFBConfig)
 WRAP_FUNC(glXMakeContextCurrent)
 WRAP_FUNC(glXQueryContext)
 WRAP_VOID_FUNC(glXSelectEvent)
-// TODO: glXGetProcAddress возвращает адрес функции,
-// принимая её строку. Нужно чтобы он возвращал обёртки,
-// в то время как лично он возвращает оригинал. дополнительно проверить glXGetProcAddressARB
 
 typedef struct {
     const char* name;
