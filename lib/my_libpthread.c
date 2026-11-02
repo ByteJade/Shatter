@@ -13,15 +13,19 @@ WRAP_FUNC(pthread_setspecific)
 
 void my___pthread_register_cancel(__pthread_unwind_buf_t* buf) {
     __pthread_unwind_buf_t arm;
-    arm2x86((__jmp_buf_tag_x86*)buf->__cancel_jmp_buf, (__jmp_buf_tag_arm*)arm.__cancel_jmp_buf);
+    armfx86((__jmp_buf_tag_x86*)buf->__cancel_jmp_buf, (__jmp_buf_tag_arm*)arm.__cancel_jmp_buf);
     __pthread_register_cancel(&arm);
 }
 void my___pthread_unregister_cancel(__pthread_unwind_buf_t* buf) {
     __pthread_unwind_buf_t arm;
-    arm2x86((__jmp_buf_tag_x86*)buf->__cancel_jmp_buf, (__jmp_buf_tag_arm*)arm.__cancel_jmp_buf);
+    armfx86((__jmp_buf_tag_x86*)buf->__cancel_jmp_buf, (__jmp_buf_tag_arm*)arm.__cancel_jmp_buf);
     __pthread_unregister_cancel(&arm);
 }
-WRAP_FUNC(__pthread_unwind_next)
+void my___pthread_unwind_next(__pthread_unwind_buf_t* buf) {
+    __pthread_unwind_buf_t arm;
+    armfx86((__jmp_buf_tag_x86*)buf->__cancel_jmp_buf, (__jmp_buf_tag_arm*)arm.__cancel_jmp_buf);
+    __pthread_unwind_next(&arm);
+}
 
 WRAP_FUNC(pthread_cond_init)
 WRAP_FUNC(pthread_cond_destroy)

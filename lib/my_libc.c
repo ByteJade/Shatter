@@ -139,7 +139,7 @@ typedef struct {
     int __mask_was_saved;
 } __jmp_buf_tag_x86;
 
-void arm2x86(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
+void armfx86(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
     arm->__jmp_buf[0]  = x86->__jmp_buf[0];
     arm->__jmp_buf[10] = x86->__jmp_buf[1];
     arm->__jmp_buf[1]  = x86->__jmp_buf[2];
