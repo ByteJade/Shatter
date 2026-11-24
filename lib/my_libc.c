@@ -153,24 +153,27 @@ void armfx86(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
     arm->__mask_was_saved = x86->__mask_was_saved;
     arm->__saved_mask = x86->__saved_mask;
 }
+void x86farm(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
+    x86->__jmp_buf[0] = arm->__jmp_buf[0];
+    x86->__jmp_buf[1] = arm->__jmp_buf[10];
+    x86->__jmp_buf[2] = arm->__jmp_buf[1];
+    x86->__jmp_buf[3] = arm->__jmp_buf[2];
+    x86->__jmp_buf[4] = arm->__jmp_buf[3];
+    x86->__jmp_buf[5] = arm->__jmp_buf[4];
+    x86->__jmp_buf[6] = arm->__jmp_buf[12];
+    x86->__jmp_buf[7] = arm->__jmp_buf[11];
+    x86->__mask_was_saved = arm->__mask_was_saved;
+    x86->__saved_mask = arm->__saved_mask;
+}
 
 int my___sigsetjmp(__jmp_buf_tag_x86* x86, int savemask) {
     int ret;
     void* address = __builtin_return_address(0);
     #ifdef __aarch64__
     __jmp_buf_tag_arm arm;
-    x86->__jmp_buf[7] = (long long int)address;
     ret = __sigsetjmp((struct __jmp_buf_tag *)&arm, savemask);
-    x86->__jmp_buf[0] = arm.__jmp_buf[0];
-    x86->__jmp_buf[1] = arm.__jmp_buf[10];
-    x86->__jmp_buf[2] = arm.__jmp_buf[1];
-    x86->__jmp_buf[3] = arm.__jmp_buf[2];
-    x86->__jmp_buf[4] = arm.__jmp_buf[3];
-    x86->__jmp_buf[5] = arm.__jmp_buf[4];
-    x86->__jmp_buf[6] = arm.__jmp_buf[12];
-    x86->__mask_was_saved = arm.__mask_was_saved;
-    if (savemask) x86->__saved_mask = arm.__saved_mask;
-    WRAPPED_RET(ret);
+    arm->__jmp_buf[11] = (long long int)address;
+    x86farm(x86, arm);
     #else
     ret = __sigsetjmp((struct __jmp_buf_tag *)&x86, savemask);
     x86->__jmp_buf[7] = (long long int)address;
