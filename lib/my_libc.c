@@ -133,10 +133,12 @@ WRAP_FUNC(isatty)
 typedef struct {
     long long int __jmp_buf[22];
     int __mask_was_saved;
+    __sigset_t __saved_mask;
 } __jmp_buf_tag_arm;
 typedef struct {
     long long int __jmp_buf[8];
     int __mask_was_saved;
+    __sigset_t __saved_mask;
 } __jmp_buf_tag_x86;
 
 void armfx86(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
@@ -149,6 +151,7 @@ void armfx86(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
     arm->__jmp_buf[12] = x86->__jmp_buf[6];
     arm->__jmp_buf[11] = x86->__jmp_buf[7];
     arm->__mask_was_saved = x86->__mask_was_saved;
+    arm->__saved_mask = x86->__saved_mask;
 }
 
 int my___sigsetjmp(__jmp_buf_tag_x86* x86, int savemask) {
@@ -166,6 +169,7 @@ int my___sigsetjmp(__jmp_buf_tag_x86* x86, int savemask) {
     x86->__jmp_buf[5] = arm.__jmp_buf[4];
     x86->__jmp_buf[6] = arm.__jmp_buf[12];
     x86->__mask_was_saved = arm.__mask_was_saved;
+    if (savemask) x86->__saved_mask = arm.__saved_mask;
     WRAPPED_RET(ret);
     #else
     ret = __sigsetjmp((struct __jmp_buf_tag *)&x86, savemask);
