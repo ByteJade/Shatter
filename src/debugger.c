@@ -139,8 +139,8 @@ void print_memory(struct sigcontext* sc, char argv[3][64], int argc) {
 void debugger_help() {
     printf("debugger commands:\n");
     printf("step - single step\n");
-    printf("quit - continue execution\n");
-    printf("abort - exit from programm\n");
+    printf("exit - continue execution\n");
+    printf("quit - exit from programm\n");
     printf("flags - print cpu flags\n");
     printf("regs - print cpu regs\n");
     printf("(b,h,w,d) [<reg>+<imm>] - print data in this location\n");
