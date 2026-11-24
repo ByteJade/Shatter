@@ -173,7 +173,7 @@ int my___sigsetjmp(__jmp_buf_tag_x86* x86, int savemask) {
     __jmp_buf_tag_arm arm;
     ret = __sigsetjmp((struct __jmp_buf_tag *)&arm, savemask);
     arm->__jmp_buf[11] = (long long int)address;
-    x86farm(x86, arm);
+    x86farm(x86, &arm);
     #else
     ret = __sigsetjmp((struct __jmp_buf_tag *)&x86, savemask);
     x86->__jmp_buf[7] = (long long int)address;
