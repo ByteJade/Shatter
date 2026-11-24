@@ -44,13 +44,11 @@ elf_t* elf_manager_set_executable(const char* name) {
 }
 
 void* elf_get_ptr(Elf64_Addr base, Elf64_Addr link) {
-    if (link < base) return (void*)(base + link);
+    if (link < base) link += base;
     return (void*)link;
 }
 static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
     (void)size;
-    Search_data* search = (Search_data*)data;
-    Elf64_Addr base = info->dlpi_addr;
     Elf64_Dyn* dyn = NULL;
     for (int i = 0; i < info->dlpi_phnum; i++) {
         const Elf64_Phdr* phdr = &info->dlpi_phdr[i];
@@ -61,6 +59,7 @@ static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
     }
     if (!dyn) return 0;
 
+    Elf64_Addr base = info->dlpi_addr;
     const char* strtab = NULL;
     Elf64_Sym* symtab = NULL;
     Elf64_Rela *rela = NULL;
@@ -82,6 +81,7 @@ static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
         }
     }
     if (!(strtab && symtab && rela)) return 0;
+    Search_data* search = (Search_data*)data;
     size_t count = rela_size / sizeof(Elf64_Rela);
     for (size_t i = 0; i < count; i++) {
         uint32_t idx = ELF64_R_SYM(rela[i].r_info);

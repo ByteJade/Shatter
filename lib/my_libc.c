@@ -146,8 +146,8 @@ void armfx86(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
     arm->__jmp_buf[2]  = x86->__jmp_buf[3];
     arm->__jmp_buf[3]  = x86->__jmp_buf[4];
     arm->__jmp_buf[4]  = x86->__jmp_buf[5];
-    arm->__jmp_buf[11] = x86->__jmp_buf[6];
-    arm->__jmp_buf[12] = x86->__jmp_buf[7];
+    arm->__jmp_buf[12] = x86->__jmp_buf[6];
+    arm->__jmp_buf[11] = x86->__jmp_buf[7];
     arm->__mask_was_saved = x86->__mask_was_saved;
 }
 

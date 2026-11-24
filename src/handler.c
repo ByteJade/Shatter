@@ -26,8 +26,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
     
     uint32_t* pc = (uint32_t*)sc_get_pc(sc);
-    uint32_t instruction = *pc;
-    int ret = (instruction >> 5) & 0xFFFF;
+    int ret = (*pc >> 5) & 0xFFFF;
     if (ret == 0) {
         debugger_step(sc);
         return;
