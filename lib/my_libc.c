@@ -151,7 +151,7 @@ void armfx86(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
     arm->__jmp_buf[12] = x86->__jmp_buf[6];
     arm->__jmp_buf[11] = x86->__jmp_buf[7];
     arm->__mask_was_saved = x86->__mask_was_saved;
-    arm->__saved_mask = x86->__saved_mask;
+    if (arm->__mask_was_saved) arm->__saved_mask = x86->__saved_mask;
 }
 void x86farm(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
     x86->__jmp_buf[0] = arm->__jmp_buf[0];
@@ -163,7 +163,7 @@ void x86farm(__jmp_buf_tag_x86* x86, __jmp_buf_tag_arm* arm) {
     x86->__jmp_buf[6] = arm->__jmp_buf[12];
     x86->__jmp_buf[7] = arm->__jmp_buf[11];
     x86->__mask_was_saved = arm->__mask_was_saved;
-    x86->__saved_mask = arm->__saved_mask;
+    if (x86->__mask_was_saved) x86->__saved_mask = arm->__saved_mask;
 }
 
 int my___sigsetjmp(__jmp_buf_tag_x86* x86, int savemask) {
